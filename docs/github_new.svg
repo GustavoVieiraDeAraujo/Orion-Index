@@ -29,7 +29,7 @@
     <text x="104" y="148.0" text-anchor="end" class="lbl">TypeScript</text>
     <rect x="114" y="138.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="138.0" width="133" height="12" rx="6" fill="#3178c6"/>
-    <text x="314" y="148.0" class="val">809.1k</text>
+    <text x="314" y="148.0" class="val">809.2k</text>
     <text x="104" y="180.0" text-anchor="end" class="lbl">Java</text>
     <rect x="114" y="170.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="170.0" width="36" height="12" rx="6" fill="#b07219"/>
