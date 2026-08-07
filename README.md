@@ -66,7 +66,16 @@ Nenhum dos SVGs traz a data de atualização embutida na imagem — quem for exi
 
 ## Sobre o script de estatísticas do perfil
 
-[`scripts/generate_profile_stats.py`](scripts/generate_profile_stats.py) e o workflow [`update_profile.yml`](.github/workflows/update_profile.yml) não fazem parte do Orion Index em si — é automação pessoal do Gustavo que mora aqui pra concentrar tudo num lugar só, em vez de espalhar em mais um repositório. Ele gera os cartões de estatísticas dos repositórios pessoais do Gustavo (`docs/profile_*.svg`) e também atualiza o README do [repositório de perfil](https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo) via um token com permissão de escrita naquele outro repositório (o `GITHUB_TOKEN` padrão do Actions só alcança o repositório onde ele roda).
+[`scripts/generate_profile_stats.py`](scripts/generate_profile_stats.py) e o workflow [`update_profile.yml`](.github/workflows/update_profile.yml) não fazem parte do Orion Index em si — é automação pessoal do Gustavo que mora aqui pra concentrar tudo num lugar só, em vez de espalhar em mais um repositório. O [repositório de perfil](https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo) fica só com o `README.md`; toda a geração e o push acontecem daqui.
+
+Roda a cada 12h (e sob demanda) via GitHub Actions:
+
+1. Lista os repositórios públicos do Gustavo (`users/GustavoVieiraDeAraujo/repos`, endpoint público — funciona com qualquer token, não precisa ser o dele).
+2. Clona cada um e conta linhas de código por linguagem, além do total de commits de cada repositório (mesma técnica de paginação do header `Link` usada no restante do projeto).
+3. Gera 3 cartões SVG (`docs/profile_biggest_repos.svg`, `docs/profile_lang_loc.svg`, `docs/profile_commits.svg`) e um combinado (`docs/profile_row1.svg`) — commitados aqui neste repositório, com o `GITHUB_TOKEN` padrão do Actions.
+4. Clona o repositório de perfil usando o secret `PROFILE_PAT` (um token com permissão de escrita lá — o `GITHUB_TOKEN` padrão só alcança o repositório onde o workflow roda, por isso precisa de um token à parte pra escrever em outro), substitui os blocos `RECENT`/`STATS`/`SKILLS` do `README.md` de lá e dá push direto.
+
+Se algum dia o token expirar ou for revogado, é só gerar outro com permissão de escrita no repositório de perfil e atualizar o secret `PROFILE_PAT` aqui.
 
 ---
 
