@@ -64,6 +64,10 @@ Ou só um dos três painéis individuais (`docs/github_new.svg`, `docs/github_to
 
 Nenhum dos SVGs traz a data de atualização embutida na imagem — quem for exibir isso decide o formato (por exemplo, puxando a data do último commit deste repositório via API do GitHub, como faz o [README de perfil](https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo) que usa este card).
 
+## Sobre o script de estatísticas do perfil
+
+[`scripts/generate_profile_stats.py`](scripts/generate_profile_stats.py) e o workflow [`update_profile.yml`](.github/workflows/update_profile.yml) não fazem parte do Orion Index em si — é automação pessoal do Gustavo que mora aqui pra concentrar tudo num lugar só, em vez de espalhar em mais um repositório. Ele gera os cartões de estatísticas dos repositórios pessoais do Gustavo (`docs/profile_*.svg`) e também atualiza o README do [repositório de perfil](https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo) via um token com permissão de escrita naquele outro repositório (o `GITHUB_TOKEN` padrão do Actions só alcança o repositório onde ele roda).
+
 ---
 
 > Documentação e código gerados com auxílio de IA.
