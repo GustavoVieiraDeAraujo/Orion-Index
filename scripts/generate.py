@@ -237,12 +237,12 @@ def main():
     }
 
     build_source_svg(
-        gh_data, "Repositórios Totais",
-        paths["github_total"], unit="M", grad_id="gradGithubTotal",
-    )
-    build_source_svg(
         gh_new_data, "Repositórios Novos",
         paths["github_new"], unit="k", grad_id="gradGithubNew",
+    )
+    build_source_svg(
+        gh_data, "Repositórios Totais",
+        paths["github_total"], unit="M", grad_id="gradGithubTotal",
     )
     build_source_svg(
         growth_data, "Crescimento Relativo",
@@ -250,7 +250,7 @@ def main():
     )
 
     build_combined_svg(
-        [paths["github_total"], paths["github_new"], paths["github_growth"]],
+        [paths["github_new"], paths["github_total"], paths["github_growth"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
     )
 

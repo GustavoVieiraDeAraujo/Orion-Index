@@ -10,11 +10,11 @@ Nenhum ângulo de popularidade de linguagem mede a mesma coisa que os outros, e 
 
 | Perspectiva | O que mede de verdade | Como é calculada |
 | --- | --- | --- |
-| **GitHub — Repositórios Totais** | Quantidade de repositórios públicos **já existentes** por linguagem principal — o acumulado histórico, tamanho do ecossistema | `language:X` |
 | **GitHub — Repositórios Novos** | Quantidade de repositórios **criados** nos últimos 30 dias por linguagem — volume absoluto do que está sendo adotado agora | `language:X created:>DATA` |
+| **GitHub — Repositórios Totais** | Quantidade de repositórios públicos **já existentes** por linguagem principal — o acumulado histórico, tamanho do ecossistema | `language:X` |
 | **GitHub — Crescimento Relativo** | **Novos ÷ Totais**, em % — não é uma busca nova, é a razão entre as duas de cima. Mede velocidade de crescimento **relativa ao próprio tamanho** | derivado, sem chamada extra à API |
 
-Todas partem da mesma API GraphQL oficial do GitHub (`search(query: "language:X", type: REPOSITORY)`). Repositórios Totais mede o que já existe (acumulado de anos) — favorece linguagem grande e estabelecida. Repositórios Novos mede criação de projeto do zero em número absoluto (janela de 30 dias) — também favorece linguagem já grande, porque tem mais gente usando. Crescimento Relativo neutraliza esse viés de tamanho: linguagem pequena mas em expansão rápida (ex: Rust, Dart) pode aparecer na frente de uma gigante estabelecida que cresce bastante em número absoluto mas pouco proporcionalmente. Por isso os top 5 de cada uma são diferentes entre si, e isso é o esperado, não um erro.
+Todas partem da mesma API GraphQL oficial do GitHub (`search(query: "language:X", type: REPOSITORY)`). Repositórios Novos mede criação de projeto do zero em número absoluto (janela de 30 dias) — favorece linguagem já grande, porque tem mais gente usando. Repositórios Totais mede o que já existe (acumulado de anos) — também favorece linguagem grande e estabelecida. Crescimento Relativo neutraliza esse viés de tamanho: linguagem pequena mas em expansão rápida (ex: Rust, Dart) pode aparecer na frente de uma gigante estabelecida que cresce bastante em número absoluto mas pouco proporcionalmente. Por isso os top 5 de cada uma são diferentes entre si, e isso é o esperado, não um erro.
 
 ### Por que não usamos PYPL
 
@@ -60,7 +60,7 @@ Qualquer repositório público pode embutir o card combinado direto, sem precisa
 ![Orion Index](https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/orion-index.svg)
 ```
 
-Ou só um dos três painéis individuais (`docs/github_total.svg`, `docs/github_new.svg`, `docs/github_growth.svg`), no mesmo formato de URL.
+Ou só um dos três painéis individuais (`docs/github_new.svg`, `docs/github_total.svg`, `docs/github_growth.svg`), no mesmo formato de URL.
 
 Nenhum dos SVGs traz a data de atualização embutida na imagem — quem for exibir isso decide o formato (por exemplo, puxando a data do último commit deste repositório via API do GitHub, como faz o [README de perfil](https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo) que usa este card).
 
