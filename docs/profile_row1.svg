@@ -7,36 +7,37 @@
     </linearGradient>
   </defs>
   <style>
-    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }
     .card { fill: url(#gradBiggest); stroke: #4b5563; stroke-width: 1; }
-    .title { fill: #1f2937; font-weight: 700; font-size: 13.5px; }
+    .title { fill: #1f2937; font-weight: 700; font-size: 15.5px; }
     .lbl { fill: #1f2937; font-weight: 600; }
     .val { fill: #f9fafb; }
     .track { fill: rgba(0,0,0,0.15); }
+    .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
   </style>
   <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
   <text x="20" y="37" class="title">Repositórios Mais Extensos</text>
   
-    <text x="20" y="64" class="lbl">2-Tecnicas-de-Programacao-1</text>
-    <rect x="20" y="72" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="72" width="286" height="10" rx="5" fill="#38bdf8"/>
-    <text x="314" y="80" class="val">9.066</text>
-    <text x="20" y="114" class="lbl">Introducao-Desenvolvimento-Jogos</text>
-    <rect x="20" y="122" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="122" width="203" height="10" rx="5" fill="#38bdf8"/>
-    <text x="314" y="130" class="val">6.423</text>
-    <text x="20" y="164" class="lbl">Crescer-CWI</text>
-    <rect x="20" y="172" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="172" width="160" height="10" rx="5" fill="#38bdf8"/>
-    <text x="314" y="180" class="val">5.074</text>
-    <text x="20" y="214" class="lbl">Back-End</text>
-    <rect x="20" y="222" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="222" width="97" height="10" rx="5" fill="#38bdf8"/>
-    <text x="314" y="230" class="val">3.080</text>
-    <text x="20" y="264" class="lbl">2-Metodos-de-Programacao-Back-End</text>
-    <rect x="20" y="272" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="272" width="90" height="10" rx="5" fill="#38bdf8"/>
-    <text x="314" y="280" class="val">2.858</text>
+    <text x="20" y="65" class="lbl">2-Tecnicas-de-Programacao-1</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="82" class="val">9.066</text>
+    <text x="20" y="115" class="lbl">Introducao-Desenvolvimento-…</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="203" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="132" class="val">6.423</text>
+    <text x="20" y="165" class="lbl">Crescer-CWI</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="160" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="182" class="val">5.074</text>
+    <text x="20" y="215" class="lbl">Back-End</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="97" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="232" class="val">3.080</text>
+    <text x="20" y="265" class="lbl">2-Metodos-de-Programacao-Ba…</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="90" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="282" class="val">2.858</text>
 </g>
 <g transform="translate(396.0,0)">
   <defs>
@@ -46,36 +47,37 @@
     </linearGradient>
   </defs>
   <style>
-    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }
     .card { fill: url(#gradLangLoc); stroke: #4b5563; stroke-width: 1; }
-    .title { fill: #1f2937; font-weight: 700; font-size: 13.5px; }
+    .title { fill: #1f2937; font-weight: 700; font-size: 15.5px; }
     .lbl { fill: #1f2937; font-weight: 600; }
     .val { fill: #f9fafb; }
     .track { fill: rgba(0,0,0,0.15); }
+    .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
   </style>
   <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
   <text x="20" y="37" class="title">Linguagens por Linhas</text>
   
-    <text x="20" y="64" class="lbl">C</text>
-    <rect x="20" y="72" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="72" width="286" height="10" rx="5" fill="#555555"/>
-    <text x="314" y="80" class="val">22.3%</text>
-    <text x="20" y="114" class="lbl">JavaScript</text>
-    <rect x="20" y="122" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="122" width="276" height="10" rx="5" fill="#f1e05a"/>
-    <text x="314" y="130" class="val">21.5%</text>
-    <text x="20" y="164" class="lbl">Ruby</text>
-    <rect x="20" y="172" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="172" width="247" height="10" rx="5" fill="#701516"/>
-    <text x="314" y="180" class="val">19.2%</text>
-    <text x="20" y="214" class="lbl">C++</text>
-    <rect x="20" y="222" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="222" width="205" height="10" rx="5" fill="#f34b7d"/>
-    <text x="314" y="230" class="val">16.0%</text>
-    <text x="20" y="264" class="lbl">Python</text>
-    <rect x="20" y="272" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="272" width="139" height="10" rx="5" fill="#3572A5"/>
-    <text x="314" y="280" class="val">10.8%</text>
+    <text x="20" y="65" class="lbl">C</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#555555" class="bar"/>
+    <text x="314" y="82" class="val">22.3%</text>
+    <text x="20" y="115" class="lbl">JavaScript</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="276" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
+    <text x="314" y="132" class="val">21.5%</text>
+    <text x="20" y="165" class="lbl">Ruby</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="247" height="11" rx="5.5" fill="#701516" class="bar"/>
+    <text x="314" y="182" class="val">19.2%</text>
+    <text x="20" y="215" class="lbl">C++</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="205" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
+    <text x="314" y="232" class="val">16.0%</text>
+    <text x="20" y="265" class="lbl">Python</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="139" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <text x="314" y="282" class="val">10.8%</text>
 </g>
 <g transform="translate(792.0,0)">
   <defs>
@@ -85,35 +87,36 @@
     </linearGradient>
   </defs>
   <style>
-    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }
     .card { fill: url(#gradCommits); stroke: #4b5563; stroke-width: 1; }
-    .title { fill: #1f2937; font-weight: 700; font-size: 13.5px; }
+    .title { fill: #1f2937; font-weight: 700; font-size: 15.5px; }
     .lbl { fill: #1f2937; font-weight: 600; }
     .val { fill: #f9fafb; }
     .track { fill: rgba(0,0,0,0.15); }
+    .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
   </style>
   <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
   <text x="20" y="37" class="title">Repositórios por Commits</text>
   
-    <text x="20" y="64" class="lbl">Crescer-CWI</text>
-    <rect x="20" y="72" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="72" width="286" height="10" rx="5" fill="#f59e0b"/>
-    <text x="314" y="80" class="val">228</text>
-    <text x="20" y="114" class="lbl">Ciplus-Front-End</text>
-    <rect x="20" y="122" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="122" width="122" height="10" rx="5" fill="#f59e0b"/>
-    <text x="314" y="130" class="val">97</text>
-    <text x="20" y="164" class="lbl">2-Metodos-de-Programacao-Back-End</text>
-    <rect x="20" y="172" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="172" width="92" height="10" rx="5" fill="#f59e0b"/>
-    <text x="314" y="180" class="val">73</text>
-    <text x="20" y="214" class="lbl">TreinaDev</text>
-    <rect x="20" y="222" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="222" width="87" height="10" rx="5" fill="#f59e0b"/>
-    <text x="314" y="230" class="val">69</text>
-    <text x="20" y="264" class="lbl">2-Metodos-de-Programacao-Front-End</text>
-    <rect x="20" y="272" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="272" width="79" height="10" rx="5" fill="#f59e0b"/>
-    <text x="314" y="280" class="val">63</text>
+    <text x="20" y="65" class="lbl">Crescer-CWI</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="82" class="val">228</text>
+    <text x="20" y="115" class="lbl">Ciplus-Front-End</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="122" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="132" class="val">97</text>
+    <text x="20" y="165" class="lbl">2-Metodos-de-Programacao-Ba…</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="92" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="182" class="val">73</text>
+    <text x="20" y="215" class="lbl">TreinaDev</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="87" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="232" class="val">69</text>
+    <text x="20" y="265" class="lbl">2-Metodos-de-Programacao-Fr…</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="79" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="282" class="val">63</text>
 </g>
 </svg>

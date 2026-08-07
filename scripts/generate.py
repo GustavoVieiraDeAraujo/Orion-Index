@@ -153,8 +153,8 @@ def build_source_svg(data, title, svg_path,
             label = f"{val:.3f}"
         rows.append(f'''
     <text x="{card_pad + label_w}" y="{cy + 4}" text-anchor="end" class="lbl">{lang}{star}</text>
-    <rect x="{bar_x}" y="{cy - 6}" width="{bar_max_w}" height="12" rx="6" class="track"/>
-    <rect x="{bar_x}" y="{cy - 6}" width="{bar_w}" height="12" rx="6" fill="{color}"/>
+    <rect x="{bar_x}" y="{cy - 6.5}" width="{bar_max_w}" height="13" rx="6.5" class="track"/>
+    <rect x="{bar_x}" y="{cy - 6.5}" width="{bar_w}" height="13" rx="6.5" fill="{color}" class="bar"/>
     <text x="{bar_x + bar_max_w + 10}" y="{cy + 4}" class="val">{label}</text>''')
 
     svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}">
@@ -165,12 +165,13 @@ def build_source_svg(data, title, svg_path,
     </linearGradient>
   </defs>
   <style>
-    text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }}
+    text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }}
     .card {{ fill: url(#{grad_id}); stroke: #4b5563; stroke-width: 1; }}
-    .title {{ fill: #1f2937; font-weight: 700; font-size: 13.5px; }}
+    .title {{ fill: #1f2937; font-weight: 700; font-size: 15.5px; }}
     .lbl {{ fill: #1f2937; font-weight: 600; }}
     .val {{ fill: #f9fafb; }}
     .track {{ fill: rgba(0,0,0,0.15); }}
+    .bar {{ stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }}
   </style>
   <rect x="0" y="0" width="{width}" height="{height}" rx="14" class="card"/>
   <text x="{card_pad}" y="{card_pad + 17}" class="title">{title}</text>

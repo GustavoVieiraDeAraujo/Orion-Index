@@ -9,10 +9,12 @@ repositorio). Faz duas coisas:
    mais extensos, commits, topicos) e gera cartoes SVG em docs/profile_*.svg
    aqui neste repositorio.
 2. Clona https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo,
-   atualiza os blocos RECENT/STATS/SKILLS do README.md de la (marcadores
+   atualiza os blocos STATS/SKILLS do README.md de la (marcadores
    <!-- X:START/END -->) e da push -- precisa de um token com permissao de
    escrita naquele outro repositorio (secret PROFILE_PAT), porque o
    GITHUB_TOKEN padrao do Actions so enxerga o repositorio onde ele roda.
+   (A secao "Projetos de Exposicao" do README do perfil e curada a mao, nao
+   e mais gerada automaticamente -- por isso nao tem mais bloco RECENT.)
 
 O card "Estatisticas do GitHub" (linguagens mais usadas no MUNDO) que entra
 no README do perfil e o proprio docs/orion-index.svg gerado por generate.py
@@ -38,7 +40,6 @@ ORION_INDEX_SVG = "https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion
 ORION_INDEX_REPO = "https://github.com/GustavoVieiraDeAraujo/Orion-Index"
 
 MARKERS = {
-    "RECENT": ("<!-- RECENT:START -->", "<!-- RECENT:END -->"),
     "STATS": ("<!-- STATS:START -->", "<!-- STATS:END -->"),
     "SKILLS": ("<!-- SKILLS:START -->", "<!-- SKILLS:END -->"),
 }
@@ -111,6 +112,13 @@ TOPIC_TO_SKILLICON = {
     "mongodb": "mongodb", "redis": "redis", "docker": "docker", "git": "git",
     "dotnet": "dotnet", "vite": "vite", "graphql": "graphql", "sdl2": "cpp",
     "styled-components": "styledcomponents", "sequelize": "sequelize",
+}
+
+# linguagem (medida por linhas de codigo, nao topico manual) -> codigo do
+# skillicons.dev. So as que tem icone direto no servico.
+LANG_TO_SKILLICON = {
+    "Python": "py", "JavaScript": "js", "TypeScript": "ts", "Ruby": "ruby",
+    "Go": "go", "Java": "java", "C": "c", "C++": "cpp", "C#": "cs", "PHP": "php",
 }
 
 
@@ -211,32 +219,6 @@ def short_label(text, max_chars=15):
     return text if len(text) <= max_chars else text[: max_chars - 1] + "…"
 
 
-def humanize_delta(iso_date):
-    dt = datetime.datetime.fromisoformat(iso_date.replace("Z", "+00:00"))
-    delta = datetime.datetime.now(datetime.timezone.utc) - dt
-    days = delta.days
-    if days <= 0:
-        return "hoje"
-    if days == 1:
-        return "há 1 dia"
-    if days < 30:
-        return f"há {days} dias"
-    months = days // 30
-    return f"há {months} {'mês' if months == 1 else 'meses'}"
-
-
-def build_recent_block(repos):
-    recent = sorted(repos, key=lambda r: r["pushed_at"], reverse=True)[:3]
-    lines = ["| Projeto | Descrição | Linguagem | Atualizado |", "| --- | --- | --- | --- |"]
-    for r in recent:
-        desc = (r.get("description") or "").replace("|", "-").strip() or "_sem descrição_"
-        if len(desc) > 90:
-            desc = desc[:87] + "..."
-        lang = r.get("language") or "-"
-        lines.append(f"| [{r['name']}]({r['html_url']}) | {desc} | {lang} | {humanize_delta(r['pushed_at'])} |")
-    return "\n".join(lines)
-
-
 def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
                      default_color="#60a5fa", top_n=5, order="value", grad_id="cardBg",
                      layout="side", label_w=84, label_chars=13):
@@ -280,17 +262,17 @@ def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
             row_top = card_pad + title_h + i * row_h
             bar_w = max(3, round(stacked_bar_w * n / bar_scale))
             rows.append(f'''
-    <text x="{card_pad}" y="{row_top + 14}" class="lbl">{label}</text>
-    <rect x="{card_pad}" y="{row_top + 22}" width="{stacked_bar_w}" height="10" rx="5" class="track"/>
-    <rect x="{card_pad}" y="{row_top + 22}" width="{bar_w}" height="10" rx="5" fill="{color}"/>
-    <text x="{card_pad + stacked_bar_w + 8}" y="{row_top + 30}" class="val">{val_label}</text>''')
+    <text x="{card_pad}" y="{row_top + 15}" class="lbl">{label}</text>
+    <rect x="{card_pad}" y="{row_top + 23}" width="{stacked_bar_w}" height="11" rx="5.5" class="track"/>
+    <rect x="{card_pad}" y="{row_top + 23}" width="{bar_w}" height="11" rx="5.5" fill="{color}" class="bar"/>
+    <text x="{card_pad + stacked_bar_w + 8}" y="{row_top + 32}" class="val">{val_label}</text>''')
         else:
             bar_w = max(3, round(bar_max_w * n / bar_scale))
             cy = card_pad + title_h + i * row_h + row_h / 2
             rows.append(f'''
     <text x="{card_pad + label_w}" y="{cy + 4}" text-anchor="end" class="lbl">{label}</text>
-    <rect x="{bar_x}" y="{cy - 6}" width="{bar_max_w}" height="12" rx="6" class="track"/>
-    <rect x="{bar_x}" y="{cy - 6}" width="{bar_w}" height="12" rx="6" fill="{color}"/>
+    <rect x="{bar_x}" y="{cy - 6.5}" width="{bar_max_w}" height="13" rx="6.5" class="track"/>
+    <rect x="{bar_x}" y="{cy - 6.5}" width="{bar_w}" height="13" rx="6.5" fill="{color}" class="bar"/>
     <text x="{bar_x + bar_max_w + 10}" y="{cy + 4}" class="val">{val_label}</text>''')
 
     svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}">
@@ -301,12 +283,13 @@ def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
     </linearGradient>
   </defs>
   <style>
-    text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }}
+    text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }}
     .card {{ fill: url(#{grad_id}); stroke: #4b5563; stroke-width: 1; }}
-    .title {{ fill: #1f2937; font-weight: 700; font-size: 13.5px; }}
+    .title {{ fill: #1f2937; font-weight: 700; font-size: 15.5px; }}
     .lbl {{ fill: #1f2937; font-weight: 600; }}
     .val {{ fill: #f9fafb; }}
     .track {{ fill: rgba(0,0,0,0.15); }}
+    .bar {{ stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }}
   </style>
   <rect x="0" y="0" width="{width}" height="{height}" rx="14" class="card"/>
   <text x="{card_pad}" y="{card_pad + 17}" class="title">{title}</text>
@@ -391,13 +374,26 @@ def build_stats_block(grand_total_lines, n_repos):
     )
 
 
-def build_skills_block(topics_count):
-    ranked = sorted(topics_count.items(), key=lambda kv: (-kv[1], kv[0]))
+def build_skills_block(topics_count, total_lines):
+    """Gera os icones a partir das estatisticas de verdade, nao de uma lista
+    escolhida a dedo: primeiro as linguagens medidas por linhas de codigo
+    (o dado mais confiavel que temos, ordenado por volume), depois as
+    ferramentas/frameworks que so dao pra saber pelos topicos dos repositorios
+    (React, Rails, Postgres etc, que uma linguagem sozinha nao revela)."""
     codes = []
-    for topic, _ in ranked:
+
+    lang_ranked = sorted(total_lines.items(), key=lambda kv: kv[1], reverse=True)
+    for lang, _ in lang_ranked:
+        code = LANG_TO_SKILLICON.get(lang)
+        if code and code not in codes:
+            codes.append(code)
+
+    topic_ranked = sorted(topics_count.items(), key=lambda kv: (-kv[1], kv[0]))
+    for topic, _ in topic_ranked:
         code = TOPIC_TO_SKILLICON.get(topic)
         if code and code not in codes:
             codes.append(code)
+
     if not codes:
         return "_nenhuma tecnologia catalogada ainda_"
     codes = codes[:14]
@@ -485,27 +481,26 @@ def main():
     p = os.path.join(DOCS_DIR, "profile_biggest_repos.svg")
     render_bar_card(repo_total_lines, "Repositórios Mais Extensos", p,
                      unit="loc", default_color="#38bdf8", grad_id="gradBiggest",
-                     layout="stacked", label_chars=34)
+                     layout="stacked", label_chars=28)
     row1_paths.append(p)
 
     p = os.path.join(DOCS_DIR, "profile_lang_loc.svg")
     render_bar_card(total_lines, "Linguagens por Linhas", p,
                      unit="pct", color_map=LANG_COLORS, grad_id="gradLangLoc",
-                     layout="stacked", label_chars=34)
+                     layout="stacked", label_chars=28)
     row1_paths.append(p)
 
     p = os.path.join(DOCS_DIR, "profile_commits.svg")
     render_bar_card(repo_commits, "Repositórios por Commits", p,
                      unit="count", default_color="#f59e0b", grad_id="gradCommits",
-                     layout="stacked", label_chars=34)
+                     layout="stacked", label_chars=28)
     row1_paths.append(p)
 
     build_combined_row(row1_paths, os.path.join(DOCS_DIR, "profile_row1.svg"))
 
     blocks = {
-        "RECENT": build_recent_block(repos),
         "STATS": build_stats_block(grand_total, len(repos)),
-        "SKILLS": build_skills_block(topics_count),
+        "SKILLS": build_skills_block(topics_count, total_lines),
     }
 
     push_profile_readme(blocks, pat)

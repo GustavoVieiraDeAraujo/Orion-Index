@@ -6,34 +6,35 @@
     </linearGradient>
   </defs>
   <style>
-    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }
     .card { fill: url(#gradGithubTotal); stroke: #4b5563; stroke-width: 1; }
-    .title { fill: #1f2937; font-weight: 700; font-size: 13.5px; }
+    .title { fill: #1f2937; font-weight: 700; font-size: 15.5px; }
     .lbl { fill: #1f2937; font-weight: 600; }
     .val { fill: #f9fafb; }
     .track { fill: rgba(0,0,0,0.15); }
+    .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
   </style>
   <rect x="0" y="0" width="380" height="230" rx="14" class="card"/>
   <text x="20" y="37" class="title">Repositórios Totais</text>
   
     <text x="104" y="70.0" text-anchor="end" class="lbl">JavaScript</text>
-    <rect x="114" y="60.0" width="190" height="12" rx="6" class="track"/>
-    <rect x="114" y="60.0" width="190" height="12" rx="6" fill="#f1e05a"/>
+    <rect x="114" y="59.5" width="190" height="13" rx="6.5" class="track"/>
+    <rect x="114" y="59.5" width="190" height="13" rx="6.5" fill="#f1e05a" class="bar"/>
     <text x="314" y="70.0" class="val">46.30M</text>
     <text x="104" y="102.0" text-anchor="end" class="lbl">Python</text>
-    <rect x="114" y="92.0" width="190" height="12" rx="6" class="track"/>
-    <rect x="114" y="92.0" width="132" height="12" rx="6" fill="#3572A5"/>
+    <rect x="114" y="91.5" width="190" height="13" rx="6.5" class="track"/>
+    <rect x="114" y="91.5" width="132" height="13" rx="6.5" fill="#3572A5" class="bar"/>
     <text x="314" y="102.0" class="val">32.17M</text>
     <text x="104" y="134.0" text-anchor="end" class="lbl">Java</text>
-    <rect x="114" y="124.0" width="190" height="12" rx="6" class="track"/>
-    <rect x="114" y="124.0" width="88" height="12" rx="6" fill="#b07219"/>
+    <rect x="114" y="123.5" width="190" height="13" rx="6.5" class="track"/>
+    <rect x="114" y="123.5" width="88" height="13" rx="6.5" fill="#b07219" class="bar"/>
     <text x="314" y="134.0" class="val">21.39M</text>
     <text x="104" y="166.0" text-anchor="end" class="lbl">TypeScript</text>
-    <rect x="114" y="156.0" width="190" height="12" rx="6" class="track"/>
-    <rect x="114" y="156.0" width="72" height="12" rx="6" fill="#3178c6"/>
+    <rect x="114" y="155.5" width="190" height="13" rx="6.5" class="track"/>
+    <rect x="114" y="155.5" width="72" height="13" rx="6.5" fill="#3178c6" class="bar"/>
     <text x="314" y="166.0" class="val">17.55M</text>
     <text x="104" y="198.0" text-anchor="end" class="lbl">C#</text>
-    <rect x="114" y="188.0" width="190" height="12" rx="6" class="track"/>
-    <rect x="114" y="188.0" width="31" height="12" rx="6" fill="#178600"/>
+    <rect x="114" y="187.5" width="190" height="13" rx="6.5" class="track"/>
+    <rect x="114" y="187.5" width="31" height="13" rx="6.5" fill="#178600" class="bar"/>
     <text x="314" y="198.0" class="val">7.55M</text>
 </svg>
