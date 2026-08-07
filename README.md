@@ -60,7 +60,9 @@ Qualquer repositório público pode embutir o card combinado direto, sem precisa
 ![Orion Index](https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/orion-index.svg)
 ```
 
-Ou só um dos três painéis individuais (`docs/github_total.svg`, `docs/github_new.svg`, `docs/github_growth.svg`), no mesmo formato de URL.
+Ou só um dos três painéis individuais (`docs/github_total.svg`, `docs/github_new.svg`, `docs/github_growth.svg`), no mesmo formato de URL — nesse caso sem a data de atualização, que só aparece no combinado (ver abaixo).
+
+A data da última atualização não fica repetida dentro de cada card: aparece uma única vez, como legenda embaixo da fileira, no `docs/orion-index.svg`.
 
 ---
 

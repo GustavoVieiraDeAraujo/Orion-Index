@@ -16,20 +16,20 @@
   </style>
   <rect x="0" y="0" width="380" height="244" rx="14" class="card"/>
   <text x="20" y="35" class="title">GitHub — Repositórios Totais</text>
-  <text x="20" y="50" class="subtitle">repositórios por linguagem · busca ao vivo, 07/08/2026</text>
+  <text x="20" y="50" class="subtitle">repositórios por linguagem</text>
   
     <text x="104" y="84.0" text-anchor="end" class="lbl">JavaScript</text>
     <rect x="114" y="74.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="74.0" width="190" height="12" rx="6" fill="#f1e05a"/>
-    <text x="314" y="84.0" class="val">46.29M</text>
+    <text x="314" y="84.0" class="val">46.30M</text>
     <text x="104" y="116.0" text-anchor="end" class="lbl">Python</text>
     <rect x="114" y="106.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="106.0" width="132" height="12" rx="6" fill="#3572A5"/>
-    <text x="314" y="116.0" class="val">32.16M</text>
+    <text x="314" y="116.0" class="val">32.17M</text>
     <text x="104" y="148.0" text-anchor="end" class="lbl">Java</text>
     <rect x="114" y="138.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="138.0" width="88" height="12" rx="6" fill="#b07219"/>
-    <text x="314" y="148.0" class="val">21.38M</text>
+    <text x="314" y="148.0" class="val">21.39M</text>
     <text x="104" y="180.0" text-anchor="end" class="lbl">TypeScript</text>
     <rect x="114" y="170.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="170.0" width="72" height="12" rx="6" fill="#3178c6"/>
