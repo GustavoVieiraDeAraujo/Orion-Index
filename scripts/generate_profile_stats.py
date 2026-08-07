@@ -179,17 +179,25 @@ def count_commits(repo_full_name):
 
 
 def orion_index_last_update():
-    """Data do ultimo commit que mexeu no card combinado do Orion Index --
-    lida do historico local do git (este script roda dentro do proprio
-    repositorio do Orion Index, entao nao precisa de chamada de API)."""
+    """Data do ultimo commit que mexeu no card combinado do Orion Index, via
+    API do GitHub (nao da pra confiar no `git log` local aqui: o checkout
+    deste workflow e raso -- fetch-depth 1 -- e um repositorio raso so tem
+    UM commit de historico, entao "git log -- path" acaba devolvendo a data
+    desse unico commit mesmo quando ele nao tocou o arquivo, em vez de
+    devolver vazio. A API sempre busca o historico de verdade, direto do
+    servidor, sem depender de quanta historia foi baixada localmente)."""
     result = subprocess.run(
-        ["git", "log", "-1", "--format=%cI", "--", "docs/orion-index.svg"],
-        capture_output=True, text=True, cwd=os.path.join(os.path.dirname(__file__), ".."),
+        ["gh", "api", "repos/GustavoVieiraDeAraujo/Orion-Index/commits?path=docs/orion-index.svg&per_page=1",
+         "-q", ".[0].commit.committer.date"],
+        capture_output=True, text=True,
     )
-    iso = result.stdout.strip()
-    if result.returncode != 0 or not iso:
+    if result.returncode != 0 or not result.stdout.strip():
         return None
-    return datetime.datetime.fromisoformat(iso).strftime("%d/%m/%Y")
+    try:
+        dt = datetime.datetime.fromisoformat(result.stdout.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return dt.strftime("%d/%m/%Y")
 
 
 def shorten_repo_name(name):
