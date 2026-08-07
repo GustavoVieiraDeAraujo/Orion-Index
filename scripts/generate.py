@@ -5,14 +5,16 @@ combinando 3 perspectivas diferentes de proposito (ver README), as 3
 vindas exclusivamente da API GraphQL oficial do GitHub (search + language:X),
 buscadas ao vivo, sem nenhum numero fixo no codigo:
 
-- Volume total: quantidade de repositorios publicos existentes por
+- Repositorios totais: quantidade de repositorios publicos existentes por
   linguagem principal — o que ja existe, acumulado desde sempre.
 - Repositorios novos: quantidade de repositorios CRIADOS nos ultimos 30
-  dias por linguagem — o que esta sendo adotado agora. Janela movel, muda
-  de verdade a cada execucao (`created:>DATA`).
-- Repositorios ativos: quantidade de repositorios que receberam PUSH nos
-  ultimos 30 dias por linguagem — o que esta sendo mantido/trabalhado
-  agora, independente de quando foi criado (`pushed:>DATA`).
+  dias por linguagem — volume absoluto do que esta sendo adotado agora.
+  Janela movel, muda de verdade a cada execucao (`created:>DATA`).
+- Crescimento relativo: novos ÷ total, por linguagem — nao e busca nova,
+  e so a razao entre as duas de cima. Revela quem esta crescendo mais
+  RAPIDO em relacao ao proprio tamanho: linguagem pequena mas em expansao
+  (ex: Rust, Kotlin) pode aparecer na frente de uma gigante estabelecida
+  que cresce muito em numero absoluto mas pouco proporcionalmente.
 
 Nao usamos o relatorio Octoverse do GitHub (mede contribuidores mensais):
 e so um relatorio esporadico em prosa, sem API nem dataset estruturado por
@@ -104,22 +106,18 @@ def fetch_github_recent_repo_counts(days=30):
     return data, f"últimos {days} dias ({cutoff_fmt} a {today})"
 
 
-def fetch_github_active_repo_counts(days=30):
-    """Conta quantos repositorios publicos receberam PUSH nos ultimos `days`
-    dias por linguagem principal — mede o que esta sendo mantido/trabalhado
-    agora, independente de quando o repositorio foi criado (ao contrario de
-    'criados recentemente', que so pega projeto novo). Mesma API, so troca o
-    qualificador pra `pushed:>DATA`."""
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
-    if not token:
-        raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
-
-    cutoff = (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
-    qualifiers = f" pushed:>{cutoff}"
-    data = {lang: _github_repo_count(lang, qualifiers, token) for lang in GITHUB_SEARCH_LANGUAGES}
-    today = datetime.date.today().strftime("%d/%m/%Y")
-    cutoff_fmt = f"{cutoff.split('-')[2]}/{cutoff.split('-')[1]}"
-    return data, f"últimos {days} dias ({cutoff_fmt} a {today})"
+def compute_growth_rates(total_data, new_data):
+    """Nao busca nada novo: so divide novos ÷ total por linguagem. Enquanto
+    'total' mede tamanho absoluto e 'novos' mede volume absoluto de adocao,
+    isso mede VELOCIDADE relativa — quem esta crescendo mais rapido em
+    relacao ao proprio tamanho, o que pode inverter o ranking das duas
+    metricas absolutas (linguagem pequena em expansao rapida na frente de
+    gigante estabelecida que cresce pouco proporcionalmente)."""
+    return {
+        lang: 100 * new_data[lang] / total_data[lang]
+        for lang in total_data
+        if lang in new_data and total_data[lang]
+    }
 
 
 def build_source_svg(data, title, source_label, date_label, svg_path,
@@ -228,17 +226,17 @@ def main():
     gh_new_data, gh_new_date = fetch_github_recent_repo_counts()
     print(f"GitHub (novos): {gh_new_date}, {len(gh_new_data)} linguagens")
 
-    gh_active_data, gh_active_date = fetch_github_active_repo_counts()
-    print(f"GitHub (ativos): {gh_active_date}, {len(gh_active_data)} linguagens")
+    growth_data = compute_growth_rates(gh_data, gh_new_data)
+    print(f"GitHub (crescimento): derivado de total e novos, {len(growth_data)} linguagens")
 
     paths = {
         "github_total": os.path.join(DOCS_DIR, "github_total.svg"),
         "github_new": os.path.join(DOCS_DIR, "github_new.svg"),
-        "github_active": os.path.join(DOCS_DIR, "github_active.svg"),
+        "github_growth": os.path.join(DOCS_DIR, "github_growth.svg"),
     }
 
     build_source_svg(
-        gh_data, "GitHub — Volume Total", "repositórios por linguagem", gh_date,
+        gh_data, "GitHub — Repositórios Totais", "repositórios por linguagem", gh_date,
         paths["github_total"], unit="M", grad_id="gradGithubTotal",
     )
     build_source_svg(
@@ -246,12 +244,12 @@ def main():
         paths["github_new"], unit="k", grad_id="gradGithubNew",
     )
     build_source_svg(
-        gh_active_data, "GitHub — Repositórios Ativos", "repositórios com push", gh_active_date,
-        paths["github_active"], unit="k", grad_id="gradGithubActive",
+        growth_data, "GitHub — Crescimento Relativo", "novos ÷ total", gh_new_date,
+        paths["github_growth"], unit="%", grad_id="gradGithubGrowth",
     )
 
     build_combined_svg(
-        [paths["github_total"], paths["github_new"], paths["github_active"]],
+        [paths["github_total"], paths["github_new"], paths["github_growth"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
     )
 

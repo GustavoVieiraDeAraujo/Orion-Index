@@ -8,13 +8,13 @@ Rastreia as linguagens de programação mais usadas no mundo, combinando três p
 
 Nenhum ângulo de popularidade de linguagem mede a mesma coisa que os outros, e este projeto assume isso em vez de esconder:
 
-| Perspectiva | O que mede de verdade | Qualificador da busca |
+| Perspectiva | O que mede de verdade | Como é calculada |
 | --- | --- | --- |
-| **GitHub — Volume Total** | Quantidade de repositórios públicos **já existentes** por linguagem principal — o acumulado histórico | `language:X` |
-| **GitHub — Repositórios Novos** | Quantidade de repositórios **criados** nos últimos 30 dias por linguagem — o que está sendo adotado agora | `language:X created:>DATA` |
-| **GitHub — Repositórios Ativos** | Quantidade de repositórios que **receberam push** nos últimos 30 dias por linguagem — o que está sendo mantido/trabalhado agora, seja o repositório novo ou antigo | `language:X pushed:>DATA` |
+| **GitHub — Repositórios Totais** | Quantidade de repositórios públicos **já existentes** por linguagem principal — o acumulado histórico, tamanho do ecossistema | `language:X` |
+| **GitHub — Repositórios Novos** | Quantidade de repositórios **criados** nos últimos 30 dias por linguagem — volume absoluto do que está sendo adotado agora | `language:X created:>DATA` |
+| **GitHub — Crescimento Relativo** | **Novos ÷ Totais**, em % — não é uma busca nova, é a razão entre as duas de cima. Mede velocidade de crescimento **relativa ao próprio tamanho** | derivado, sem chamada extra à API |
 
-Todas as três usam a mesma API GraphQL oficial do GitHub (`search(query: "language:X", type: REPOSITORY)`), só trocando o qualificador. Volume total mede o que já existe (acumulado de anos). Repositórios Novos mede criação de projeto do zero (janela de 30 dias). Repositórios Ativos mede trabalho em andamento, incluindo projeto antigo que segue vivo (também janela de 30 dias, mas sem o filtro de data de criação). Por isso os top 5 de cada uma são diferentes entre si, e isso é o esperado, não um erro — por exemplo, Python lidera disparado em "Novos" (boom de IA/ciência de dados puxando projeto do zero), mas fica atrás de JavaScript no volume total acumulado.
+Todas partem da mesma API GraphQL oficial do GitHub (`search(query: "language:X", type: REPOSITORY)`). Repositórios Totais mede o que já existe (acumulado de anos) — favorece linguagem grande e estabelecida. Repositórios Novos mede criação de projeto do zero em número absoluto (janela de 30 dias) — também favorece linguagem já grande, porque tem mais gente usando. Crescimento Relativo neutraliza esse viés de tamanho: linguagem pequena mas em expansão rápida (ex: Rust, Dart) pode aparecer na frente de uma gigante estabelecida que cresce bastante em número absoluto mas pouco proporcionalmente. Por isso os top 5 de cada uma são diferentes entre si, e isso é o esperado, não um erro.
 
 ### Por que não usamos PYPL
 
@@ -22,7 +22,11 @@ O [PYPL](https://pypl.github.io/PYPL.html) (interesse de busca por "[linguagem] 
 
 ### Por que não usamos mais a Stack Overflow Developer Survey
 
-Chegamos a usar o CSV oficial da pesquisa (dado real, publicado pela própria Stack Exchange). Trocamos pela terceira perspectiva do GitHub (Repositórios Ativos) pra ficar 100% dentro de uma única fonte, com uma única API, um único token de acesso e um único modelo de confiança — em vez de misturar busca ao vivo com CSV anual de outra organização. Menos peça em movimento, mais fácil de auditar.
+Chegamos a usar o CSV oficial da pesquisa (dado real, publicado pela própria Stack Exchange). Trocamos pela terceira perspectiva do GitHub (Crescimento Relativo) pra ficar 100% dentro de uma única fonte, com uma única API, um único token de acesso e um único modelo de confiança — em vez de misturar busca ao vivo com CSV anual de outra organização. Menos peça em movimento, mais fácil de auditar.
+
+### Por que Crescimento Relativo, e não "repositórios com push recente"
+
+A primeira versão da terceira perspectiva era "repositórios que receberam push nos últimos 30 dias" (`pushed:>DATA`) — mas na prática o top 5 saía quase idêntico ao de Repositórios Novos, porque as duas métricas em número absoluto são dominadas pelas mesmas linguagens gigantes (Python, JavaScript, TypeScript, Java). Trocamos por uma razão (Novos ÷ Totais) porque isso normaliza pelo tamanho de cada linguagem e produz um ranking genuinamente diferente, revelando quem está crescendo rápido de verdade — não só quem já é grande.
 
 ### Por que não usamos o relatório Octoverse do GitHub
 
@@ -40,10 +44,10 @@ Nenhuma das três perspectivas conta HTML ou CSS no gráfico: marcação e estil
 
 [`scripts/generate.py`](scripts/generate.py) roda mensalmente (e sob demanda) via GitHub Actions, sem nenhuma dependência externa além da biblioteca padrão do Python e o `GITHUB_TOKEN` automático do Actions:
 
-1. Consulta a API GraphQL do GitHub (`search(query: "language:X", type: REPOSITORY)`) pra cada linguagem candidata e pega a contagem total de repositórios (volume total).
+1. Consulta a API GraphQL do GitHub (`search(query: "language:X", type: REPOSITORY)`) pra cada linguagem candidata e pega a contagem total de repositórios (repositórios totais).
 2. Repete a mesma consulta com `created:>DATA` (últimos 30 dias) pra medir o que está sendo criado agora (repositórios novos).
-3. Repete de novo com `pushed:>DATA` (últimos 30 dias) pra medir o que está sendo mantido agora, novo ou antigo (repositórios ativos).
-4. Gera um card SVG por perspectiva (`docs/github_total.svg`, `docs/github_new.svg`, `docs/github_active.svg`) e um combinado (`docs/orion-index.svg`).
+3. Divide novos ÷ totais por linguagem (crescimento relativo) — sem chamada extra à API.
+4. Gera um card SVG por perspectiva (`docs/github_total.svg`, `docs/github_new.svg`, `docs/github_growth.svg`) e um combinado (`docs/orion-index.svg`).
 5. Commita os arquivos gerados se algo mudou.
 
 Nenhuma das três perspectivas precisa de ação manual — tudo é buscado do zero a cada execução, sempre com o dado mais recente disponível.
@@ -56,7 +60,7 @@ Qualquer repositório público pode embutir o card combinado direto, sem precisa
 ![Orion Index](https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/orion-index.svg)
 ```
 
-Ou só um dos três painéis individuais (`docs/github_total.svg`, `docs/github_new.svg`, `docs/github_active.svg`), no mesmo formato de URL.
+Ou só um dos três painéis individuais (`docs/github_total.svg`, `docs/github_new.svg`, `docs/github_growth.svg`), no mesmo formato de URL.
 
 ---
 
