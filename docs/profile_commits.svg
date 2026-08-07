@@ -1,0 +1,39 @@
+<svg width="380" height="320" viewBox="0 0 380 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Repositórios por Commits">
+  <defs>
+    <linearGradient id="gradCommits" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D1D5DB"/>
+      <stop offset="100%" stop-color="#374151"/>
+    </linearGradient>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }
+    .card { fill: url(#gradCommits); stroke: #4b5563; stroke-width: 1; }
+    .title { fill: #1f2937; font-weight: 700; font-size: 13.5px; }
+    .lbl { fill: #1f2937; font-weight: 600; }
+    .val { fill: #f9fafb; }
+    .track { fill: rgba(0,0,0,0.15); }
+  </style>
+  <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
+  <text x="20" y="37" class="title">Repositórios por Commits</text>
+  
+    <text x="20" y="64" class="lbl">Crescer-CWI</text>
+    <rect x="20" y="72" width="286" height="10" rx="5" class="track"/>
+    <rect x="20" y="72" width="286" height="10" rx="5" fill="#f59e0b"/>
+    <text x="314" y="80" class="val">228</text>
+    <text x="20" y="114" class="lbl">Ciplus-Front-End</text>
+    <rect x="20" y="122" width="286" height="10" rx="5" class="track"/>
+    <rect x="20" y="122" width="122" height="10" rx="5" fill="#f59e0b"/>
+    <text x="314" y="130" class="val">97</text>
+    <text x="20" y="164" class="lbl">2-Metodos-de-Programacao-Back-End</text>
+    <rect x="20" y="172" width="286" height="10" rx="5" class="track"/>
+    <rect x="20" y="172" width="92" height="10" rx="5" fill="#f59e0b"/>
+    <text x="314" y="180" class="val">73</text>
+    <text x="20" y="214" class="lbl">TreinaDev</text>
+    <rect x="20" y="222" width="286" height="10" rx="5" class="track"/>
+    <rect x="20" y="222" width="87" height="10" rx="5" fill="#f59e0b"/>
+    <text x="314" y="230" class="val">69</text>
+    <text x="20" y="264" class="lbl">2-Metodos-de-Programacao-Front-End</text>
+    <rect x="20" y="272" width="286" height="10" rx="5" class="track"/>
+    <rect x="20" y="272" width="79" height="10" rx="5" fill="#f59e0b"/>
+    <text x="314" y="280" class="val">63</text>
+</svg>

@@ -1,0 +1,39 @@
+name: Atualizar estatisticas do perfil
+
+on:
+  schedule:
+    - cron: "0 */12 * * *" # a cada 12 horas
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "scripts/generate_profile_stats.py"
+      - ".github/workflows/update_profile.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  update-profile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gerar cartoes e atualizar o README do perfil
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PROFILE_PAT: ${{ secrets.PROFILE_PAT }}
+        run: python3 scripts/generate_profile_stats.py
+
+      - name: Commitar cartoes se houve mudanca
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- docs; then
+            echo "Sem mudancas nos cartoes."
+            exit 0
+          fi
+          git add docs
+          git commit -m "Atualiza cartoes de estatisticas do perfil"
+          git push
