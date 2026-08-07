@@ -121,6 +121,49 @@ LANG_TO_SKILLICON = {
     "Go": "go", "Java": "java", "C": "c", "C++": "cpp", "C#": "cs", "PHP": "php",
 }
 
+# codigo do skillicons.dev (mesmo codigo usado nos dois mapas acima) ->
+# (nome de exibicao, cor da marca em hex, slug do logo no simple-icons via
+# shields.io, cor do texto/logo). Usado pra desenhar badge com icone E nome,
+# nao so o icone sozinho.
+BADGE_INFO = {
+    "py": ("Python", "3776AB", "python", "white"),
+    "js": ("JavaScript", "F7DF1E", "javascript", "black"),
+    "ts": ("TypeScript", "3178C6", "typescript", "white"),
+    "ruby": ("Ruby", "CC342D", "ruby", "white"),
+    "go": ("Go", "00ADD8", "go", "white"),
+    "java": ("Java", "007396", "openjdk", "white"),
+    "cs": ("C%23", "239120", "csharp", "white"),
+    "c": ("C", "A8B9CC", "c", "black"),
+    "cpp": ("C++", "00599C", "cplusplus", "white"),
+    "php": ("PHP", "777BB4", "php", "white"),
+    "rails": ("Ruby%20on%20Rails", "CC0000", "rubyonrails", "white"),
+    "react": ("React", "61DAFB", "react", "black"),
+    "vue": ("Vue.js", "4FC08D", "vuedotjs", "white"),
+    "angular": ("Angular", "DD0031", "angular", "white"),
+    "html": ("HTML5", "E34F26", "html5", "white"),
+    "css": ("CSS3", "1572B6", "css3", "white"),
+    "sass": ("Sass", "CC6699", "sass", "white"),
+    "tailwind": ("Tailwind%20CSS", "06B6D4", "tailwindcss", "white"),
+    "bootstrap": ("Bootstrap", "7952B3", "bootstrap", "white"),
+    "nodejs": ("Node.js", "339933", "nodedotjs", "white"),
+    "express": ("Express", "000000", "express", "white"),
+    "django": ("Django", "092E20", "django", "white"),
+    "flask": ("Flask", "000000", "flask", "white"),
+    "rust": ("Rust", "000000", "rust", "white"),
+    "postgres": ("PostgreSQL", "4169E1", "postgresql", "white"),
+    "mysql": ("MySQL", "4479A1", "mysql", "white"),
+    "sqlite": ("SQLite", "003B57", "sqlite", "white"),
+    "mongodb": ("MongoDB", "47A248", "mongodb", "white"),
+    "redis": ("Redis", "DC382D", "redis", "white"),
+    "docker": ("Docker", "2496ED", "docker", "white"),
+    "git": ("Git", "F05032", "git", "white"),
+    "dotnet": (".NET", "512BD4", "dotnet", "white"),
+    "vite": ("Vite", "646CFF", "vite", "white"),
+    "graphql": ("GraphQL", "E10098", "graphql", "white"),
+    "styledcomponents": ("styled--components", "DB7093", "styledcomponents", "white"),
+    "sequelize": ("Sequelize", "52B0E7", "sequelize", "white"),
+}
+
 
 def list_profile_repos():
     """Usa o endpoint PUBLICO users/{login}/repos (nao user/repos): funciona
@@ -397,7 +440,17 @@ def build_skills_block(topics_count, total_lines):
     if not codes:
         return "_nenhuma tecnologia catalogada ainda_"
     codes = codes[:14]
-    return f'<img src="https://skillicons.dev/icons?i={",".join(codes)}" alt="tecnologias" height="48" />'
+
+    badges = []
+    for code in codes:
+        info = BADGE_INFO.get(code)
+        if not info:
+            continue
+        label, color, logo, logo_color = info
+        badge_url = f"https://img.shields.io/badge/{label}-{color}?style=for-the-badge&logo={logo}&logoColor={logo_color}"
+        alt = label.replace("%20", " ").replace("--", "-").replace("%23", "#")
+        badges.append(f'<img src="{badge_url}" alt="{alt}" height="30" />')
+    return " ".join(badges)
 
 
 def push_profile_readme(blocks, pat):

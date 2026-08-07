@@ -172,7 +172,7 @@ def build_svg(calendar):
     flame_closed = "M-6,-0.7 L-9,0 L-6,0.7 Z"
 
     total = calendar["totalContributions"]
-    title = f"{total} contribuições no último ano · nave atira nos commits, semana a semana"
+    title = f"{total} commits no último ano"
 
     svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Nave espacial atirando nos meus commits">
   <style>
