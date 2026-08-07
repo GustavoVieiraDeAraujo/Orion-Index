@@ -12,18 +12,17 @@ on:
 
 permissions:
   contents: write
-  issues: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Gerar graficos
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/generate.py
 
       - name: Commitar se houve mudanca
@@ -37,6 +36,3 @@ jobs:
           git add docs
           git commit -m "Atualiza Orion Index"
           git push
-
-      - name: Checar se saiu Octoverse novo
-        run: python3 scripts/check_octoverse_freshness.py

@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """
 Orion Index: rastreia as linguagens de programacao mais usadas no mundo,
-combinando 3 fontes com metodologias diferentes (de proposito, ver README):
+combinando 3 fontes com metodologias diferentes (de proposito, ver README),
+todas buscadas ao vivo, sem nenhum numero fixo no codigo:
 
-- PYPL: buscado automaticamente todo mes (dado aberto, CC-BY, atualizado
-  pelos mantenedores em pypl/pypl.github.io).
-- Stack Overflow Developer Survey: buscado automaticamente todo mes, direto
-  do CSV oficial publicado pela propria Stack Exchange no GitHub
-  (StackExchange/Survey). So muda de verdade 1x/ano, quando sai pesquisa
-  nova, mas a busca em si nao precisa de nenhuma acao manual.
-- GitHub Octoverse: fixo no codigo, atualizado manualmente quando sai um
-  relatorio novo. Unica das tres sem nenhum jeito de automatizar: nao ha
-  API nem dataset estruturado, so um relatorio esporadico em prosa (testado
-  e confirmado: nem octoverse.github.com nem o post do blog tem qualquer
-  endpoint de dado por tras).
+- PYPL: interesse de busca por "[linguagem] tutorial" no Google Trends
+  (dado aberto, CC-BY, atualizado pelos mantenedores em pypl/pypl.github.io).
+- Stack Overflow Developer Survey: % de respondentes que usaram cada
+  linguagem no ultimo ano, calculado a partir do CSV oficial de respostas
+  individuais publicado pela propria Stack Exchange no GitHub.
+- GitHub: quantidade de repositorios publicos por linguagem principal,
+  via API GraphQL oficial do GitHub (search + language:X). Nao e a mesma
+  coisa que o relatorio Octoverse (que mede contribuidores mensais, nao
+  repositorios) — trocamos por essa metrica de proposito porque e a unica
+  forma de ter um numero do proprio GitHub 100% automatizavel: o Octoverse
+  em si e so um relatorio esporadico em prosa, sem API nem dataset
+  estruturado por tras (confirmado testando octoverse.github.com e o post
+  do blog, nenhum dos dois tem endpoint de dado).
 
 TIOBE foi excluido de proposito: o termo de uso deles proibe copiar ou
 republicar o conteudo sem consentimento previo, e eles vendem o dataset
@@ -22,6 +25,7 @@ completo. Nao faz sentido raspar o que e vendido como produto.
 import csv
 import datetime
 import io
+import json
 import os
 import re
 import sys
@@ -45,44 +49,18 @@ LANG_COLORS = {
     "Rust": "#dea584", "Swift": "#F05138", "Kotlin": "#A97BFF",
 }
 
-# --- GitHub Octoverse 2025 -------------------------------------------------
-# Contribuidores mensais distintos no GitHub, agosto/2025. Fonte:
-# https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/
-# TypeScript, Python e JavaScript: numero absoluto divulgado pelo GitHub,
-# conferido em duas fontes independentes.
-# Java e C#: o GitHub so divulgou o ganho no ano e o % de crescimento, nao
-# o total. Valor = ganho / crescimento + ganho (os dois numeros oficiais).
-#   Java: ganho ~174.705, +20,73% -> anterior ~842.761 -> atual ~1.017.466
-#   C#:   ganho ~136.735, +22,22% -> anterior ~615.369 -> atual ~752.104
-# Marcados como estimativa no grafico (nao e numero que o GitHub deu pronto).
-OCTOVERSE_2025 = {
-    "TypeScript": 2_636_006,
-    "Python": 2_600_000,
-    "JavaScript": 2_150_000,
-    "Java": 1_017_000,
-    "C#": 752_000,
-}
-OCTOVERSE_ESTIMATED = {"Java", "C#"}
-OCTOVERSE_DATE = "ago/2025"
-OCTOVERSE_DATE_FULL = "dados de agosto/2025, relatório publicado em outubro/2025"
-# Numeros vieram deste relatorio (nao mude so por causa do check de frescor).
-OCTOVERSE_REPORT_SOURCE = "https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/"
-# Ultimo post da categoria Octoverse que eu (ou uma sessao de IA) ja revisei
-# e confirmei que nao tem numero novo de linguagem. O check_octoverse_freshness.py
-# le esta constante — atualize pra URL do post revisado toda vez que checar um
-# novo aviso, mesmo que a conclusao seja "sem novidade", pra nao alertar de novo.
-# Revisado em 07/08/2026: post so reforça o crescimento de 66% do relatorio
-# original, sem numero absoluto novo.
-OCTOVERSE_SOURCE = "https://github.blog/ai-and-ml/generative-ai/how-ai-is-reshaping-developer-choice-and-octoverse-data-proves-it/"
-
-# --- Stack Overflow Developer Survey -----------------------------------
-# Buscado automaticamente do CSV oficial (respostas individuais, coluna
-# "LanguageHaveWorkedWith") publicado pela propria Stack Exchange:
-# https://github.com/StackExchange/Survey/tree/main/packages/archive
 # raw.githubusercontent.com so devolve o ponteiro Git LFS pra esse arquivo
 # (ele e grande, ~140MB); a URL abaixo (github.com/.../raw/...) resolve o
 # LFS de verdade e devolve o CSV completo.
 STACKOVERFLOW_CSV_URL = "https://github.com/StackExchange/Survey/raw/refs/heads/main/packages/archive/{year}/results.csv"
+
+# Linguagens comparadas na busca por repositorio no GitHub. Precisam bater
+# com o nome que o GitHub usa no qualificador `language:` da busca.
+GITHUB_SEARCH_LANGUAGES = [
+    "Python", "JavaScript", "TypeScript", "Java", "C++", "C", "C#", "Go",
+    "Rust", "PHP", "Ruby", "Kotlin", "Swift", "Scala", "Shell", "R", "Dart",
+    "Elixir", "Haskell", "Objective-C",
+]
 
 
 def fetch_pypl():
@@ -148,6 +126,34 @@ def fetch_stackoverflow():
     data = {lang: 100 * n / total for lang, n in counts.items()}
     total_fmt = f"{total:,}".replace(",", ".")
     return data, f"pesquisa de {year}, {total_fmt} respondentes"
+
+
+def fetch_github_repo_counts():
+    """Conta quantos repositorios publicos existem por linguagem principal,
+    via API GraphQL oficial do GitHub (`search(query: "language:X")`).
+    Precisa de um token (o GITHUB_TOKEN automatico do Actions serve, so
+    precisa de acesso de leitura publico)."""
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not token:
+        raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
+
+    data = {}
+    for lang in GITHUB_SEARCH_LANGUAGES:
+        query = f'{{ search(query: "language:{lang}", type: REPOSITORY) {{ repositoryCount }} }}'
+        req = urllib.request.Request(
+            "https://api.github.com/graphql",
+            data=json.dumps({"query": query}).encode(),
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            body = json.loads(resp.read().decode())
+        if "errors" in body:
+            raise RuntimeError(f"Erro na busca do GitHub pra {lang}: {body['errors']}")
+        data[lang] = body["data"]["search"]["repositoryCount"]
+
+    today = datetime.date.today().strftime("%d/%m/%Y")
+    return data, f"busca ao vivo, {today}"
 
 
 def build_source_svg(data, title, source_label, date_label, svg_path,
@@ -254,9 +260,12 @@ def main():
     so_data, so_date = fetch_stackoverflow()
     print(f"Stack Overflow Survey: {so_date}, {len(so_data)} linguagens")
 
+    gh_data, gh_date = fetch_github_repo_counts()
+    print(f"GitHub: {gh_date}, {len(gh_data)} linguagens")
+
     paths = {
         "pypl": os.path.join(DOCS_DIR, "pypl.svg"),
-        "octoverse": os.path.join(DOCS_DIR, "octoverse.svg"),
+        "github": os.path.join(DOCS_DIR, "github.svg"),
         "stackoverflow": os.path.join(DOCS_DIR, "stackoverflow.svg"),
     }
 
@@ -265,8 +274,8 @@ def main():
         paths["pypl"], unit="pct_frac", grad_id="gradPypl",
     )
     build_source_svg(
-        OCTOVERSE_2025, "GitHub Octoverse", "contribuidores mensais", OCTOVERSE_DATE,
-        paths["octoverse"], unit="M", estimated=OCTOVERSE_ESTIMATED, grad_id="gradOctoverse",
+        gh_data, "GitHub", "repositórios por linguagem", gh_date,
+        paths["github"], unit="M", grad_id="gradGithub",
     )
     build_source_svg(
         so_data, "Stack Overflow Survey", "% de respondentes", so_date,
@@ -274,7 +283,7 @@ def main():
     )
 
     build_combined_svg(
-        [paths["pypl"], paths["octoverse"], paths["stackoverflow"]],
+        [paths["pypl"], paths["github"], paths["stackoverflow"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
     )
 
