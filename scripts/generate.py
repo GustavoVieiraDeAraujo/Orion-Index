@@ -184,14 +184,14 @@ def build_source_svg(data, title, source_label, svg_path,
         f.write(svg)
 
 
-def build_combined_svg(panel_paths, out_path, updated_label):
+def build_combined_svg(panel_paths, out_path):
     """Junta os 3 SVGs individuais lado a lado num so arquivo, via manipulacao
     de texto simples (evita os problemas de namespace do xml.etree ao mesclar
-    varios documentos SVG independentes). A data de atualizacao nao fica mais
-    dentro de cada card (repetida 3x); fica so aqui, uma vez, como legenda
-    embaixo da fileira inteira."""
+    varios documentos SVG independentes). Nao leva data de atualizacao
+    embutida: quem usa a imagem decide como e onde mostrar isso (o proprio
+    README deste repo, ou de quem embutir, pode puxar a data do ultimo
+    commit via API do GitHub)."""
     gap = 16
-    caption_h = 24
     inner_bodies = []
     total_w = 0.0
     max_h = 0.0
@@ -213,15 +213,9 @@ def build_combined_svg(panel_paths, out_path, updated_label):
         groups.append(f'<g transform="translate({x_offset},0)">{body}</g>')
         x_offset += w + gap
 
-    total_h = max_h + caption_h
-    caption = (
-        f'<text x="0" y="{max_h + 17}" font-family="-apple-system, BlinkMacSystemFont, '
-        f'\'Segoe UI\', Helvetica, Arial, sans-serif" font-size="11" fill="#6b7280">{updated_label}</text>'
-    )
-
     combined = (
-        f'<svg width="{total_w}" height="{total_h}" viewBox="0 0 {total_w} {total_h}" '
-        f'xmlns="http://www.w3.org/2000/svg">\n' + "\n".join(groups) + "\n" + caption + "\n</svg>\n"
+        f'<svg width="{total_w}" height="{max_h}" viewBox="0 0 {total_w} {max_h}" '
+        f'xmlns="http://www.w3.org/2000/svg">\n' + "\n".join(groups) + "\n</svg>\n"
     )
 
     with open(out_path, "w", encoding="utf-8") as f:
@@ -257,11 +251,9 @@ def main():
         paths["github_growth"], unit="%", grad_id="gradGithubGrowth",
     )
 
-    today_fmt = datetime.date.today().strftime("%d/%m/%Y")
     build_combined_svg(
         [paths["github_total"], paths["github_new"], paths["github_growth"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
-        updated_label=f"Última atualização: {today_fmt}",
     )
 
     print("SVGs gerados em docs/.")
