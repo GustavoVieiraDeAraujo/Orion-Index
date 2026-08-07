@@ -74,15 +74,6 @@ IGNORE_DIRS = {
     ".pytest_cache", ".tox", ".yarn",
 }
 
-# prefixo comum nos nomes dos repos de trabalho/curso -- tirar deixa o nome
-# mais curto e mais facil de reconhecer no card "Repositorios Mais Extensos"
-# (mais longo primeiro, senao "Trabalho-" nunca seria removido)
-REPO_NAME_PREFIXES = [
-    "Trabalhos-Algoritmos-Progamacao-Computadores",
-    "Exercicios-Processo-Trainee-Struct", "Exercicios-",
-    "Processo-Seletivo-", "Projeto-Final-Struct-", "Trabalho-",
-]
-
 TOPIC_BLOCKLIST = {
     "extracurricular-unb", "extracurricular", "trabalho-unb", "trabalho-senac",
     "projeto-pessoal", "processo-seletivo", "senac", "unb",
@@ -123,45 +114,48 @@ LANG_TO_SKILLICON = {
 
 # codigo do skillicons.dev (mesmo codigo usado nos dois mapas acima) ->
 # (nome de exibicao, cor da marca em hex, slug do logo no simple-icons via
-# shields.io, cor do texto/logo). Usado pra desenhar badge com icone E nome,
-# nao so o icone sozinho.
+# shields.io, cor do texto/logo, site oficial). Usado pra desenhar um badge
+# com icone, nome E link clicavel pro site oficial daquela stack -- tudo
+# automatico: qualquer linguagem/topico novo que apareca nos repos e ja
+# esteja mapeado aqui embaixo entra sozinho na proxima execucao, sem
+# precisar mexer em mais nada.
 BADGE_INFO = {
-    "py": ("Python", "3776AB", "python", "white"),
-    "js": ("JavaScript", "F7DF1E", "javascript", "black"),
-    "ts": ("TypeScript", "3178C6", "typescript", "white"),
-    "ruby": ("Ruby", "CC342D", "ruby", "white"),
-    "go": ("Go", "00ADD8", "go", "white"),
-    "java": ("Java", "007396", "openjdk", "white"),
-    "cs": ("C%23", "239120", "csharp", "white"),
-    "c": ("C", "A8B9CC", "c", "black"),
-    "cpp": ("C++", "00599C", "cplusplus", "white"),
-    "php": ("PHP", "777BB4", "php", "white"),
-    "rails": ("Ruby%20on%20Rails", "CC0000", "rubyonrails", "white"),
-    "react": ("React", "61DAFB", "react", "black"),
-    "vue": ("Vue.js", "4FC08D", "vuedotjs", "white"),
-    "angular": ("Angular", "DD0031", "angular", "white"),
-    "html": ("HTML5", "E34F26", "html5", "white"),
-    "css": ("CSS3", "1572B6", "css3", "white"),
-    "sass": ("Sass", "CC6699", "sass", "white"),
-    "tailwind": ("Tailwind%20CSS", "06B6D4", "tailwindcss", "white"),
-    "bootstrap": ("Bootstrap", "7952B3", "bootstrap", "white"),
-    "nodejs": ("Node.js", "339933", "nodedotjs", "white"),
-    "express": ("Express", "000000", "express", "white"),
-    "django": ("Django", "092E20", "django", "white"),
-    "flask": ("Flask", "000000", "flask", "white"),
-    "rust": ("Rust", "000000", "rust", "white"),
-    "postgres": ("PostgreSQL", "4169E1", "postgresql", "white"),
-    "mysql": ("MySQL", "4479A1", "mysql", "white"),
-    "sqlite": ("SQLite", "003B57", "sqlite", "white"),
-    "mongodb": ("MongoDB", "47A248", "mongodb", "white"),
-    "redis": ("Redis", "DC382D", "redis", "white"),
-    "docker": ("Docker", "2496ED", "docker", "white"),
-    "git": ("Git", "F05032", "git", "white"),
-    "dotnet": (".NET", "512BD4", "dotnet", "white"),
-    "vite": ("Vite", "646CFF", "vite", "white"),
-    "graphql": ("GraphQL", "E10098", "graphql", "white"),
-    "styledcomponents": ("styled--components", "DB7093", "styledcomponents", "white"),
-    "sequelize": ("Sequelize", "52B0E7", "sequelize", "white"),
+    "py": ("Python", "3776AB", "python", "white", "https://www.python.org/"),
+    "js": ("JavaScript", "F7DF1E", "javascript", "black", "https://developer.mozilla.org/docs/Web/JavaScript"),
+    "ts": ("TypeScript", "3178C6", "typescript", "white", "https://www.typescriptlang.org/"),
+    "ruby": ("Ruby", "CC342D", "ruby", "white", "https://www.ruby-lang.org/"),
+    "go": ("Go", "00ADD8", "go", "white", "https://go.dev/"),
+    "java": ("Java", "007396", "openjdk", "white", "https://openjdk.org/"),
+    "cs": ("C%23", "239120", "csharp", "white", "https://learn.microsoft.com/dotnet/csharp/"),
+    "c": ("C", "A8B9CC", "c", "black", "https://en.cppreference.com/w/c"),
+    "cpp": ("C++", "00599C", "cplusplus", "white", "https://isocpp.org/"),
+    "php": ("PHP", "777BB4", "php", "white", "https://www.php.net/"),
+    "rails": ("Ruby%20on%20Rails", "CC0000", "rubyonrails", "white", "https://rubyonrails.org/"),
+    "react": ("React", "61DAFB", "react", "black", "https://react.dev/"),
+    "vue": ("Vue.js", "4FC08D", "vuedotjs", "white", "https://vuejs.org/"),
+    "angular": ("Angular", "DD0031", "angular", "white", "https://angular.dev/"),
+    "html": ("HTML5", "E34F26", "html5", "white", "https://developer.mozilla.org/docs/Web/HTML"),
+    "css": ("CSS3", "1572B6", "css3", "white", "https://developer.mozilla.org/docs/Web/CSS"),
+    "sass": ("Sass", "CC6699", "sass", "white", "https://sass-lang.com/"),
+    "tailwind": ("Tailwind%20CSS", "06B6D4", "tailwindcss", "white", "https://tailwindcss.com/"),
+    "bootstrap": ("Bootstrap", "7952B3", "bootstrap", "white", "https://getbootstrap.com/"),
+    "nodejs": ("Node.js", "339933", "nodedotjs", "white", "https://nodejs.org/"),
+    "express": ("Express", "000000", "express", "white", "https://expressjs.com/"),
+    "django": ("Django", "092E20", "django", "white", "https://www.djangoproject.com/"),
+    "flask": ("Flask", "000000", "flask", "white", "https://flask.palletsprojects.com/"),
+    "rust": ("Rust", "000000", "rust", "white", "https://www.rust-lang.org/"),
+    "postgres": ("PostgreSQL", "4169E1", "postgresql", "white", "https://www.postgresql.org/"),
+    "mysql": ("MySQL", "4479A1", "mysql", "white", "https://www.mysql.com/"),
+    "sqlite": ("SQLite", "003B57", "sqlite", "white", "https://www.sqlite.org/"),
+    "mongodb": ("MongoDB", "47A248", "mongodb", "white", "https://www.mongodb.com/"),
+    "redis": ("Redis", "DC382D", "redis", "white", "https://redis.io/"),
+    "docker": ("Docker", "2496ED", "docker", "white", "https://www.docker.com/"),
+    "git": ("Git", "F05032", "git", "white", "https://git-scm.com/"),
+    "dotnet": (".NET", "512BD4", "dotnet", "white", "https://dotnet.microsoft.com/"),
+    "vite": ("Vite", "646CFF", "vite", "white", "https://vitejs.dev/"),
+    "graphql": ("GraphQL", "E10098", "graphql", "white", "https://graphql.org/"),
+    "styledcomponents": ("styled--components", "DB7093", "styledcomponents", "white", "https://styled-components.com/"),
+    "sequelize": ("Sequelize", "52B0E7", "sequelize", "white", "https://sequelize.org/"),
 }
 
 
@@ -249,13 +243,6 @@ def orion_index_last_update():
     except ValueError:
         return None
     return dt.strftime("%d/%m/%Y")
-
-
-def shorten_repo_name(name):
-    for prefix in REPO_NAME_PREFIXES:
-        if name.startswith(prefix):
-            return name[len(prefix):].lstrip("-") or name
-    return name
 
 
 def short_label(text, max_chars=15):
@@ -446,10 +433,10 @@ def build_skills_block(topics_count, total_lines):
         info = BADGE_INFO.get(code)
         if not info:
             continue
-        label, color, logo, logo_color = info
+        label, color, logo, logo_color, url = info
         badge_url = f"https://img.shields.io/badge/{label}-{color}?style=for-the-badge&logo={logo}&logoColor={logo_color}"
         alt = label.replace("%20", " ").replace("--", "-").replace("%23", "#")
-        badges.append(f'<img src="{badge_url}" alt="{alt}" height="30" />')
+        badges.append(f'<a href="{url}" target="_blank"><img src="{badge_url}" alt="{alt}" height="30" /></a>')
     return " ".join(badges)
 
 
@@ -518,13 +505,13 @@ def main():
         counts = count_lines(repo["full_name"])
         repo_total = sum(counts.values())
         if repo_total:
-            repo_total_lines[shorten_repo_name(repo["name"])] = repo_total
+            repo_total_lines[repo["name"]] = repo_total
         for lang, n in counts.items():
             total_lines[lang] = total_lines.get(lang, 0) + n
 
         n_commits = count_commits(repo["full_name"])
         if n_commits:
-            repo_commits[shorten_repo_name(repo["name"])] = n_commits
+            repo_commits[repo["name"]] = n_commits
 
     grand_total = sum(total_lines.values())
 
@@ -534,19 +521,19 @@ def main():
     p = os.path.join(DOCS_DIR, "profile_biggest_repos.svg")
     render_bar_card(repo_total_lines, "Repositórios Mais Extensos", p,
                      unit="loc", default_color="#38bdf8", grad_id="gradBiggest",
-                     layout="stacked", label_chars=28)
+                     layout="stacked", label_chars=40)
     row1_paths.append(p)
 
     p = os.path.join(DOCS_DIR, "profile_lang_loc.svg")
     render_bar_card(total_lines, "Linguagens por Linhas", p,
                      unit="pct", color_map=LANG_COLORS, grad_id="gradLangLoc",
-                     layout="stacked", label_chars=28)
+                     layout="stacked", label_chars=40)
     row1_paths.append(p)
 
     p = os.path.join(DOCS_DIR, "profile_commits.svg")
     render_bar_card(repo_commits, "Repositórios por Commits", p,
                      unit="count", default_color="#f59e0b", grad_id="gradCommits",
-                     layout="stacked", label_chars=28)
+                     layout="stacked", label_chars=40)
     row1_paths.append(p)
 
     build_combined_row(row1_paths, os.path.join(DOCS_DIR, "profile_row1.svg"))
