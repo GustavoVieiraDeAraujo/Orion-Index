@@ -1,0 +1,36 @@
+name: Atualizar Orion Index
+
+on:
+  schedule:
+    - cron: "0 6 1 * *" # todo dia 1 do mes, 06:00 UTC
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "scripts/generate.py"
+      - ".github/workflows/update.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gerar graficos
+        run: python3 scripts/generate.py
+
+      - name: Commitar se houve mudanca
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- docs; then
+            echo "Sem mudancas."
+            exit 0
+          fi
+          git add docs
+          git commit -m "Atualiza Orion Index"
+          git push
