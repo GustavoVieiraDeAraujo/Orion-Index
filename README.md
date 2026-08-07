@@ -12,7 +12,7 @@ Nenhum índice de popularidade de linguagem mede a mesma coisa que os outros, e 
 | --- | --- | --- | --- |
 | **[PYPL](https://pypl.github.io/PYPL.html)** | Interesse de busca por **"[linguagem] tutorial"** no Google Trends: quem está aprendendo ou querendo aprender agora | Mensal | Automática: busca o dado mais recente a cada execução, direto do [dataset oficial](https://github.com/pypl/pypl.github.io) (CC-BY) |
 | **[Stack Overflow Developer Survey](https://survey.stackoverflow.co/)** | Autodeclaração de quem já é dev: "em quais linguagens você trabalhou no último ano" | Anual | Automática: baixa o CSV oficial de respostas individuais ([`StackExchange/Survey`](https://github.com/StackExchange/Survey)) e recalcula o % a cada execução. Só o valor em si muda 1x/ano (quando sai pesquisa nova), mas a busca não precisa de nenhuma ação manual |
-| **[GitHub Octoverse](https://github.blog/news-insights/octoverse/)** | Contribuidores mensais distintos que **commitaram código de verdade** no GitHub | Esporádica (~1x/ano) | Manual: fixo no código, atualizado quando sai relatório novo. É a única sem forma de automatizar — confirmei que nem `octoverse.github.com` nem o post do blog têm qualquer endpoint de dado por trás, só texto e imagens estáticas |
+| **[GitHub Octoverse](https://github.blog/news-insights/octoverse/)** | Contribuidores mensais distintos que **commitaram código de verdade** no GitHub | Esporádica (~1x/ano) | Semi-automática: o **valor em si** continua manual (é texto corrido, não dado estruturado — nem `octoverse.github.com` nem o post do blog têm endpoint por trás), mas a **detecção de post novo** é automática, via feed RSS oficial da categoria (ver abaixo) |
 
 PYPL mede interesse de aprendizado, Stack Overflow mede autopercepção de profissionais já atuantes, Octoverse mede uso de produção real. Por isso os top 5 de cada um são diferentes entre si, e isso é o esperado, não um erro.
 
@@ -33,12 +33,13 @@ Nenhuma das três fontes conta HTML ou CSS no gráfico: marcação e estilo não
 3. Usa os números do GitHub Octoverse já registrados no código (constante `OCTOVERSE_2025`), com a fonte, a data e a conta de qualquer estimativa documentadas ao lado, já que essa fonte não tem como ser buscada automaticamente.
 4. Gera um card SVG por fonte (`docs/pypl.svg`, `docs/octoverse.svg`, `docs/stackoverflow.svg`) e um combinado (`docs/orion-index.svg`).
 5. Commita os arquivos gerados se algo mudou.
+6. [`scripts/check_octoverse_freshness.py`](scripts/check_octoverse_freshness.py) confere o [feed RSS oficial da categoria Octoverse](https://github.blog/news-insights/octoverse/feed/) e compara com a URL registrada em `OCTOVERSE_SOURCE`. Se tiver post novo, abre uma issue neste repositório automaticamente avisando — sem precisar de ninguém lembrando de checar manualmente.
 
 Linguagens marcadas com `*` no gráfico do Octoverse não têm total absoluto divulgado pelo GitHub — são estimadas a partir do ganho de contribuidores e do percentual de crescimento, ambos oficiais (ver comentário no código para a conta exata).
 
 ## Atualizando o Octoverse
 
-Quando sair um relatório novo, edite a constante `OCTOVERSE_2025` (e `OCTOVERSE_DATE`/`OCTOVERSE_SOURCE`) em [`scripts/generate.py`](scripts/generate.py) e rode o workflow manualmente (ou espere a próxima execução mensal). PYPL e Stack Overflow não precisam de nenhuma ação: se atualizam sozinhos.
+PYPL e Stack Overflow não precisam de nenhuma ação, se atualizam sozinhos. Pro Octoverse: quando o workflow abrir a issue avisando de um post novo, edite a constante `OCTOVERSE_2025` (e `OCTOVERSE_DATE`/`OCTOVERSE_SOURCE`, apontando pra URL do post novo) em [`scripts/generate.py`](scripts/generate.py), rode o workflow manualmente e feche a issue.
 
 ## Usando em outro lugar
 

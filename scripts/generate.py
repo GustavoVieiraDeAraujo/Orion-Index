@@ -65,7 +65,15 @@ OCTOVERSE_2025 = {
 OCTOVERSE_ESTIMATED = {"Java", "C#"}
 OCTOVERSE_DATE = "ago/2025"
 OCTOVERSE_DATE_FULL = "dados de agosto/2025, relatório publicado em outubro/2025"
-OCTOVERSE_SOURCE = "https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/"
+# Numeros vieram deste relatorio (nao mude so por causa do check de frescor).
+OCTOVERSE_REPORT_SOURCE = "https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/"
+# Ultimo post da categoria Octoverse que eu (ou uma sessao de IA) ja revisei
+# e confirmei que nao tem numero novo de linguagem. O check_octoverse_freshness.py
+# le esta constante — atualize pra URL do post revisado toda vez que checar um
+# novo aviso, mesmo que a conclusao seja "sem novidade", pra nao alertar de novo.
+# Revisado em 07/08/2026: post so reforça o crescimento de 66% do relatorio
+# original, sem numero absoluto novo.
+OCTOVERSE_SOURCE = "https://github.blog/ai-and-ml/generative-ai/how-ai-is-reshaping-developer-choice-and-octoverse-data-proves-it/"
 
 # --- Stack Overflow Developer Survey -----------------------------------
 # Buscado automaticamente do CSV oficial (respostas individuais, coluna
