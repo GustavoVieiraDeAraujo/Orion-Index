@@ -1,45 +1,39 @@
 #!/usr/bin/env python3
 """
 Orion Index: rastreia as linguagens de programacao mais usadas no mundo,
-combinando 3 perspectivas diferentes de proposito (ver README), todas
+combinando 3 perspectivas diferentes de proposito (ver README), as 3
+vindas exclusivamente da API GraphQL oficial do GitHub (search + language:X),
 buscadas ao vivo, sem nenhum numero fixo no codigo:
 
-- GitHub, volume total: quantidade de repositorios publicos existentes por
+- Volume total: quantidade de repositorios publicos existentes por
   linguagem principal — o que ja existe, acumulado desde sempre.
-- GitHub, criados recentemente: quantidade de repositorios criados nos
-  ultimos 30 dias por linguagem — o que esta sendo adotado agora. Janela
-  movel, muda de verdade a cada execucao (as duas metricas do GitHub usam
-  a mesma API GraphQL oficial, search + language:X).
-- Stack Overflow Developer Survey: % de respondentes que usaram cada
-  linguagem no ultimo ano, calculado a partir do CSV oficial de respostas
-  individuais publicado pela propria Stack Exchange no GitHub. Sempre busca
-  o ano mais recente disponivel (tenta o atual, cai pro anterior se ainda
-  nao saiu).
+- Repositorios novos: quantidade de repositorios CRIADOS nos ultimos 30
+  dias por linguagem — o que esta sendo adotado agora. Janela movel, muda
+  de verdade a cada execucao (`created:>DATA`).
+- Repositorios ativos: quantidade de repositorios que receberam PUSH nos
+  ultimos 30 dias por linguagem — o que esta sendo mantido/trabalhado
+  agora, independente de quando foi criado (`pushed:>DATA`).
 
 Nao usamos o relatorio Octoverse do GitHub (mede contribuidores mensais):
 e so um relatorio esporadico em prosa, sem API nem dataset estruturado por
 tras (confirmado testando octoverse.github.com e o post do blog, nenhum
 dos dois tem endpoint de dado). E nao usamos o PYPL (interesse de busca via
 Google Trends): apesar de ser dado real e a fonte mais estabelecida pra
-esse angulo, e um projeto pessoal de terceiro sem contrato de acesso —
-preferimos ficar 100% dentro de fontes com API oficial ou dataset publicado
-pela propria organizacao dona do dado.
+esse angulo, e um projeto pessoal de terceiro sem contrato de acesso. E nao
+usamos mais a Stack Overflow Survey: pra ficar 100% dentro de uma unica
+fonte, com uma unica API oficial e um unico modelo de confianca, em vez de
+misturar API ao vivo com CSV anual de terceiro.
 
 TIOBE foi excluido de proposito: o termo de uso deles proibe copiar ou
 republicar o conteudo sem consentimento previo, e eles vendem o dataset
 completo. Nao faz sentido raspar o que e vendido como produto.
 """
-import csv
 import datetime
-import io
 import json
 import os
 import re
-import sys
 import urllib.error
 import urllib.request
-
-csv.field_size_limit(sys.maxsize)
 
 DOCS_DIR = os.path.join(os.path.dirname(__file__), "..", "docs")
 
@@ -55,11 +49,6 @@ LANG_COLORS = {
     "Rust": "#dea584", "Swift": "#F05138", "Kotlin": "#A97BFF",
 }
 
-# raw.githubusercontent.com so devolve o ponteiro Git LFS pra esse arquivo
-# (ele e grande, ~140MB); a URL abaixo (github.com/.../raw/...) resolve o
-# LFS de verdade e devolve o CSV completo.
-STACKOVERFLOW_CSV_URL = "https://github.com/StackExchange/Survey/raw/refs/heads/main/packages/archive/{year}/results.csv"
-
 # Linguagens comparadas na busca por repositorio no GitHub. Precisam bater
 # com o nome que o GitHub usa no qualificador `language:` da busca.
 GITHUB_SEARCH_LANGUAGES = [
@@ -67,50 +56,6 @@ GITHUB_SEARCH_LANGUAGES = [
     "Rust", "PHP", "Ruby", "Kotlin", "Swift", "Scala", "Shell", "R", "Dart",
     "Elixir", "Haskell", "Objective-C",
 ]
-
-
-def fetch_stackoverflow():
-    """Baixa o CSV oficial (respostas individuais) da pesquisa mais recente
-    disponivel e conta quantos % de respondentes usaram cada linguagem
-    (coluna LanguageHaveWorkedWith, resposta multipla separada por ';').
-    Tenta o ano atual primeiro; se a pesquisa daquele ano ainda nao saiu,
-    cai pro ano anterior."""
-    current_year = datetime.date.today().year
-    for year in (current_year, current_year - 1, current_year - 2):
-        url = STACKOVERFLOW_CSV_URL.format(year=year)
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "orion-index"})
-            with urllib.request.urlopen(req, timeout=120) as resp:
-                raw = resp.read()
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                continue
-            raise
-        text = raw.decode("utf-8-sig")
-        break
-    else:
-        raise RuntimeError("Nao encontrei CSV da Stack Overflow Survey em nenhum ano recente")
-
-    from collections import Counter
-    counts = Counter()
-    total = 0
-    reader = csv.DictReader(io.StringIO(text))
-    col = "LanguageHaveWorkedWith"
-    for row in reader:
-        val = row.get(col)
-        if not val or val == "NA":
-            continue
-        total += 1
-        for lang in val.split(";"):
-            lang = lang.strip()
-            if not lang:
-                continue
-            lang = lang.replace("Bash/Shell (all shells)", "Bash/Shell")
-            counts[lang] += 1
-
-    data = {lang: 100 * n / total for lang, n in counts.items()}
-    total_fmt = f"{total:,}".replace(",", ".")
-    return data, f"pesquisa de {year}, {total_fmt} respondentes"
 
 
 def _github_repo_count(lang, qualifiers, token):
@@ -153,6 +98,24 @@ def fetch_github_recent_repo_counts(days=30):
 
     cutoff = (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
     qualifiers = f" created:>{cutoff}"
+    data = {lang: _github_repo_count(lang, qualifiers, token) for lang in GITHUB_SEARCH_LANGUAGES}
+    today = datetime.date.today().strftime("%d/%m/%Y")
+    cutoff_fmt = f"{cutoff.split('-')[2]}/{cutoff.split('-')[1]}"
+    return data, f"últimos {days} dias ({cutoff_fmt} a {today})"
+
+
+def fetch_github_active_repo_counts(days=30):
+    """Conta quantos repositorios publicos receberam PUSH nos ultimos `days`
+    dias por linguagem principal — mede o que esta sendo mantido/trabalhado
+    agora, independente de quando o repositorio foi criado (ao contrario de
+    'criados recentemente', que so pega projeto novo). Mesma API, so troca o
+    qualificador pra `pushed:>DATA`."""
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not token:
+        raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
+
+    cutoff = (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
+    qualifiers = f" pushed:>{cutoff}"
     data = {lang: _github_repo_count(lang, qualifiers, token) for lang in GITHUB_SEARCH_LANGUAGES}
     today = datetime.date.today().strftime("%d/%m/%Y")
     cutoff_fmt = f"{cutoff.split('-')[2]}/{cutoff.split('-')[1]}"
@@ -262,33 +225,33 @@ def main():
     gh_data, gh_date = fetch_github_repo_counts()
     print(f"GitHub (total): {gh_date}, {len(gh_data)} linguagens")
 
-    gh_recent_data, gh_recent_date = fetch_github_recent_repo_counts()
-    print(f"GitHub (recentes): {gh_recent_date}, {len(gh_recent_data)} linguagens")
+    gh_new_data, gh_new_date = fetch_github_recent_repo_counts()
+    print(f"GitHub (novos): {gh_new_date}, {len(gh_new_data)} linguagens")
 
-    so_data, so_date = fetch_stackoverflow()
-    print(f"Stack Overflow Survey: {so_date}, {len(so_data)} linguagens")
+    gh_active_data, gh_active_date = fetch_github_active_repo_counts()
+    print(f"GitHub (ativos): {gh_active_date}, {len(gh_active_data)} linguagens")
 
     paths = {
-        "github": os.path.join(DOCS_DIR, "github.svg"),
-        "github_recent": os.path.join(DOCS_DIR, "github_recent.svg"),
-        "stackoverflow": os.path.join(DOCS_DIR, "stackoverflow.svg"),
+        "github_total": os.path.join(DOCS_DIR, "github_total.svg"),
+        "github_new": os.path.join(DOCS_DIR, "github_new.svg"),
+        "github_active": os.path.join(DOCS_DIR, "github_active.svg"),
     }
 
     build_source_svg(
         gh_data, "GitHub — Volume Total", "repositórios por linguagem", gh_date,
-        paths["github"], unit="M", grad_id="gradGithub",
+        paths["github_total"], unit="M", grad_id="gradGithubTotal",
     )
     build_source_svg(
-        gh_recent_data, "GitHub — Em Alta", "repositórios criados", gh_recent_date,
-        paths["github_recent"], unit="k", grad_id="gradGithubRecent",
+        gh_new_data, "GitHub — Repositórios Novos", "repositórios criados", gh_new_date,
+        paths["github_new"], unit="k", grad_id="gradGithubNew",
     )
     build_source_svg(
-        so_data, "Stack Overflow Survey", "% de respondentes", so_date,
-        paths["stackoverflow"], unit="%", grad_id="gradStackoverflow",
+        gh_active_data, "GitHub — Repositórios Ativos", "repositórios com push", gh_active_date,
+        paths["github_active"], unit="k", grad_id="gradGithubActive",
     )
 
     build_combined_svg(
-        [paths["github"], paths["github_recent"], paths["stackoverflow"]],
+        [paths["github_total"], paths["github_new"], paths["github_active"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
     )
 
