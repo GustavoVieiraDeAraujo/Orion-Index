@@ -21,19 +21,19 @@
     <text x="104" y="84.0" text-anchor="end" class="lbl">Python</text>
     <rect x="114" y="74.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="74.0" width="190" height="12" rx="6" fill="#3572A5"/>
-    <text x="314" y="84.0" class="val">1143.6k</text>
+    <text x="314" y="84.0" class="val">1143.9k</text>
     <text x="104" y="116.0" text-anchor="end" class="lbl">JavaScript</text>
     <rect x="114" y="106.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="106.0" width="145" height="12" rx="6" fill="#f1e05a"/>
-    <text x="314" y="116.0" class="val">872.7k</text>
+    <text x="314" y="116.0" class="val">872.9k</text>
     <text x="104" y="148.0" text-anchor="end" class="lbl">TypeScript</text>
     <rect x="114" y="138.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="138.0" width="133" height="12" rx="6" fill="#3178c6"/>
-    <text x="314" y="148.0" class="val">799.3k</text>
+    <text x="314" y="148.0" class="val">799.4k</text>
     <text x="104" y="180.0" text-anchor="end" class="lbl">Java</text>
     <rect x="114" y="170.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="170.0" width="36" height="12" rx="6" fill="#b07219"/>
-    <text x="314" y="180.0" class="val">217.9k</text>
+    <text x="314" y="180.0" class="val">218.0k</text>
     <text x="104" y="212.0" text-anchor="end" class="lbl">C++</text>
     <rect x="114" y="202.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="202.0" width="17" height="12" rx="6" fill="#f34b7d"/>
