@@ -77,16 +77,17 @@ Roda a cada 12h (e sob demanda) via GitHub Actions:
 
 Se algum dia o token expirar ou for revogado, é só gerar outro com permissão de escrita no repositório de perfil e atualizar o secret `PROFILE_PAT` aqui.
 
-## Sobre o gráfico do Pac-Man
+## Sobre a animação da nave espacial
 
-[`scripts/generate_pacman.py`](scripts/generate_pacman.py) e o workflow [`pacman.yml`](.github/workflows/pacman.yml) também são automação pessoal, não fazem parte do Orion Index. Diferente do resto do projeto, esse aqui é feito do zero, sem nenhuma action ou gerador pronto de terceiro: busca os dados reais de contribuição do Gustavo via GraphQL do GitHub (`contributionsCollection`) e desenha um Pac-Man comendo o próprio grafo de contribuições, com SVG + [SMIL](https://developer.mozilla.org/en-US/docs/Web/SVG/SVG_animation_with_SMIL) (animação nativa do SVG, sem JavaScript nenhum):
+[`scripts/generate_spaceship.py`](scripts/generate_spaceship.py) e o workflow [`spaceship.yml`](.github/workflows/spaceship.yml) também são automação pessoal, não fazem parte do Orion Index. Feito do zero, sem nenhuma action ou gerador pronto de terceiro: busca os dados reais de contribuição do Gustavo via GraphQL do GitHub (`contributionsCollection`) e desenha uma nave espacial atirando no próprio grafo de contribuições, com SVG + [SMIL](https://developer.mozilla.org/en-US/docs/Web/SVG/SVG_animation_with_SMIL) (animação nativa do SVG, sem JavaScript nenhum):
 
 - Cada semana do ano vira uma coluna, cada dia da semana uma linha — a mesma grade de um gráfico de contribuições de verdade.
-- O Pac-Man percorre a grade em zigue-zague (varre domingo da esquerda pra direita, desce, varre segunda da direita pra esquerda, e assim por diante).
-- Cada quadradinho tem sua própria animação de opacidade, com o instante calculado a partir da posição real do Pac-Man no percurso — ele "come" o quadrado bem na hora que passa por cima.
+- A nave percorre a grade em zigue-zague (varre domingo da esquerda pra direita, desce, varre segunda da direita pra esquerda, e assim por diante), virando de verdade conforme a direção do trecho.
+- Quadrado com contribuição de verdade explode quando a nave passa: flash branco, estouro de escala e partículas saindo do centro. Quadrado vazio (sem commit naquele dia) só desaparece rápido, sem efeito — nunca foi um alvo de verdade.
+- O instante exato de cada explosão é calculado a partir da posição real da nave no percurso naquele momento.
 - No fim do ciclo tudo reaparece e recomeça, em loop.
 
-Roda uma vez por dia, gera `docs/pacman.svg` aqui neste repositório (mesmo `GITHUB_TOKEN` padrão do Actions, sem precisar de token especial) e o [README de perfil](https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo) embute direto de lá.
+Roda uma vez por dia, gera `docs/spaceship.svg` aqui neste repositório (mesmo `GITHUB_TOKEN` padrão do Actions, sem precisar de token especial) e o [README de perfil](https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo) embute direto de lá.
 
 ---
 

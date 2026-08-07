@@ -1,4 +1,4 @@
-name: Gerar Pac-Man comendo os commits
+name: Gerar nave atirando nos commits
 
 on:
   schedule:
@@ -7,8 +7,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "scripts/generate_pacman.py"
-      - ".github/workflows/pacman.yml"
+      - "scripts/generate_spaceship.py"
+      - ".github/workflows/spaceship.yml"
 
 permissions:
   contents: write
@@ -23,16 +23,16 @@ jobs:
       - name: Gerar animacao
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python3 scripts/generate_pacman.py
+        run: python3 scripts/generate_spaceship.py
 
       - name: Commitar se houve mudanca
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- docs/pacman.svg; then
+          if git diff --quiet -- docs/spaceship.svg; then
             echo "Sem mudancas."
             exit 0
           fi
-          git add docs/pacman.svg
-          git commit -m "Atualiza Pac-Man com os commits mais recentes"
+          git add docs/spaceship.svg
+          git commit -m "Atualiza nave com os commits mais recentes"
           git push
