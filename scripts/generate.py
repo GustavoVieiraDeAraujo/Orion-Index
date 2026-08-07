@@ -120,7 +120,7 @@ def compute_growth_rates(total_data, new_data):
     }
 
 
-def build_source_svg(data, title, source_label, svg_path,
+def build_source_svg(data, title, svg_path,
                       unit="%", estimated=frozenset(), gradient=("#D1D5DB", "#374151"), top_n=5, grad_id="cardBg"):
     filtered = {k: v for k, v in data.items() if k not in NOT_PROGRAMMING_LANGUAGES}
     ranked = sorted(filtered.items(), key=lambda kv: kv[1], reverse=True)[:top_n]
@@ -128,7 +128,7 @@ def build_source_svg(data, title, source_label, svg_path,
 
     row_h = 32
     card_pad = 20
-    title_h = 44
+    title_h = 30
     width = 380
     label_w = 84
     bar_x = card_pad + label_w + 10
@@ -157,7 +157,7 @@ def build_source_svg(data, title, source_label, svg_path,
     <rect x="{bar_x}" y="{cy - 6}" width="{bar_w}" height="12" rx="6" fill="{color}"/>
     <text x="{bar_x + bar_max_w + 10}" y="{cy + 4}" class="val">{label}</text>''')
 
-    svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title} ({source_label})">
+    svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}">
   <defs>
     <linearGradient id="{grad_id}" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="{gradient[0]}"/>
@@ -168,14 +168,12 @@ def build_source_svg(data, title, source_label, svg_path,
     text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11.5px; }}
     .card {{ fill: url(#{grad_id}); stroke: #4b5563; stroke-width: 1; }}
     .title {{ fill: #1f2937; font-weight: 700; font-size: 13.5px; }}
-    .subtitle {{ fill: #374151; font-size: 10.5px; }}
     .lbl {{ fill: #1f2937; font-weight: 600; }}
     .val {{ fill: #f9fafb; }}
     .track {{ fill: rgba(0,0,0,0.15); }}
   </style>
   <rect x="0" y="0" width="{width}" height="{height}" rx="14" class="card"/>
-  <text x="{card_pad}" y="{card_pad + 15}" class="title">{title}</text>
-  <text x="{card_pad}" y="{card_pad + 30}" class="subtitle">{source_label}</text>
+  <text x="{card_pad}" y="{card_pad + 17}" class="title">{title}</text>
   {"".join(rows)}
 </svg>'''
 
@@ -239,15 +237,15 @@ def main():
     }
 
     build_source_svg(
-        gh_data, "GitHub — Repositórios Totais", "repositórios por linguagem",
+        gh_data, "Repositórios Totais",
         paths["github_total"], unit="M", grad_id="gradGithubTotal",
     )
     build_source_svg(
-        gh_new_data, "GitHub — Repositórios Novos", "criados nos últimos 30 dias",
+        gh_new_data, "Repositórios Novos",
         paths["github_new"], unit="k", grad_id="gradGithubNew",
     )
     build_source_svg(
-        growth_data, "GitHub — Crescimento Relativo", "novos ÷ total (30 dias)",
+        growth_data, "Crescimento Relativo",
         paths["github_growth"], unit="%", grad_id="gradGithubGrowth",
     )
 
