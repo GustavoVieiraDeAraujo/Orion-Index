@@ -5,20 +5,30 @@ combinando 3 fontes com metodologias diferentes (de proposito, ver README):
 
 - PYPL: buscado automaticamente todo mes (dado aberto, CC-BY, atualizado
   pelos mantenedores em pypl/pypl.github.io).
+- Stack Overflow Developer Survey: buscado automaticamente todo mes, direto
+  do CSV oficial publicado pela propria Stack Exchange no GitHub
+  (StackExchange/Survey). So muda de verdade 1x/ano, quando sai pesquisa
+  nova, mas a busca em si nao precisa de nenhuma acao manual.
 - GitHub Octoverse: fixo no codigo, atualizado manualmente quando sai um
-  relatorio novo (nao ha API, so relatorio esporadico em prosa).
-- Stack Overflow Developer Survey: fixo no codigo, atualizado manualmente
-  quando sai uma pesquisa nova (anual).
+  relatorio novo. Unica das tres sem nenhum jeito de automatizar: nao ha
+  API nem dataset estruturado, so um relatorio esporadico em prosa (testado
+  e confirmado: nem octoverse.github.com nem o post do blog tem qualquer
+  endpoint de dado por tras).
 
 TIOBE foi excluido de proposito: o termo de uso deles proibe copiar ou
 republicar o conteudo sem consentimento previo, e eles vendem o dataset
 completo. Nao faz sentido raspar o que e vendido como produto.
 """
+import csv
 import datetime
+import io
 import os
 import re
 import sys
+import urllib.error
 import urllib.request
+
+csv.field_size_limit(sys.maxsize)
 
 DOCS_DIR = os.path.join(os.path.dirname(__file__), "..", "docs")
 PYPL_URL = "https://raw.githubusercontent.com/pypl/pypl.github.io/master/PYPL/All.js"
@@ -57,20 +67,14 @@ OCTOVERSE_DATE = "ago/2025"
 OCTOVERSE_DATE_FULL = "dados de agosto/2025, relatório publicado em outubro/2025"
 OCTOVERSE_SOURCE = "https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/"
 
-# --- Stack Overflow Developer Survey 2025 -----------------------------------
-# % de respondentes que usaram a linguagem no ultimo ano ("used in the past
-# year"). Conferido em duas fontes independentes. HTML/CSS excluido (nao e
-# linguagem de programacao).
-# Fonte: https://survey.stackoverflow.co/2025/technology/
-STACKOVERFLOW_2025 = {
-    "JavaScript": 66.0,
-    "SQL": 58.6,
-    "Python": 57.9,
-    "Bash/Shell": 48.7,
-    "TypeScript": 43.6,
-}
-STACKOVERFLOW_DATE = "pesquisa de 2025, ~49 mil respondentes"
-STACKOVERFLOW_SOURCE = "https://survey.stackoverflow.co/2025/technology/"
+# --- Stack Overflow Developer Survey -----------------------------------
+# Buscado automaticamente do CSV oficial (respostas individuais, coluna
+# "LanguageHaveWorkedWith") publicado pela propria Stack Exchange:
+# https://github.com/StackExchange/Survey/tree/main/packages/archive
+# raw.githubusercontent.com so devolve o ponteiro Git LFS pra esse arquivo
+# (ele e grande, ~140MB); a URL abaixo (github.com/.../raw/...) resolve o
+# LFS de verdade e devolve o CSV completo.
+STACKOVERFLOW_CSV_URL = "https://github.com/StackExchange/Survey/raw/refs/heads/main/packages/archive/{year}/results.csv"
 
 
 def fetch_pypl():
@@ -92,6 +96,50 @@ def fetch_pypl():
     data = dict(zip(langs, values))
     date_label = f"{int(month) + 1:02d}/{year}"
     return data, date_label
+
+
+def fetch_stackoverflow():
+    """Baixa o CSV oficial (respostas individuais) da pesquisa mais recente
+    disponivel e conta quantos % de respondentes usaram cada linguagem
+    (coluna LanguageHaveWorkedWith, resposta multipla separada por ';').
+    Tenta o ano atual primeiro; se a pesquisa daquele ano ainda nao saiu,
+    cai pro ano anterior."""
+    current_year = datetime.date.today().year
+    for year in (current_year, current_year - 1, current_year - 2):
+        url = STACKOVERFLOW_CSV_URL.format(year=year)
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "orion-index"})
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                raw = resp.read()
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                continue
+            raise
+        text = raw.decode("utf-8-sig")
+        break
+    else:
+        raise RuntimeError("Nao encontrei CSV da Stack Overflow Survey em nenhum ano recente")
+
+    from collections import Counter
+    counts = Counter()
+    total = 0
+    reader = csv.DictReader(io.StringIO(text))
+    col = "LanguageHaveWorkedWith"
+    for row in reader:
+        val = row.get(col)
+        if not val or val == "NA":
+            continue
+        total += 1
+        for lang in val.split(";"):
+            lang = lang.strip()
+            if not lang:
+                continue
+            lang = lang.replace("Bash/Shell (all shells)", "Bash/Shell")
+            counts[lang] += 1
+
+    data = {lang: 100 * n / total for lang, n in counts.items()}
+    total_fmt = f"{total:,}".replace(",", ".")
+    return data, f"pesquisa de {year}, {total_fmt} respondentes"
 
 
 def build_source_svg(data, title, source_label, date_label, svg_path,
@@ -195,6 +243,9 @@ def main():
     pypl_data, pypl_date = fetch_pypl()
     print(f"PYPL: dados de {pypl_date}, {len(pypl_data)} linguagens")
 
+    so_data, so_date = fetch_stackoverflow()
+    print(f"Stack Overflow Survey: {so_date}, {len(so_data)} linguagens")
+
     paths = {
         "pypl": os.path.join(DOCS_DIR, "pypl.svg"),
         "octoverse": os.path.join(DOCS_DIR, "octoverse.svg"),
@@ -210,7 +261,7 @@ def main():
         paths["octoverse"], unit="M", estimated=OCTOVERSE_ESTIMATED, grad_id="gradOctoverse",
     )
     build_source_svg(
-        STACKOVERFLOW_2025, "Stack Overflow Survey", "% de respondentes", STACKOVERFLOW_DATE,
+        so_data, "Stack Overflow Survey", "% de respondentes", so_date,
         paths["stackoverflow"], unit="%", grad_id="gradStackoverflow",
     )
 
