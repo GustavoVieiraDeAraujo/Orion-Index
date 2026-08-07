@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 """
 Orion Index: rastreia as linguagens de programacao mais usadas no mundo,
-combinando 3 fontes com metodologias diferentes (de proposito, ver README),
-todas buscadas ao vivo, sem nenhum numero fixo no codigo:
+combinando 3 perspectivas diferentes de proposito (ver README), todas
+buscadas ao vivo, sem nenhum numero fixo no codigo:
 
-- PYPL: interesse de busca por "[linguagem] tutorial" no Google Trends
-  (dado aberto, CC-BY, atualizado pelos mantenedores em pypl/pypl.github.io).
+- GitHub, volume total: quantidade de repositorios publicos existentes por
+  linguagem principal — o que ja existe, acumulado desde sempre.
+- GitHub, criados recentemente: quantidade de repositorios criados nos
+  ultimos 30 dias por linguagem — o que esta sendo adotado agora. Janela
+  movel, muda de verdade a cada execucao (as duas metricas do GitHub usam
+  a mesma API GraphQL oficial, search + language:X).
 - Stack Overflow Developer Survey: % de respondentes que usaram cada
   linguagem no ultimo ano, calculado a partir do CSV oficial de respostas
-  individuais publicado pela propria Stack Exchange no GitHub.
-- GitHub: quantidade de repositorios publicos por linguagem principal,
-  via API GraphQL oficial do GitHub (search + language:X). Nao e a mesma
-  coisa que o relatorio Octoverse (que mede contribuidores mensais, nao
-  repositorios) — trocamos por essa metrica de proposito porque e a unica
-  forma de ter um numero do proprio GitHub 100% automatizavel: o Octoverse
-  em si e so um relatorio esporadico em prosa, sem API nem dataset
-  estruturado por tras (confirmado testando octoverse.github.com e o post
-  do blog, nenhum dos dois tem endpoint de dado).
+  individuais publicado pela propria Stack Exchange no GitHub. Sempre busca
+  o ano mais recente disponivel (tenta o atual, cai pro anterior se ainda
+  nao saiu).
+
+Nao usamos o relatorio Octoverse do GitHub (mede contribuidores mensais):
+e so um relatorio esporadico em prosa, sem API nem dataset estruturado por
+tras (confirmado testando octoverse.github.com e o post do blog, nenhum
+dos dois tem endpoint de dado). E nao usamos o PYPL (interesse de busca via
+Google Trends): apesar de ser dado real e a fonte mais estabelecida pra
+esse angulo, e um projeto pessoal de terceiro sem contrato de acesso —
+preferimos ficar 100% dentro de fontes com API oficial ou dataset publicado
+pela propria organizacao dona do dado.
 
 TIOBE foi excluido de proposito: o termo de uso deles proibe copiar ou
 republicar o conteudo sem consentimento previo, e eles vendem o dataset
@@ -35,7 +42,6 @@ import urllib.request
 csv.field_size_limit(sys.maxsize)
 
 DOCS_DIR = os.path.join(os.path.dirname(__file__), "..", "docs")
-PYPL_URL = "https://raw.githubusercontent.com/pypl/pypl.github.io/master/PYPL/All.js"
 
 # Linguagens que sao marcacao/estilo/consulta, nao linguagem de programacao
 # de proposito geral. Ficam de fora do top 5 de qualquer fonte.
@@ -61,27 +67,6 @@ GITHUB_SEARCH_LANGUAGES = [
     "Rust", "PHP", "Ruby", "Kotlin", "Swift", "Scala", "Shell", "R", "Dart",
     "Elixir", "Haskell", "Objective-C",
 ]
-
-
-def fetch_pypl():
-    """Baixa o dataset publico do PYPL e retorna {linguagem: fatia} do mes mais recente."""
-    with urllib.request.urlopen(PYPL_URL, timeout=30) as resp:
-        text = resp.read().decode("utf-8")
-
-    header_match = re.search(r"'Date',(.*?)\]", text, re.DOTALL)
-    if not header_match:
-        raise RuntimeError("Nao consegui achar o cabecalho de linguagens no PYPL")
-    langs = [x.strip().strip("'") for x in header_match.group(1).split(",") if x.strip()]
-
-    rows = re.findall(r"\[new Date\((\d+),(\d+),\d+\),([^\]]*)\]", text)
-    if not rows:
-        raise RuntimeError("Nao consegui achar nenhuma linha de dados no PYPL")
-    year, month, values_raw = rows[-1]
-    values = [float(v) for v in values_raw.split(",") if v.strip() != ""]
-
-    data = dict(zip(langs, values))
-    date_label = f"{int(month) + 1:02d}/{year}"
-    return data, date_label
 
 
 def fetch_stackoverflow():
@@ -128,32 +113,50 @@ def fetch_stackoverflow():
     return data, f"pesquisa de {year}, {total_fmt} respondentes"
 
 
+def _github_repo_count(lang, qualifiers, token):
+    query = f'{{ search(query: "language:{lang}{qualifiers}", type: REPOSITORY) {{ repositoryCount }} }}'
+    req = urllib.request.Request(
+        "https://api.github.com/graphql",
+        data=json.dumps({"query": query}).encode(),
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        body = json.loads(resp.read().decode())
+    if "errors" in body:
+        raise RuntimeError(f"Erro na busca do GitHub pra {lang}: {body['errors']}")
+    return body["data"]["search"]["repositoryCount"]
+
+
 def fetch_github_repo_counts():
-    """Conta quantos repositorios publicos existem por linguagem principal,
-    via API GraphQL oficial do GitHub (`search(query: "language:X")`).
-    Precisa de um token (o GITHUB_TOKEN automatico do Actions serve, so
-    precisa de acesso de leitura publico)."""
+    """Conta quantos repositorios publicos existem por linguagem principal
+    (volume total acumulado), via API GraphQL oficial do GitHub
+    (`search(query: "language:X")`). Precisa de um token (o GITHUB_TOKEN
+    automatico do Actions serve, so precisa de acesso de leitura publico)."""
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if not token:
         raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
 
-    data = {}
-    for lang in GITHUB_SEARCH_LANGUAGES:
-        query = f'{{ search(query: "language:{lang}", type: REPOSITORY) {{ repositoryCount }} }}'
-        req = urllib.request.Request(
-            "https://api.github.com/graphql",
-            data=json.dumps({"query": query}).encode(),
-            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            body = json.loads(resp.read().decode())
-        if "errors" in body:
-            raise RuntimeError(f"Erro na busca do GitHub pra {lang}: {body['errors']}")
-        data[lang] = body["data"]["search"]["repositoryCount"]
-
+    data = {lang: _github_repo_count(lang, "", token) for lang in GITHUB_SEARCH_LANGUAGES}
     today = datetime.date.today().strftime("%d/%m/%Y")
     return data, f"busca ao vivo, {today}"
+
+
+def fetch_github_recent_repo_counts(days=30):
+    """Conta quantos repositorios publicos foram CRIADOS nos ultimos `days`
+    dias por linguagem principal — janela movel, muda de verdade a cada
+    execucao (ao contrario do total acumulado). Mesma API, so acrescenta o
+    qualificador `created:>DATA`."""
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not token:
+        raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
+
+    cutoff = (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
+    qualifiers = f" created:>{cutoff}"
+    data = {lang: _github_repo_count(lang, qualifiers, token) for lang in GITHUB_SEARCH_LANGUAGES}
+    today = datetime.date.today().strftime("%d/%m/%Y")
+    cutoff_fmt = f"{cutoff.split('-')[2]}/{cutoff.split('-')[1]}"
+    return data, f"últimos {days} dias ({cutoff_fmt} a {today})"
 
 
 def build_source_svg(data, title, source_label, date_label, svg_path,
@@ -183,6 +186,8 @@ def build_source_svg(data, title, source_label, date_label, svg_path,
             label = f"{val * 100:.1f}%"
         elif unit == "M":
             label = f"{'~' if lang in estimated else ''}{val / 1_000_000:.2f}M"
+        elif unit == "k":
+            label = f"{val / 1_000:.1f}k" if val >= 1000 else f"{val:.0f}"
         else:
             label = f"{val:.3f}"
         rows.append(f'''
@@ -254,28 +259,28 @@ def build_combined_svg(panel_paths, out_path):
 
 
 def main():
-    pypl_data, pypl_date = fetch_pypl()
-    print(f"PYPL: dados de {pypl_date}, {len(pypl_data)} linguagens")
+    gh_data, gh_date = fetch_github_repo_counts()
+    print(f"GitHub (total): {gh_date}, {len(gh_data)} linguagens")
+
+    gh_recent_data, gh_recent_date = fetch_github_recent_repo_counts()
+    print(f"GitHub (recentes): {gh_recent_date}, {len(gh_recent_data)} linguagens")
 
     so_data, so_date = fetch_stackoverflow()
     print(f"Stack Overflow Survey: {so_date}, {len(so_data)} linguagens")
 
-    gh_data, gh_date = fetch_github_repo_counts()
-    print(f"GitHub: {gh_date}, {len(gh_data)} linguagens")
-
     paths = {
-        "pypl": os.path.join(DOCS_DIR, "pypl.svg"),
         "github": os.path.join(DOCS_DIR, "github.svg"),
+        "github_recent": os.path.join(DOCS_DIR, "github_recent.svg"),
         "stackoverflow": os.path.join(DOCS_DIR, "stackoverflow.svg"),
     }
 
     build_source_svg(
-        pypl_data, "PYPL", "interesse de busca por tutorial", pypl_date,
-        paths["pypl"], unit="pct_frac", grad_id="gradPypl",
+        gh_data, "GitHub — Volume Total", "repositórios por linguagem", gh_date,
+        paths["github"], unit="M", grad_id="gradGithub",
     )
     build_source_svg(
-        gh_data, "GitHub", "repositórios por linguagem", gh_date,
-        paths["github"], unit="M", grad_id="gradGithub",
+        gh_recent_data, "GitHub — Em Alta", "repositórios criados", gh_recent_date,
+        paths["github_recent"], unit="k", grad_id="gradGithubRecent",
     )
     build_source_svg(
         so_data, "Stack Overflow Survey", "% de respondentes", so_date,
@@ -283,7 +288,7 @@ def main():
     )
 
     build_combined_svg(
-        [paths["pypl"], paths["github"], paths["stackoverflow"]],
+        [paths["github"], paths["github_recent"], paths["stackoverflow"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
     )
 
