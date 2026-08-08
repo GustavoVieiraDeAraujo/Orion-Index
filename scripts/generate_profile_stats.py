@@ -144,15 +144,22 @@ BADGE_INFO = {
 }
 
 
+FORK_ALLOWLIST = {"Trabalho-Sofware-Basico"}
+
+
 def list_profile_repos():
     """Endpoint publico users/{login}/repos: funciona com qualquer token,
-    ja retorna so o que e publico."""
+    ja retorna so o que e publico. Forks ficam de fora (nao e codigo meu),
+    exceto os listados em FORK_ALLOWLIST."""
     result = subprocess.run(
         ["gh", "api", f"users/{PROFILE_OWNER}/repos?per_page=100&type=owner", "--paginate", "-q", ".[]"],
         capture_output=True, text=True, check=True,
     )
     repos = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
-    return [r for r in repos if not r["fork"] and r["name"] != PROFILE_REPO_NAME]
+    return [
+        r for r in repos
+        if r["name"] != PROFILE_REPO_NAME and (not r["fork"] or r["name"] in FORK_ALLOWLIST)
+    ]
 
 
 def count_lines(repo_full_name):
