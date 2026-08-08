@@ -1,40 +1,7 @@
 #!/usr/bin/env python3
-"""
-Orion Index: rastreia as linguagens de programacao mais usadas no mundo,
-combinando 4 perspectivas diferentes de proposito (ver README), as 4
-vindas exclusivamente da API GraphQL oficial do GitHub (search + language:X),
-buscadas ao vivo, sem nenhum numero fixo no codigo:
-
-- Repositorios totais: quantidade de repositorios publicos existentes por
-  linguagem principal — o que ja existe, acumulado desde sempre.
-- Repositorios novos: quantidade de repositorios CRIADOS nos ultimos 30
-  dias por linguagem — volume absoluto do que esta sendo adotado agora.
-  Janela movel, muda de verdade a cada execucao (`created:>DATA`).
-- Crescimento relativo: novos ÷ total, por linguagem — nao e busca nova,
-  e so a razao entre as duas de cima. Revela quem esta crescendo mais
-  RAPIDO em relacao ao proprio tamanho: linguagem pequena mas em expansao
-  (ex: Rust, Kotlin) pode aparecer na frente de uma gigante estabelecida
-  que cresce muito em numero absoluto mas pouco proporcionalmente.
-- Repositorios por finalidade: quantidade de repositorios por TOPICO de
-  proposito (`topic:X`, sem filtro de linguagem) -- ao inves de comparar
-  linguagem entre si, compara pra que as pessoas estao usando codigo agora
-  (IA, API, automacao, ciencia de dados, devops...). Unica das 4 que nao
-  rankeia linguagem.
-
-Nao usamos o relatorio Octoverse do GitHub (mede contribuidores mensais):
-e so um relatorio esporadico em prosa, sem API nem dataset estruturado por
-tras (confirmado testando octoverse.github.com e o post do blog, nenhum
-dos dois tem endpoint de dado). E nao usamos o PYPL (interesse de busca via
-Google Trends): apesar de ser dado real e a fonte mais estabelecida pra
-esse angulo, e um projeto pessoal de terceiro sem contrato de acesso. E nao
-usamos mais a Stack Overflow Survey: pra ficar 100% dentro de uma unica
-fonte, com uma unica API oficial e um unico modelo de confianca, em vez de
-misturar API ao vivo com CSV anual de terceiro.
-
-TIOBE foi excluido de proposito: o termo de uso deles proibe copiar ou
-republicar o conteudo sem consentimento previo, e eles vendem o dataset
-completo. Nao faz sentido raspar o que e vendido como produto.
-"""
+# Busca as 4 perspectivas do Orion Index na API GraphQL do GitHub e gera os
+# cartoes SVG em docs/. Por que essas 4 (e nao PYPL/TIOBE/Octoverse) esta
+# explicado no README, nao repetido aqui.
 import datetime
 import json
 import os
@@ -100,10 +67,7 @@ def _github_repo_count(lang, qualifiers, token):
 
 
 def fetch_github_repo_counts():
-    """Conta quantos repositorios publicos existem por linguagem principal
-    (volume total acumulado), via API GraphQL oficial do GitHub
-    (`search(query: "language:X")`). Precisa de um token (o GITHUB_TOKEN
-    automatico do Actions serve, so precisa de acesso de leitura publico)."""
+    """Repositorios publicos existentes por linguagem, acumulado historico."""
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if not token:
         raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
@@ -114,10 +78,8 @@ def fetch_github_repo_counts():
 
 
 def fetch_github_recent_repo_counts(days=30):
-    """Conta quantos repositorios publicos foram CRIADOS nos ultimos `days`
-    dias por linguagem principal — janela movel, muda de verdade a cada
-    execucao (ao contrario do total acumulado). Mesma API, so acrescenta o
-    qualificador `created:>DATA`."""
+    """Repositorios criados nos ultimos `days` dias por linguagem. Janela
+    movel: o corte de data muda a cada execucao."""
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if not token:
         raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
@@ -131,12 +93,9 @@ def fetch_github_recent_repo_counts(days=30):
 
 
 def compute_growth_rates(total_data, new_data):
-    """Nao busca nada novo: so divide novos ÷ total por linguagem. Enquanto
-    'total' mede tamanho absoluto e 'novos' mede volume absoluto de adocao,
-    isso mede VELOCIDADE relativa — quem esta crescendo mais rapido em
-    relacao ao proprio tamanho, o que pode inverter o ranking das duas
-    metricas absolutas (linguagem pequena em expansao rapida na frente de
-    gigante estabelecida que cresce pouco proporcionalmente)."""
+    """Novos ÷ total por linguagem -- normaliza pelo tamanho, entao uma
+    linguagem pequena crescendo rapido pode superar uma gigante estabelecida
+    aqui mesmo perdendo nas duas metricas absolutas."""
     return {
         lang: 100 * new_data[lang] / total_data[lang]
         for lang in total_data
@@ -145,9 +104,8 @@ def compute_growth_rates(total_data, new_data):
 
 
 def fetch_github_purpose_counts():
-    """Conta repositorios por TOPICO de finalidade (`topic:X`, sem filtro de
-    linguagem) -- pra que as pessoas estao usando codigo agora, nao qual
-    linguagem. Mesma API GraphQL, so troca o que vai dentro de `query`."""
+    """Repositorios por topico de proposito (`topic:X`), sem filtro de
+    linguagem -- pra que o codigo esta sendo usado, nao em qual linguagem."""
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if not token:
         raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
@@ -167,10 +125,7 @@ def short_label(text, max_chars=22):
 def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
                       gradient=("#D1D5DB", "#374151"), top_n=5, grad_id="cardBg",
                       default_color="#8a8a8a"):
-    """Cartao padrao: layout empilhado (rotulo numa linha, barra full-width
-    embaixo) -- mesmo estilo usado nos cartoes do meu repositorio, de
-    proposito, pra manter um padrao unico visual em toda a fileira de
-    cartoes do Orion Index, nao so nos cartoes do perfil."""
+    """Renderiza um cartao de barras: rotulo em cima, barra full-width embaixo."""
     filtered = {k: v for k, v in data.items() if k not in NOT_PROGRAMMING_LANGUAGES}
     ranked = sorted(filtered.items(), key=lambda kv: kv[1], reverse=True)[:top_n]
     bar_scale = ranked[0][1] if ranked else 1
@@ -231,13 +186,9 @@ def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
 
 
 def build_combined_svg(panel_paths, out_path, cols=2):
-    """Junta os 4 SVGs individuais numa grade (2 colunas, 2 linhas por
-    padrao) num so arquivo, via manipulacao de texto simples (evita os
-    problemas de namespace do xml.etree ao mesclar varios documentos SVG
-    independentes). Nao leva data de atualizacao embutida: quem usa a
-    imagem decide como e onde mostrar isso (o proprio README deste repo,
-    ou de quem embutir, pode puxar a data do ultimo commit via API do
-    GitHub)."""
+    """Junta os cartoes numa grade e escreve o SVG combinado. Concatena texto
+    em vez de usar xml.etree pra nao esbarrar em conflito de id/namespace
+    entre os SVGs originais."""
     gap = 16
     parsed = []
     for path in panel_paths:

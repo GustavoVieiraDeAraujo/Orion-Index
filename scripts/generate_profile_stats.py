@@ -1,26 +1,10 @@
 #!/usr/bin/env python3
-"""
-Gera as estatisticas do PERFIL de GustavoVieiraDeAraujo (nao e o Orion Index
-em si -- e um script separado que so mora aqui pra concentrar toda a
-automacao de dashboard num unico lugar, em vez de espalhar em mais um
-repositorio). Faz duas coisas:
-
-1. Varre os repositorios publicos do Gustavo (linhas de codigo, repositorios
-   mais extensos, commits, topicos) e gera cartoes SVG em docs/profile_*.svg
-   aqui neste repositorio.
-2. Clona https://github.com/GustavoVieiraDeAraujo/GustavoVieiraDeAraujo,
-   atualiza os blocos STATS/SKILLS do README.md de la (marcadores
-   <!-- X:START/END -->) e da push -- precisa de um token com permissao de
-   escrita naquele outro repositorio (secret PROFILE_PAT), porque o
-   GITHUB_TOKEN padrao do Actions so enxerga o repositorio onde ele roda.
-   (A secao "Projetos de Exposicao" do README do perfil e curada a mao, nao
-   e mais gerada automaticamente -- por isso nao tem mais bloco RECENT.)
-
-O card "Estatisticas do GitHub" (linguagens mais usadas no MUNDO) que entra
-no README do perfil e o proprio docs/orion-index.svg gerado por generate.py
--- aqui so lemos a data do ultimo commit dele pra mostrar quando foi
-atualizado de verdade.
-"""
+# Automacao pessoal do perfil, nao do Orion Index em si -- mora aqui so pra
+# nao espalhar workflow em mais um repositorio. Varre os repos publicos do
+# Gustavo, gera os cartoes de docs/profile_*.svg e depois clona o repo de
+# perfil (via secret PROFILE_PAT, ja que o token padrao do Actions nao
+# enxerga fora deste repositorio) pra atualizar os blocos STATS/SKILLS do
+# README de la.
 import datetime
 import json
 import os
@@ -160,10 +144,8 @@ BADGE_INFO = {
 
 
 def list_profile_repos():
-    """Usa o endpoint PUBLICO users/{login}/repos (nao user/repos): funciona
-    com qualquer token, mesmo o GITHUB_TOKEN deste repositorio (que nao tem
-    nenhuma relacao de "usuario autenticado" com a conta do Gustavo) --
-    e so retorna repositorio publico mesmo, o que ja e o filtro que queremos."""
+    """Endpoint publico users/{login}/repos: funciona com qualquer token,
+    ja retorna so o que e publico."""
     result = subprocess.run(
         ["gh", "api", f"users/{PROFILE_OWNER}/repos?per_page=100&type=owner", "--paginate", "-q", ".[]"],
         capture_output=True, text=True, check=True,
@@ -224,13 +206,10 @@ def count_commits(repo_full_name):
 
 
 def orion_index_last_update():
-    """Data do ultimo commit que mexeu no card combinado do Orion Index, via
-    API do GitHub (nao da pra confiar no `git log` local aqui: o checkout
-    deste workflow e raso -- fetch-depth 1 -- e um repositorio raso so tem
-    UM commit de historico, entao "git log -- path" acaba devolvendo a data
-    desse unico commit mesmo quando ele nao tocou o arquivo, em vez de
-    devolver vazio. A API sempre busca o historico de verdade, direto do
-    servidor, sem depender de quanta historia foi baixada localmente)."""
+    """Data do ultimo commit que mexeu no card combinado do Orion Index.
+    Via API, nao `git log` local: o checkout deste workflow e raso
+    (fetch-depth 1), entao um `git log -- path` local devolve a data do
+    unico commit baixado mesmo quando ele nao tocou o arquivo."""
     result = subprocess.run(
         ["gh", "api", "repos/GustavoVieiraDeAraujo/Orion-Index/commits?path=docs/orion-index.svg&per_page=1",
          "-q", ".[0].commit.committer.date"],
@@ -252,14 +231,9 @@ def short_label(text, max_chars=15):
 def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
                      default_color="#60a5fa", top_n=5, order="value", grad_id="cardBg",
                      layout="side", label_w=84, label_chars=13):
-    """Cartao de barras padrao: 380px nativo, sempre top N linhas. Sem
-    subtitulo de proposito: o titulo tem que ser mnemonico sozinho, o
-    detalhe de cada tabela fica explicado no NOTE do README, nao repetido
-    dentro do card.
-
-    `layout="side"` (padrao): rotulo a esquerda, barra a direita -- bom pra
-    rotulo curto. `layout="stacked"`: rotulo numa linha, barra full-width
-    embaixo -- bom pra rotulo longo (nome de repositorio)."""
+    """Cartao de barras top N. `layout="side"`: rotulo a esquerda, barra a
+    direita (rotulo curto). `layout="stacked"`: rotulo em cima, barra
+    full-width embaixo (rotulo longo, tipo nome de repositorio)."""
     color_map = color_map or {}
     items = list(data.items())
     if order == "value":
@@ -332,10 +306,8 @@ def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
 
 
 def build_combined_row(panel_paths, out_path, cols=2):
-    """Junta N SVGs de cartao numa grade (2 colunas, 2 linhas por padrao)
-    num so arquivo (concatenacao de texto, mesma tecnica do generate.py --
-    evita conflito de namespace/id do xml.etree ao mesclar varios
-    documentos SVG independentes)."""
+    """Junta os cartoes numa grade (2 colunas por padrao). Concatena texto
+    em vez de xml.etree pra nao esbarrar em conflito de id/namespace."""
     parsed = []
     for path in panel_paths:
         with open(path, "r", encoding="utf-8") as f:
@@ -410,11 +382,9 @@ def build_stats_block(grand_total_lines, n_repos):
 
 
 def build_skills_block(topics_count, total_lines):
-    """Gera os icones a partir das estatisticas de verdade, nao de uma lista
-    escolhida a dedo: primeiro as linguagens medidas por linhas de codigo
-    (o dado mais confiavel que temos, ordenado por volume), depois as
-    ferramentas/frameworks que so dao pra saber pelos topicos dos repositorios
-    (React, Rails, Postgres etc, que uma linguagem sozinha nao revela)."""
+    """Ordena por linguagens medidas em LOC primeiro (dado mais confiavel),
+    depois ferramentas/frameworks que so os topicos revelam (React, Rails,
+    Postgres etc)."""
     codes = []
 
     lang_ranked = sorted(total_lines.items(), key=lambda kv: kv[1], reverse=True)
@@ -446,10 +416,8 @@ def build_skills_block(topics_count, total_lines):
 
 
 def push_profile_readme(blocks, pat):
-    """Clona o repositorio de perfil com o PAT embutido na URL, substitui os
-    3 blocos marcados no README.md, e da commit+push -- unico jeito de um
-    workflow deste repositorio (Orion Index) escrever em OUTRO repositorio,
-    ja que o GITHUB_TOKEN padrao do Actions so tem permissao aqui dentro."""
+    """Clona o repo de perfil com o PAT embutido na URL, substitui os blocos
+    marcados no README.md e da commit+push."""
     tmp = tempfile.mkdtemp(prefix="profile-")
     url = f"https://x-access-token:{pat}@github.com/{PROFILE_REPO_FULL}.git"
     try:

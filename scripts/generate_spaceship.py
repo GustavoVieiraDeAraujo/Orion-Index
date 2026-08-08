@@ -1,28 +1,9 @@
 #!/usr/bin/env python3
-"""
-Gera uma animacao SVG ORIGINAL (nave espacial atirando nos commits do
-grafico de contribuicoes do Gustavo) a partir dos dados reais de
-contribuicao, buscados ao vivo via GraphQL do GitHub. Nao usa nenhuma
-action, biblioteca ou gerador pronto de terceiro pra isso -- so a API
-oficial do GitHub pros dados, e SVG + SMIL (animacao nativa do proprio
-formato SVG, sem JS) escritos aqui do zero.
-
-Como a animacao e construida:
-- Cada semana do ano vira uma coluna, cada dia da semana uma linha -- mesma
-  grade do grafico de contribuicoes de verdade do GitHub.
-- A nave percorre a grade em zigue-zague (varre a linha de domingo da
-  esquerda pra direita, desce, varre a linha de segunda da direita pra
-  esquerda, e assim por diante) via <animateMotion> com um path calculado,
-  virando de verdade (rotate="auto") conforme a direcao do trecho.
-- Quadrado com contribuicao de verdade (count > 0) "explode" quando a nave
-  passa: flash branco, leve estouro de escala, e particulas que saem
-  voando do centro do quadrado. Quadrado vazio (sem commit naquele dia) so
-  desaparece rapido, sem efeito, porque nunca foi um alvo de verdade.
-- O instante exato de cada explosao ("begin") e calculado a partir da
-  posicao real da nave no path naquele momento, pra ela atingir o quadrado
-  bem na hora que passa por cima.
-- No fim do ciclo tudo reaparece e recomeca (repeatCount indefinite).
-"""
+# Nave espacial atirando no grafico de contribuicoes, feita do zero em
+# SVG + SMIL (sem JS, sem biblioteca de animacao). Dados reais via GraphQL.
+# A nave varre a grade em zigue-zague; cada quadrado com contribuicao
+# explode (flash + particulas) no instante em que ela passa por cima,
+# calculado a partir da posicao dela no path naquele momento.
 import json
 import math
 import os
