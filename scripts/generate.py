@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Orion Index: rastreia as linguagens de programacao mais usadas no mundo,
-combinando 3 perspectivas diferentes de proposito (ver README), as 3
+combinando 4 perspectivas diferentes de proposito (ver README), as 4
 vindas exclusivamente da API GraphQL oficial do GitHub (search + language:X),
 buscadas ao vivo, sem nenhum numero fixo no codigo:
 
@@ -15,6 +15,11 @@ buscadas ao vivo, sem nenhum numero fixo no codigo:
   RAPIDO em relacao ao proprio tamanho: linguagem pequena mas em expansao
   (ex: Rust, Kotlin) pode aparecer na frente de uma gigante estabelecida
   que cresce muito em numero absoluto mas pouco proporcionalmente.
+- Repositorios por finalidade: quantidade de repositorios por TOPICO de
+  proposito (`topic:X`, sem filtro de linguagem) -- ao inves de comparar
+  linguagem entre si, compara pra que as pessoas estao usando codigo agora
+  (IA, API, automacao, ciencia de dados, devops...). Unica das 4 que nao
+  rankeia linguagem.
 
 Nao usamos o relatorio Octoverse do GitHub (mede contribuidores mensais):
 e so um relatorio esporadico em prosa, sem API nem dataset estruturado por
@@ -59,9 +64,24 @@ GITHUB_SEARCH_LANGUAGES = [
     "Elixir", "Haskell", "Objective-C",
 ]
 
+# finalidade/proposito -> topico usado no GitHub pra marcar repositorios
+# daquele tipo. Candidatos curados; o card mostra o top 5 por contagem real,
+# igual a lista de linguagens acima (nem toda finalidade cabe no top 5).
+GITHUB_PURPOSE_TOPICS = {
+    "IA / Machine Learning": "machine-learning",
+    "APIs": "api",
+    "Automação": "automation",
+    "Ciência de Dados": "data-science",
+    "DevOps": "devops",
+    "Jogos": "game-development",
+    "Segurança": "cybersecurity",
+    "Aplicações Web": "webapp",
+    "Mobile": "mobile-app",
+}
 
-def _github_repo_count(lang, qualifiers, token):
-    query = f'{{ search(query: "language:{lang}{qualifiers}", type: REPOSITORY) {{ repositoryCount }} }}'
+
+def _github_search_count(query_str, token):
+    query = f'{{ search(query: "{query_str}", type: REPOSITORY) {{ repositoryCount }} }}'
     req = urllib.request.Request(
         "https://api.github.com/graphql",
         data=json.dumps({"query": query}).encode(),
@@ -71,8 +91,12 @@ def _github_repo_count(lang, qualifiers, token):
     with urllib.request.urlopen(req, timeout=30) as resp:
         body = json.loads(resp.read().decode())
     if "errors" in body:
-        raise RuntimeError(f"Erro na busca do GitHub pra {lang}: {body['errors']}")
+        raise RuntimeError(f"Erro na busca do GitHub pra '{query_str}': {body['errors']}")
     return body["data"]["search"]["repositoryCount"]
+
+
+def _github_repo_count(lang, qualifiers, token):
+    return _github_search_count(f"language:{lang}{qualifiers}", token)
 
 
 def fetch_github_repo_counts():
@@ -120,26 +144,49 @@ def compute_growth_rates(total_data, new_data):
     }
 
 
-def build_source_svg(data, title, svg_path,
-                      unit="%", estimated=frozenset(), gradient=("#D1D5DB", "#374151"), top_n=5, grad_id="cardBg"):
+def fetch_github_purpose_counts():
+    """Conta repositorios por TOPICO de finalidade (`topic:X`, sem filtro de
+    linguagem) -- pra que as pessoas estao usando codigo agora, nao qual
+    linguagem. Mesma API GraphQL, so troca o que vai dentro de `query`."""
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not token:
+        raise RuntimeError("GITHUB_TOKEN/GH_TOKEN nao configurado")
+
+    data = {
+        purpose: _github_search_count(f"topic:{topic}", token)
+        for purpose, topic in GITHUB_PURPOSE_TOPICS.items()
+    }
+    today = datetime.date.today().strftime("%d/%m/%Y")
+    return data, f"busca ao vivo, {today}"
+
+
+def short_label(text, max_chars=22):
+    return text if len(text) <= max_chars else text[: max_chars - 1] + "…"
+
+
+def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
+                      gradient=("#D1D5DB", "#374151"), top_n=5, grad_id="cardBg",
+                      default_color="#8a8a8a"):
+    """Cartao padrao: layout empilhado (rotulo numa linha, barra full-width
+    embaixo) -- mesmo estilo usado nos cartoes do meu repositorio, de
+    proposito, pra manter um padrao unico visual em toda a fileira de
+    cartoes do Orion Index, nao so nos cartoes do perfil."""
     filtered = {k: v for k, v in data.items() if k not in NOT_PROGRAMMING_LANGUAGES}
     ranked = sorted(filtered.items(), key=lambda kv: kv[1], reverse=True)[:top_n]
     bar_scale = ranked[0][1] if ranked else 1
 
-    row_h = 32
     card_pad = 20
     title_h = 30
+    row_h = 50
     width = 380
-    label_w = 84
-    bar_x = card_pad + label_w + 10
-    bar_max_w = width - bar_x - card_pad - 56
+    bar_w_full = width - card_pad * 2 - 54
     height = card_pad * 2 + title_h + row_h * len(ranked)
 
     rows = []
     for i, (lang, val) in enumerate(ranked):
-        bar_w = max(3, round(bar_max_w * val / bar_scale))
-        cy = card_pad + title_h + i * row_h + row_h / 2
-        color = LANG_COLORS.get(lang, "#8a8a8a")
+        bar_w = max(3, round(bar_w_full * val / bar_scale))
+        row_top = card_pad + title_h + i * row_h
+        color = LANG_COLORS.get(lang, default_color)
         star = " *" if lang in estimated else ""
         if unit == "%":
             label = f"{val:.1f}%"
@@ -152,10 +199,10 @@ def build_source_svg(data, title, svg_path,
         else:
             label = f"{val:.3f}"
         rows.append(f'''
-    <text x="{card_pad + label_w}" y="{cy + 4}" text-anchor="end" class="lbl">{lang}{star}</text>
-    <rect x="{bar_x}" y="{cy - 6.5}" width="{bar_max_w}" height="13" rx="6.5" class="track"/>
-    <rect x="{bar_x}" y="{cy - 6.5}" width="{bar_w}" height="13" rx="6.5" fill="{color}" class="bar"/>
-    <text x="{bar_x + bar_max_w + 10}" y="{cy + 4}" class="val">{label}</text>''')
+    <text x="{card_pad}" y="{row_top + 15}" class="lbl">{short_label(str(lang))}{star}</text>
+    <rect x="{card_pad}" y="{row_top + 23}" width="{bar_w_full}" height="11" rx="5.5" class="track"/>
+    <rect x="{card_pad}" y="{row_top + 23}" width="{bar_w}" height="11" rx="5.5" fill="{color}" class="bar"/>
+    <text x="{card_pad + bar_w_full + 8}" y="{row_top + 32}" class="val">{label}</text>''')
 
     svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}">
   <defs>
@@ -183,37 +230,38 @@ def build_source_svg(data, title, svg_path,
         f.write(svg)
 
 
-def build_combined_svg(panel_paths, out_path):
-    """Junta os 3 SVGs individuais lado a lado num so arquivo, via manipulacao
-    de texto simples (evita os problemas de namespace do xml.etree ao mesclar
-    varios documentos SVG independentes). Nao leva data de atualizacao
-    embutida: quem usa a imagem decide como e onde mostrar isso (o proprio
-    README deste repo, ou de quem embutir, pode puxar a data do ultimo
-    commit via API do GitHub)."""
+def build_combined_svg(panel_paths, out_path, cols=2):
+    """Junta os 4 SVGs individuais numa grade (2 colunas, 2 linhas por
+    padrao) num so arquivo, via manipulacao de texto simples (evita os
+    problemas de namespace do xml.etree ao mesclar varios documentos SVG
+    independentes). Nao leva data de atualizacao embutida: quem usa a
+    imagem decide como e onde mostrar isso (o proprio README deste repo,
+    ou de quem embutir, pode puxar a data do ultimo commit via API do
+    GitHub)."""
     gap = 16
-    inner_bodies = []
-    total_w = 0.0
-    max_h = 0.0
-
+    parsed = []
     for path in panel_paths:
         with open(path, "r", encoding="utf-8") as f:
             content = f.read()
         w = float(re.search(r'width="([\d.]+)"', content).group(1))
         h = float(re.search(r'height="([\d.]+)"', content).group(1))
         body = re.search(r"<svg[^>]*>(.*)</svg>", content, re.DOTALL).group(1)
-        inner_bodies.append((body, w))
-        total_w += w + gap
-        max_h = max(max_h, h)
-    total_w -= gap
+        parsed.append((body, w, h))
+
+    col_w = parsed[0][1]
+    row_h = max(h for _, _, h in parsed)
+    n_rows = -(-len(parsed) // cols)  # ceil sem importar math
+    total_w = cols * col_w + (cols - 1) * gap
+    total_h = n_rows * row_h + (n_rows - 1) * gap
 
     groups = []
-    x_offset = 0.0
-    for body, w in inner_bodies:
-        groups.append(f'<g transform="translate({x_offset},0)">{body}</g>')
-        x_offset += w + gap
+    for i, (body, w, h) in enumerate(parsed):
+        col, row = i % cols, i // cols
+        x, y = col * (col_w + gap), row * (row_h + gap)
+        groups.append(f'<g transform="translate({x},{y})">{body}</g>')
 
     combined = (
-        f'<svg width="{total_w}" height="{max_h}" viewBox="0 0 {total_w} {max_h}" '
+        f'<svg width="{total_w}" height="{total_h}" viewBox="0 0 {total_w} {total_h}" '
         f'xmlns="http://www.w3.org/2000/svg">\n' + "\n".join(groups) + "\n</svg>\n"
     )
 
@@ -231,12 +279,19 @@ def main():
     growth_data = compute_growth_rates(gh_data, gh_new_data)
     print(f"GitHub (crescimento): derivado de total e novos, {len(growth_data)} linguagens")
 
+    purpose_data, purpose_date = fetch_github_purpose_counts()
+    print(f"GitHub (finalidade): {purpose_date}, {len(purpose_data)} topicos")
+
     paths = {
-        "github_total": os.path.join(DOCS_DIR, "github_total.svg"),
         "github_new": os.path.join(DOCS_DIR, "github_new.svg"),
+        "github_total": os.path.join(DOCS_DIR, "github_total.svg"),
+        "github_purpose": os.path.join(DOCS_DIR, "github_purpose.svg"),
         "github_growth": os.path.join(DOCS_DIR, "github_growth.svg"),
     }
 
+    # ordem bate com a ordem dos bullets no NOTE do README (texto mais
+    # curto primeiro, mais longo por ultimo) -- linha 1: Novos + Totais,
+    # linha 2: Finalidade + Crescimento
     build_source_svg(
         gh_new_data, "Repositórios Novos",
         paths["github_new"], unit="k", grad_id="gradGithubNew",
@@ -246,13 +301,19 @@ def main():
         paths["github_total"], unit="M", grad_id="gradGithubTotal",
     )
     build_source_svg(
+        purpose_data, "Repositórios por Finalidade",
+        paths["github_purpose"], unit="k", grad_id="gradGithubPurpose",
+        default_color="#a78bfa",
+    )
+    build_source_svg(
         growth_data, "Crescimento Relativo",
         paths["github_growth"], unit="%", grad_id="gradGithubGrowth",
     )
 
     build_combined_svg(
-        [paths["github_new"], paths["github_total"], paths["github_growth"]],
+        [paths["github_new"], paths["github_total"], paths["github_purpose"], paths["github_growth"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
+        cols=2,
     )
 
     print("SVGs gerados em docs/.")

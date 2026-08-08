@@ -1,5 +1,5 @@
-<svg width="1172.0" height="230.0" viewBox="0 0 1172.0 230.0" xmlns="http://www.w3.org/2000/svg">
-<g transform="translate(0.0,0)">
+<svg width="776.0" height="656.0" viewBox="0 0 776.0 656.0" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(0.0,0.0)">
   <defs>
     <linearGradient id="gradGithubNew" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#D1D5DB"/>
@@ -15,31 +15,31 @@
     .track { fill: rgba(0,0,0,0.15); }
     .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
   </style>
-  <rect x="0" y="0" width="380" height="230" rx="14" class="card"/>
+  <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
   <text x="20" y="37" class="title">Repositórios Novos</text>
   
-    <text x="104" y="70.0" text-anchor="end" class="lbl">Python</text>
-    <rect x="114" y="59.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="59.5" width="190" height="13" rx="6.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="70.0" class="val">1158.2k</text>
-    <text x="104" y="102.0" text-anchor="end" class="lbl">JavaScript</text>
-    <rect x="114" y="91.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="91.5" width="145" height="13" rx="6.5" fill="#f1e05a" class="bar"/>
-    <text x="314" y="102.0" class="val">884.1k</text>
-    <text x="104" y="134.0" text-anchor="end" class="lbl">TypeScript</text>
-    <rect x="114" y="123.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="123.5" width="133" height="13" rx="6.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="134.0" class="val">810.2k</text>
-    <text x="104" y="166.0" text-anchor="end" class="lbl">Java</text>
-    <rect x="114" y="155.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="155.5" width="36" height="13" rx="6.5" fill="#b07219" class="bar"/>
-    <text x="314" y="166.0" class="val">220.7k</text>
-    <text x="104" y="198.0" text-anchor="end" class="lbl">C++</text>
-    <rect x="114" y="187.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="187.5" width="17" height="13" rx="6.5" fill="#f34b7d" class="bar"/>
-    <text x="314" y="198.0" class="val">104.4k</text>
+    <text x="20" y="65" class="lbl">Python</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <text x="314" y="82" class="val">1159.7k</text>
+    <text x="20" y="115" class="lbl">JavaScript</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="218" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
+    <text x="314" y="132" class="val">885.3k</text>
+    <text x="20" y="165" class="lbl">TypeScript</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="200" height="11" rx="5.5" fill="#3178c6" class="bar"/>
+    <text x="314" y="182" class="val">811.4k</text>
+    <text x="20" y="215" class="lbl">Java</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="55" height="11" rx="5.5" fill="#b07219" class="bar"/>
+    <text x="314" y="232" class="val">221.0k</text>
+    <text x="20" y="265" class="lbl">C++</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="26" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
+    <text x="314" y="282" class="val">104.6k</text>
 </g>
-<g transform="translate(396.0,0)">
+<g transform="translate(396.0,0.0)">
   <defs>
     <linearGradient id="gradGithubTotal" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#D1D5DB"/>
@@ -55,31 +55,71 @@
     .track { fill: rgba(0,0,0,0.15); }
     .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
   </style>
-  <rect x="0" y="0" width="380" height="230" rx="14" class="card"/>
+  <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
   <text x="20" y="37" class="title">Repositórios Totais</text>
   
-    <text x="104" y="70.0" text-anchor="end" class="lbl">JavaScript</text>
-    <rect x="114" y="59.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="59.5" width="190" height="13" rx="6.5" fill="#f1e05a" class="bar"/>
-    <text x="314" y="70.0" class="val">46.30M</text>
-    <text x="104" y="102.0" text-anchor="end" class="lbl">Python</text>
-    <rect x="114" y="91.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="91.5" width="132" height="13" rx="6.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="102.0" class="val">32.17M</text>
-    <text x="104" y="134.0" text-anchor="end" class="lbl">Java</text>
-    <rect x="114" y="123.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="123.5" width="88" height="13" rx="6.5" fill="#b07219" class="bar"/>
-    <text x="314" y="134.0" class="val">21.39M</text>
-    <text x="104" y="166.0" text-anchor="end" class="lbl">TypeScript</text>
-    <rect x="114" y="155.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="155.5" width="72" height="13" rx="6.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="166.0" class="val">17.55M</text>
-    <text x="104" y="198.0" text-anchor="end" class="lbl">C#</text>
-    <rect x="114" y="187.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="187.5" width="31" height="13" rx="6.5" fill="#178600" class="bar"/>
-    <text x="314" y="198.0" class="val">7.55M</text>
+    <text x="20" y="65" class="lbl">JavaScript</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
+    <text x="314" y="82" class="val">46.30M</text>
+    <text x="20" y="115" class="lbl">Python</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="199" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <text x="314" y="132" class="val">32.17M</text>
+    <text x="20" y="165" class="lbl">Java</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="132" height="11" rx="5.5" fill="#b07219" class="bar"/>
+    <text x="314" y="182" class="val">21.39M</text>
+    <text x="20" y="215" class="lbl">TypeScript</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="108" height="11" rx="5.5" fill="#3178c6" class="bar"/>
+    <text x="314" y="232" class="val">17.55M</text>
+    <text x="20" y="265" class="lbl">C#</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="47" height="11" rx="5.5" fill="#178600" class="bar"/>
+    <text x="314" y="282" class="val">7.55M</text>
 </g>
-<g transform="translate(792.0,0)">
+<g transform="translate(0.0,336.0)">
+  <defs>
+    <linearGradient id="gradGithubPurpose" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D1D5DB"/>
+      <stop offset="100%" stop-color="#374151"/>
+    </linearGradient>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }
+    .card { fill: url(#gradGithubPurpose); stroke: #4b5563; stroke-width: 1; }
+    .title { fill: #1f2937; font-weight: 700; font-size: 15.5px; }
+    .lbl { fill: #1f2937; font-weight: 600; }
+    .val { fill: #f9fafb; }
+    .track { fill: rgba(0,0,0,0.15); }
+    .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
+  </style>
+  <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
+  <text x="20" y="37" class="title">Repositórios por Finalidade</text>
+  
+    <text x="20" y="65" class="lbl">IA / Machine Learning</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="82" class="val">228.8k</text>
+    <text x="20" y="115" class="lbl">APIs</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="183" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="132" class="val">146.6k</text>
+    <text x="20" y="165" class="lbl">Automação</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="110" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="182" class="val">88.0k</text>
+    <text x="20" y="215" class="lbl">Ciência de Dados</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="97" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="232" class="val">77.5k</text>
+    <text x="20" y="265" class="lbl">DevOps</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="48" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="282" class="val">38.6k</text>
+</g>
+<g transform="translate(396.0,336.0)">
   <defs>
     <linearGradient id="gradGithubGrowth" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#D1D5DB"/>
@@ -95,28 +135,28 @@
     .track { fill: rgba(0,0,0,0.15); }
     .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
   </style>
-  <rect x="0" y="0" width="380" height="230" rx="14" class="card"/>
+  <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
   <text x="20" y="37" class="title">Crescimento Relativo</text>
   
-    <text x="104" y="70.0" text-anchor="end" class="lbl">TypeScript</text>
-    <rect x="114" y="59.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="59.5" width="190" height="13" rx="6.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="70.0" class="val">4.6%</text>
-    <text x="104" y="102.0" text-anchor="end" class="lbl">Rust</text>
-    <rect x="114" y="91.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="91.5" width="155" height="13" rx="6.5" fill="#dea584" class="bar"/>
-    <text x="314" y="102.0" class="val">3.8%</text>
-    <text x="104" y="134.0" text-anchor="end" class="lbl">Python</text>
-    <rect x="114" y="123.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="123.5" width="148" height="13" rx="6.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="134.0" class="val">3.6%</text>
-    <text x="104" y="166.0" text-anchor="end" class="lbl">Dart</text>
-    <rect x="114" y="155.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="155.5" width="95" height="13" rx="6.5" fill="#8a8a8a" class="bar"/>
-    <text x="314" y="166.0" class="val">2.3%</text>
-    <text x="104" y="198.0" text-anchor="end" class="lbl">Shell</text>
-    <rect x="114" y="187.5" width="190" height="13" rx="6.5" class="track"/>
-    <rect x="114" y="187.5" width="93" height="13" rx="6.5" fill="#89e051" class="bar"/>
-    <text x="314" y="198.0" class="val">2.3%</text>
+    <text x="20" y="65" class="lbl">TypeScript</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#3178c6" class="bar"/>
+    <text x="314" y="82" class="val">4.6%</text>
+    <text x="20" y="115" class="lbl">Rust</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="234" height="11" rx="5.5" fill="#dea584" class="bar"/>
+    <text x="314" y="132" class="val">3.8%</text>
+    <text x="20" y="165" class="lbl">Python</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="223" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <text x="314" y="182" class="val">3.6%</text>
+    <text x="20" y="215" class="lbl">Dart</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="143" height="11" rx="5.5" fill="#8a8a8a" class="bar"/>
+    <text x="314" y="232" class="val">2.3%</text>
+    <text x="20" y="265" class="lbl">Shell</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="139" height="11" rx="5.5" fill="#89e051" class="bar"/>
+    <text x="314" y="282" class="val">2.3%</text>
 </g>
 </svg>

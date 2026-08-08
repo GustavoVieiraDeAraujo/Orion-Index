@@ -1,0 +1,40 @@
+<svg width="380" height="320" viewBox="0 0 380 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Repositórios por Finalidade">
+  <defs>
+    <linearGradient id="gradGithubPurpose" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D1D5DB"/>
+      <stop offset="100%" stop-color="#374151"/>
+    </linearGradient>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }
+    .card { fill: url(#gradGithubPurpose); stroke: #4b5563; stroke-width: 1; }
+    .title { fill: #1f2937; font-weight: 700; font-size: 15.5px; }
+    .lbl { fill: #1f2937; font-weight: 600; }
+    .val { fill: #f9fafb; }
+    .track { fill: rgba(0,0,0,0.15); }
+    .bar { stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }
+  </style>
+  <rect x="0" y="0" width="380" height="320" rx="14" class="card"/>
+  <text x="20" y="37" class="title">Repositórios por Finalidade</text>
+  
+    <text x="20" y="65" class="lbl">IA / Machine Learning</text>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="82" class="val">228.8k</text>
+    <text x="20" y="115" class="lbl">APIs</text>
+    <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="123" width="183" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="132" class="val">146.6k</text>
+    <text x="20" y="165" class="lbl">Automação</text>
+    <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="173" width="110" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="182" class="val">88.0k</text>
+    <text x="20" y="215" class="lbl">Ciência de Dados</text>
+    <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="223" width="97" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="232" class="val">77.5k</text>
+    <text x="20" y="265" class="lbl">DevOps</text>
+    <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
+    <rect x="20" y="273" width="48" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="282" class="val">38.6k</text>
+</svg>

@@ -266,7 +266,7 @@ def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
         items = sorted(items, key=lambda kv: kv[1], reverse=True)
     items = items[:top_n]
     grand_total = sum(data.values()) or 1
-    bar_scale = items[0][1] if items else 1
+    bar_scale = max((v for _, v in items), default=1)
 
     card_pad = 20
     title_h = 30
@@ -331,33 +331,34 @@ def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
         f.write(svg)
 
 
-def build_combined_row(panel_paths, out_path):
-    """Junta N SVGs de cartao lado a lado num so arquivo (concatenacao de
-    texto, mesma tecnica do generate.py -- evita conflito de namespace/id
-    do xml.etree ao mesclar varios documentos SVG independentes)."""
-    inner_bodies = []
-    total_w = 0.0
-    max_h = 0.0
-
+def build_combined_row(panel_paths, out_path, cols=2):
+    """Junta N SVGs de cartao numa grade (2 colunas, 2 linhas por padrao)
+    num so arquivo (concatenacao de texto, mesma tecnica do generate.py --
+    evita conflito de namespace/id do xml.etree ao mesclar varios
+    documentos SVG independentes)."""
+    parsed = []
     for path in panel_paths:
         with open(path, "r", encoding="utf-8") as f:
             content = f.read()
         w = float(re.search(r'width="([\d.]+)"', content).group(1))
         h = float(re.search(r'height="([\d.]+)"', content).group(1))
         body = re.search(r"<svg[^>]*>(.*)</svg>", content, re.DOTALL).group(1)
-        inner_bodies.append((body, w))
-        total_w += w + CARD_GAP
-        max_h = max(max_h, h)
-    total_w -= CARD_GAP
+        parsed.append((body, w, h))
+
+    col_w = parsed[0][1]
+    row_h = max(h for _, _, h in parsed)
+    n_rows = -(-len(parsed) // cols)  # ceil sem importar math
+    total_w = cols * col_w + (cols - 1) * CARD_GAP
+    total_h = n_rows * row_h + (n_rows - 1) * CARD_GAP
 
     groups = []
-    x_offset = 0.0
-    for body, w in inner_bodies:
-        groups.append(f'<g transform="translate({x_offset},0)">{body}</g>')
-        x_offset += w + CARD_GAP
+    for i, (body, w, h) in enumerate(parsed):
+        col, row = i % cols, i // cols
+        x, y = col * (col_w + CARD_GAP), row * (row_h + CARD_GAP)
+        groups.append(f'<g transform="translate({x},{y})">{body}</g>')
 
     combined = (
-        f'<svg width="{total_w}" height="{max_h}" viewBox="0 0 {total_w} {max_h}" '
+        f'<svg width="{total_w}" height="{total_h}" viewBox="0 0 {total_w} {total_h}" '
         f'xmlns="http://www.w3.org/2000/svg">\n' + "\n".join(groups) + "\n</svg>\n"
     )
 
@@ -378,11 +379,13 @@ def build_stats_block(grand_total_lines, n_repos):
         'são marcação e estilo, não linguagem de programação.\n'
         '> - **Repositórios Mais Extensos** — meus repositórios com mais linhas de código.\n'
         '> - **Linguagens por Linhas** — % de linhas de código por linguagem, somando todos os meus repositórios.\n'
+        '> - **Repositórios por Ano** — quantos repositórios eu criei por ano, mostra o crescimento do portfólio '
+        'ao longo do tempo.\n'
         '> - **Repositórios por Commits** — meus repositórios com mais commits, ou seja, onde mais voltei pra '
         'trabalhar (diferente de "mais extenso": um repositório pode ter poucas linhas e muitos commits, ou o '
         'contrário).\n\n'
         '<p align="center">\n'
-        f'<img src="https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/profile_row1.svg" alt="repositorios mais extensos, linguagens por linhas de codigo, repositorios por numero de commits" width="100%" />\n'
+        f'<img src="https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/profile_row1.svg" alt="repositorios mais extensos, linguagens por linhas de codigo, repositorios por ano, repositorios por numero de commits" width="100%" />\n'
         '</p>\n\n'
         f'<p align="center"><sub>Última atualização: {my_updated}</sub></p>\n\n'
         '---\n\n'
@@ -393,12 +396,14 @@ def build_stats_block(grand_total_lines, n_repos):
         '> - **Repositórios Novos** — quantos foram criados nos últimos 30 dias, por linguagem.\n'
         '> - **Repositórios Totais** — quantos repositórios públicos existem por linguagem no GitHub inteiro, '
         'acumulado histórico.\n'
+        '> - **Repositórios por Finalidade** — quantos repositórios existem por tópico de propósito (IA, APIs, '
+        'automação, dados...), sem olhar linguagem nenhuma.\n'
         '> - **Crescimento Relativo** — novos ÷ totais: qual linguagem está crescendo mais rápido em relação ao '
         'próprio tamanho, não só em número absoluto.\n'
         '>\n'
         f'> Detalhes de cada fonte no [README do Orion Index]({ORION_INDEX_REPO}#readme).\n\n'
         '<p align="center">\n'
-        f'<img src="{ORION_INDEX_SVG}" alt="Orion Index: linguagens mais usadas no mundo segundo o GitHub (repositorios novos, totais e crescimento relativo)" width="100%" />\n'
+        f'<img src="{ORION_INDEX_SVG}" alt="Orion Index: linguagens mais usadas no mundo segundo o GitHub (repositorios novos, totais, por finalidade e crescimento relativo)" width="100%" />\n'
         '</p>\n\n'
         f'<p align="center"><sub>Última atualização: {orion_updated}</sub></p>'
     )
@@ -494,6 +499,7 @@ def main():
     repo_total_lines = {}
     repo_commits = {}
     topics_count = {}
+    year_count = {}
 
     for repo in repos:
         print(f"- {repo['name']}")
@@ -501,6 +507,9 @@ def main():
             if topic in TOPIC_BLOCKLIST:
                 continue
             topics_count[topic] = topics_count.get(topic, 0) + 1
+
+        year = repo["created_at"][:4]
+        year_count[year] = year_count.get(year, 0) + 1
 
         counts = count_lines(repo["full_name"])
         repo_total = sum(counts.values())
@@ -514,9 +523,13 @@ def main():
             repo_commits[repo["name"]] = n_commits
 
     grand_total = sum(total_lines.values())
+    # cronologico (nao por contagem): conta o crescimento do portfolio ao
+    # longo do tempo, nao "ano com mais repos primeiro"
+    year_count = dict(sorted(year_count.items()))
 
-    # ordem da esquerda pra direita bate com a ordem dos bullets no NOTE do
-    # README (texto mais curto primeiro, mais longo por ultimo)
+    # ordem bate com a ordem dos bullets no NOTE do README (texto mais
+    # curto primeiro, mais longo por ultimo) -- linha 1: Mais Extensos +
+    # Linguagens, linha 2: Por Ano + Por Commits
     row1_paths = []
     p = os.path.join(DOCS_DIR, "profile_biggest_repos.svg")
     render_bar_card(repo_total_lines, "Repositórios Mais Extensos", p,
@@ -528,6 +541,12 @@ def main():
     render_bar_card(total_lines, "Linguagens por Linhas", p,
                      unit="pct", color_map=LANG_COLORS, grad_id="gradLangLoc",
                      layout="stacked", label_chars=40)
+    row1_paths.append(p)
+
+    p = os.path.join(DOCS_DIR, "profile_by_year.svg")
+    render_bar_card(year_count, "Repositórios por Ano", p,
+                     unit="count", default_color="#a78bfa", grad_id="gradByYear",
+                     layout="stacked", label_chars=40, order="key", top_n=10)
     row1_paths.append(p)
 
     p = os.path.join(DOCS_DIR, "profile_commits.svg")
