@@ -5,7 +5,7 @@
     .title { fill: #9ca3af; }
   </style>
   <rect x="0" y="0" width="783" height="165" rx="14" class="card"/>
-  <text x="22" y="26" class="title">334 commits no último ano</text>
+  <text x="22" y="26" class="title">339 commits no último ano</text>
   
     <rect x="22.0" y="48.0" width="11" height="11" rx="2.5" fill="#2d3748">
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
@@ -1967,9 +1967,9 @@
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
         keyTimes="0;0.9950;1.0000;1" values="1;1;0;0" />
     </rect>
-    <rect x="750.0" y="132.0" width="11" height="11" rx="2.5" fill="#3b82f6">
+    <rect x="750.0" y="132.0" width="11" height="11" rx="2.5" fill="#60a5fa">
       <animate attributeName="fill" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.9950;1.0000;1" values="#3b82f6;#3b82f6;#f8fafc;#3b82f6" />
+        keyTimes="0;0.9950;1.0000;1" values="#60a5fa;#60a5fa;#f8fafc;#60a5fa" />
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
         keyTimes="0;0.9950;1.0000;1.0000;1" values="1;1;1;0;0" />
     </rect>
