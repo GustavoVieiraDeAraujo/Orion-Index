@@ -410,22 +410,39 @@ def _wave_path(width, height, amplitude, period, baseline, fill_above=False, pha
     return d
 
 
+def _wave_bob_keyframes(width, height, amplitude, period, baseline, fill_above, phase_shift, bob, steps=8):
+    """Gera path 'd' pra cada fase de um ciclo de sobe-e-desce: a onda toda
+    balanca verticalmente (baseline oscila em seno) mantendo fase e forma
+    -- da pra animar o atributo d direto entre esses quadros, morphing em
+    vez de so arrastar a forma de lado."""
+    frames = []
+    for i in range(steps + 1):
+        t = i / steps
+        b = baseline + bob * math.sin(2 * math.pi * t)
+        frames.append(_wave_path(width, height, amplitude, period, b, fill_above=fill_above, phase_shift=phase_shift))
+    return frames
+
+
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
     """Banner com o nome, silhueta solida em cima e duas ondas cruzando na
     base (mesma composicao do capsule-render 'waving' original, mas com uma
     segunda camada). As duas ondas tem o mesmo periodo, mas a de cima
     comeca deslocada (nao exatamente meio ciclo, senao vira espelho perfeito
     e fica parado/simetrico demais) -- picos e vales cruzam de forma menos
-    previsivel. Substitui o capsule-render (servico de terceiro de um unico
-    mantenedor) por um SVG proprio: gradiente + ondas animadas (looping via
-    translate). O texto fica estatico (sem fade-in) porque o GitHub nao
-    roda animacao SMIL em SVG carregado via <img>, so ficaria com
-    opacidade zero pra sempre. So depende de raw.githubusercontent.com
+    previsivel. Cada onda balanca pra cima e pra baixo (morph do atributo
+    d entre quadros pre-calculados, nao so um translate de lado)  pra
+    parecer sobe-e-desce de agua de verdade, nao duas imagens deslizando.
+    Substitui o capsule-render (servico de terceiro de um unico mantenedor)
+    por um SVG proprio. O texto fica estatico (sem fade-in) porque o
+    GitHub nao roda animacao SMIL em SVG carregado via <img>, so ficaria
+    com opacidade zero pra sempre. So depende de raw.githubusercontent.com
     dai em diante."""
     width, height = 1200, 300
     period, amplitude, baseline = 300, 20, 225
-    wave_back = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, phase_shift=0)
-    wave_front = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, phase_shift=period * 0.4)
+    back_frames = _wave_bob_keyframes(width + period, height, amplitude, period, baseline,
+                                       fill_above=True, phase_shift=0, bob=14)
+    front_frames = _wave_bob_keyframes(width + period, height, amplitude, period, baseline,
+                                        fill_above=True, phase_shift=period * 0.4, bob=14)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
@@ -433,13 +450,13 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
         '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
         '</linearGradient></defs>'
-        f'<g fill="url(#bannerGrad)"><path d="{wave_back}">'
-        f'<animateTransform attributeName="transform" type="translate" '
-        f'from="0,0" to="{-period},0" dur="9s" repeatCount="indefinite"/>'
+        f'<g fill="url(#bannerGrad)"><path d="{back_frames[0]}">'
+        f'<animate attributeName="d" values="{";".join(back_frames)}" '
+        f'dur="6s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<g fill="#f9fafb" opacity="0.28"><path d="{wave_front}">'
-        f'<animateTransform attributeName="transform" type="translate" '
-        f'from="0,0" to="{-period},0" dur="9s" repeatCount="indefinite"/>'
+        f'<g fill="#f9fafb" opacity="0.28"><path d="{front_frames[0]}">'
+        f'<animate attributeName="d" values="{";".join(front_frames)}" '
+        f'dur="7s" repeatCount="indefinite"/>'
         '</path></g>'
         f'<text x="{width / 2:.0f}" y="115" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
