@@ -138,4 +138,4 @@ Ou só um dos quatro painéis individuais (`docs/github_new.svg`, `docs/github_t
 
 ---
 
-> Documentação reescrita e código revisado com auxílio de IA (Claude).
+> Documentacao gerada com auxilio de IA.
