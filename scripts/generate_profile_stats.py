@@ -406,8 +406,10 @@ def _wave_path(width, height, amplitude, period, baseline):
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
     """Banner ondulado com o nome. Substitui o capsule-render (servico de
     terceiro de um unico mantenedor) por um SVG proprio com a mesma ideia
-    visual: gradiente + onda animada (looping via translate) + fade-in no
-    texto. So depende de raw.githubusercontent.com dai em diante."""
+    visual: gradiente + onda animada (looping via translate). O texto fica
+    estatico (sem fade-in) porque o GitHub nao roda animacao SMIL em SVG
+    carregado via <img>, so ficaria com opacidade zero pra sempre. So
+    depende de raw.githubusercontent.com dai em diante."""
     width, height = 1200, 180
     period, amplitude, baseline = 300, 14, 50
     wave_d = _wave_path(width + period, height, amplitude, period, baseline)
@@ -424,9 +426,8 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '</path></g>'
         f'<text x="{width / 2:.0f}" y="115" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
-        'font-size="34" font-weight="700" text-anchor="middle" dominant-baseline="middle" opacity="0">'
+        'font-size="34" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
         f'{name}'
-        '<animate attributeName="opacity" values="0;0;1" keyTimes="0;0.15;0.6" dur="2.4s" fill="freeze"/>'
         '</text></svg>'
     )
 
