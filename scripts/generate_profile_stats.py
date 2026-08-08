@@ -390,29 +390,33 @@ def build_combined_row(panel_paths, out_path, cols=2):
         f.write(combined)
 
 
-def _wave_path(width, height, amplitude, period, baseline):
+def _wave_path(width, height, amplitude, period, baseline, fill_above=False):
     """Gera uma onda suave com curvas quadraticas alternando pra cima e pra
-    baixo, fechada embaixo -- vira uma silhueta de onda preenchivel."""
+    baixo -- vira uma silhueta de onda preenchivel. Com fill_above=True a
+    silhueta fecha pra cima (preenche entre o topo e a onda, onda fica
+    embaixo); por padrao fecha pra baixo (preenche entre a onda e a base)."""
     d = f"M0,{baseline:.1f}"
     x = 0.0
     while x < width:
         d += f" Q{x + period / 4:.1f},{baseline - amplitude:.1f} {x + period / 2:.1f},{baseline:.1f}"
         d += f" Q{x + period * 3 / 4:.1f},{baseline + amplitude:.1f} {x + period:.1f},{baseline:.1f}"
         x += period
-    d += f" L{x:.1f},{height} L0,{height} Z"
+    edge = 0 if fill_above else height
+    d += f" L{x:.1f},{edge} L0,{edge} Z"
     return d
 
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
-    """Banner ondulado com o nome. Substitui o capsule-render (servico de
-    terceiro de um unico mantenedor) por um SVG proprio com a mesma ideia
-    visual: gradiente + onda animada (looping via translate). O texto fica
+    """Banner com o nome, silhueta solida em cima e onda ondulando embaixo
+    (mesma composicao do capsule-render 'waving' original). Substitui o
+    capsule-render (servico de terceiro de um unico mantenedor) por um SVG
+    proprio: gradiente + onda animada (looping via translate). O texto fica
     estatico (sem fade-in) porque o GitHub nao roda animacao SMIL em SVG
     carregado via <img>, so ficaria com opacidade zero pra sempre. So
     depende de raw.githubusercontent.com dai em diante."""
-    width, height = 1200, 180
-    period, amplitude, baseline = 300, 14, 50
-    wave_d = _wave_path(width + period, height, amplitude, period, baseline)
+    width, height = 1200, 220
+    period, amplitude, baseline = 300, 18, 170
+    wave_d = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
@@ -424,9 +428,9 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         f'<animateTransform attributeName="transform" type="translate" '
         f'from="0,0" to="{-period},0" dur="9s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<text x="{width / 2:.0f}" y="115" fill="#f9fafb" '
+        f'<text x="{width / 2:.0f}" y="95" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
-        'font-size="34" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
+        'font-size="40" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
         f'{name}'
         '</text></svg>'
     )
