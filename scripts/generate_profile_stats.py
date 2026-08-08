@@ -417,8 +417,8 @@ def _wave_keyframes(width, baseline, frames_deltas):
 # adaptado dos valores reais do capsule-render (model/animationModel/
 # waving.ts), so trocando escala pra caber na nossa altura de banner.
 # Ultimo quadro repete o primeiro pra fechar o loop sem salto.
-_WAVE_FRAMES_BACK = [(-10, 15, -5, 12), (8, 15, 12, -8), (15, -5, -10, -8), (-10, 15, -5, 12)]
-_WAVE_FRAMES_FRONT = [(3, -8, 8, -5), (12, -15, -10, 5), (-5, 8, -8, 15), (3, -8, 8, -5)]
+_WAVE_FRAMES_BACK = [(-35, 45, -15, 38), (25, 45, 38, -25), (45, -15, -30, -25), (-35, 45, -15, 38)]
+_WAVE_FRAMES_FRONT = [(10, -25, 25, -15), (38, -45, -30, 15), (-15, 25, -25, 45), (10, -25, 25, -15)]
 
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
@@ -434,8 +434,8 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
     via <img>, so ficaria com opacidade zero pra sempre. So depende de
     raw.githubusercontent.com dai em diante."""
     width, height = 1200, 300
-    baseline = 280
-    dur = 16
+    baseline = 255
+    dur = 6
     back_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_BACK)
     front_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_FRONT)
 
