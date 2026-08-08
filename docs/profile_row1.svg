@@ -146,14 +146,14 @@
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="122" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
     <text x="314" y="132" class="val">97</text>
-    <text x="20" y="165" class="lbl">Trabalho-2-Metodos-de-Programacao-Back-…</text>
+    <text x="20" y="165" class="lbl">Orion-Index</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="173" width="92" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
     <text x="314" y="182" class="val">73</text>
-    <text x="20" y="215" class="lbl">Orion-Index</text>
+    <text x="20" y="215" class="lbl">Trabalho-2-Metodos-de-Programacao-Back-…</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="88" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
-    <text x="314" y="232" class="val">70</text>
+    <rect x="20" y="223" width="92" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="232" class="val">73</text>
     <text x="20" y="265" class="lbl">Processo-Seletivo-TreinaDev</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="87" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
