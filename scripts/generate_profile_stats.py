@@ -390,38 +390,42 @@ def build_combined_row(panel_paths, out_path, cols=2):
         f.write(combined)
 
 
-def _wave_path(width, height, amplitude, period, baseline, fill_above=False, invert=False):
+def _wave_path(width, height, amplitude, period, baseline, fill_above=False, phase_shift=0.0):
     """Gera uma onda suave com curvas quadraticas alternando pra cima e pra
     baixo -- vira uma silhueta de onda preenchivel. Com fill_above=True a
     silhueta fecha pra cima (preenche entre o topo e a onda, onda fica
     embaixo); por padrao fecha pra baixo (preenche entre a onda e a base).
-    invert=True troca a fase (crista vira vale e vice-versa)."""
-    sign = -1 if invert else 1
-    d = f"M0,{baseline:.1f}"
-    x = 0.0
+    phase_shift desloca o inicio da onda em pixels (positivo = onda comeca
+    mais pra direita); comeca um periodo antes de x=0 pra cobrir esse
+    deslocamento sem deixar buraco na borda esquerda."""
+    start = -period + (phase_shift % period)
+    d = f"M{start:.1f},{baseline:.1f}"
+    x = start
     while x < width:
-        d += f" Q{x + period / 4:.1f},{baseline - amplitude * sign:.1f} {x + period / 2:.1f},{baseline:.1f}"
-        d += f" Q{x + period * 3 / 4:.1f},{baseline + amplitude * sign:.1f} {x + period:.1f},{baseline:.1f}"
+        d += f" Q{x + period / 4:.1f},{baseline - amplitude:.1f} {x + period / 2:.1f},{baseline:.1f}"
+        d += f" Q{x + period * 3 / 4:.1f},{baseline + amplitude:.1f} {x + period:.1f},{baseline:.1f}"
         x += period
     edge = 0 if fill_above else height
-    d += f" L{x:.1f},{edge} L0,{edge} Z"
+    d += f" L{x:.1f},{edge} L{start:.1f},{edge} Z"
     return d
 
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
     """Banner com o nome, silhueta solida em cima e duas ondas cruzando na
     base (mesma composicao do capsule-render 'waving' original, mas com uma
-    segunda camada). As duas ondas tem o mesmo periodo, defasadas em meio
-    ciclo -- onde uma esta no pico, a outra esta no vale, sempre. Substitui
-    o capsule-render (servico de terceiro de um unico mantenedor) por um
-    SVG proprio: gradiente + ondas animadas (looping via translate). O
-    texto fica estatico (sem fade-in) porque o GitHub nao roda animacao
-    SMIL em SVG carregado via <img>, so ficaria com opacidade zero pra
-    sempre. So depende de raw.githubusercontent.com dai em diante."""
+    segunda camada). As duas ondas tem o mesmo periodo, mas a de cima
+    comeca deslocada (nao exatamente meio ciclo, senao vira espelho perfeito
+    e fica parado/simetrico demais) -- picos e vales cruzam de forma menos
+    previsivel. Substitui o capsule-render (servico de terceiro de um unico
+    mantenedor) por um SVG proprio: gradiente + ondas animadas (looping via
+    translate). O texto fica estatico (sem fade-in) porque o GitHub nao
+    roda animacao SMIL em SVG carregado via <img>, so ficaria com
+    opacidade zero pra sempre. So depende de raw.githubusercontent.com
+    dai em diante."""
     width, height = 1200, 300
     period, amplitude, baseline = 300, 20, 225
-    wave_back = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=False)
-    wave_front = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=True)
+    wave_back = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, phase_shift=0)
+    wave_front = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, phase_shift=period * 0.4)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
