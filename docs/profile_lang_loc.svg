@@ -36,5 +36,5 @@
     <text x="20" y="265" class="lbl">Python</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="126" height="11" rx="5.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="282" class="val">10.0%</text>
+    <text x="314" y="282" class="val">10.1%</text>
 </svg>
