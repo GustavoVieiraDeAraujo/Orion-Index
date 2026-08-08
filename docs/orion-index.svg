@@ -21,7 +21,7 @@
     <text x="20" y="65" class="lbl">Python</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="82" class="val">1118.5k</text>
+    <text x="314" y="82" class="val">1118.6k</text>
     <text x="20" y="115" class="lbl">JavaScript</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="218" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
