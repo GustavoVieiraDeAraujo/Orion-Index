@@ -389,18 +389,21 @@ def build_combined_row(panel_paths, out_path, cols=2):
         f.write(combined)
 
 
-def _single_wave_path(width, y0, yctrl, ymid, yend):
-    """Uma onda em S cobrindo a largura inteira (Q + T), igual ao
-    capsule-render de verdade faz -- nao um padrao pequeno repetido lado a
-    lado. Preenche do topo (y=0) ate a linha da onda: M0,0 desce ate y0,
-    curva ate o meio (ymid, controlado por yctrl), T continua simetrico
-    ate yend na borda direita, fecha por cima de volta a origem."""
-    half = width / 2
-    quarter = width / 4
-    return (
-        f"M0,0 L0,{y0:.1f} Q{quarter:.1f},{yctrl:.1f} {half:.1f},{ymid:.1f} "
-        f"T{width:.1f},{yend:.1f} L{width:.1f},0 Z"
-    )
+def _single_wave_path(width, y0, yctrl, ymid, yend, cycles=4):
+    """Onda em S (Q + T, mesma tecnica do capsule-render) repetida
+    `cycles` vezes lado a lado -- controla o comprimento de onda: mais
+    ciclos = ondas mais curtas/frequentes na horizontal. Preenche do topo
+    (y=0) ate a linha da onda em cada segmento."""
+    seg = width / cycles
+    d = f"M0,0 L0,{y0:.1f}"
+    x = 0.0
+    for _ in range(cycles):
+        quarter = x + seg / 4
+        half = x + seg / 2
+        d += f" Q{quarter:.1f},{yctrl:.1f} {half:.1f},{ymid:.1f} T{x + seg:.1f},{yend:.1f}"
+        x += seg
+    d += f" L{width:.1f},0 Z"
+    return d
 
 
 def _wave_keyframes(width, baseline, frames_deltas):
@@ -423,19 +426,21 @@ _WAVE_FRAMES_FRONT = [(10, -25, 25, -15), (38, -45, -30, 15), (-15, 25, -25, 45)
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
     """Banner com o nome, silhueta solida em cima e duas ondas na base --
-    mesma tecnica do capsule-render original (fonte real conferida em
-    kyechan99/capsule-render): cada onda e uma curva unica em S cobrindo a
-    largura inteira (nao um padrao pequeno repetido), duas camadas
-    translucidas sobrepostas da mesma cor, animando via morph direto do
-    atributo d (nao translate). A segunda camada comeca com metade do
-    ciclo ja percorrido (begin negativo) em vez da primeira, entao uma
-    esta sempre num ponto bem diferente da outra. O texto fica estatico
-    (sem fade-in) porque o GitHub nao roda animacao SMIL em SVG carregado
-    via <img>, so ficaria com opacidade zero pra sempre. So depende de
-    raw.githubusercontent.com dai em diante."""
+    tecnica base do capsule-render original (fonte real conferida em
+    kyechan99/capsule-render): cada onda usa curvas em S (Q + T), mas aqui
+    repetidas em varios ciclos lado a lado (comprimento de onda mais
+    curto, mais ondulacoes visiveis, diferente do original que faz um S
+    so cobrindo a largura toda). Duas camadas translucidas sobrepostas da
+    mesma cor, animando via morph direto do atributo d (nao translate). A
+    segunda camada comeca com metade do ciclo ja percorrido (begin
+    negativo) em vez da primeira, entao uma esta sempre num ponto bem
+    diferente da outra. O texto fica estatico (sem fade-in) porque o
+    GitHub nao roda animacao SMIL em SVG carregado via <img>, so ficaria
+    com opacidade zero pra sempre. So depende de raw.githubusercontent.com
+    dai em diante."""
     width, height = 1200, 300
     baseline = 255
-    dur = 6
+    dur = 9
     back_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_BACK)
     front_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_FRONT)
 
