@@ -5,7 +5,7 @@
     .title { fill: #9ca3af; }
   </style>
   <rect x="0" y="0" width="783" height="165" rx="14" class="card"/>
-  <text x="22" y="26" class="title">342 commits no último ano</text>
+  <text x="22" y="26" class="title">345 commits no último ano</text>
   
     <rect x="22.0" y="48.0" width="11" height="11" rx="2.5" fill="#2d3748">
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
