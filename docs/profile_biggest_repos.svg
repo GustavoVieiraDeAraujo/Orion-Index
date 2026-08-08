@@ -21,20 +21,20 @@
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
     <text x="314" y="82" class="val">9.066</text>
-    <text x="20" y="115" class="lbl">Trabalho-Introducao-Desenvolvimento-Jog…</text>
+    <text x="20" y="115" class="lbl">Trabalho-Sofware-Basico</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="203" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
-    <text x="314" y="132" class="val">6.423</text>
-    <text x="20" y="165" class="lbl">Processo-Seletivo-Crescer-CWI</text>
+    <rect x="20" y="123" width="225" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="132" class="val">7.135</text>
+    <text x="20" y="165" class="lbl">Trabalho-Introducao-Desenvolvimento-Jog…</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="160" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
-    <text x="314" y="182" class="val">5.074</text>
-    <text x="20" y="215" class="lbl">Projeto-Final-Struct-Back-End</text>
+    <rect x="20" y="173" width="203" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="182" class="val">6.423</text>
+    <text x="20" y="215" class="lbl">Processo-Seletivo-Crescer-CWI</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="97" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
-    <text x="314" y="232" class="val">3.080</text>
-    <text x="20" y="265" class="lbl">Trabalho-2-Metodos-de-Programacao-Back-…</text>
+    <rect x="20" y="223" width="160" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="232" class="val">5.074</text>
+    <text x="20" y="265" class="lbl">Projeto-Final-Struct-Back-End</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="90" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
-    <text x="314" y="282" class="val">2.858</text>
+    <rect x="20" y="273" width="97" height="11" rx="5.5" fill="#38bdf8" class="bar"/>
+    <text x="314" y="282" class="val">3.080</text>
 </svg>

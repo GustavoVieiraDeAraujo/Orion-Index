@@ -19,22 +19,22 @@
   
     <text x="20" y="65" class="lbl">2022</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="73" width="204" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <rect x="20" y="73" width="179" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
     <text x="314" y="82" class="val">5</text>
     <text x="20" y="115" class="lbl">2023</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="286" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <rect x="20" y="123" width="250" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
     <text x="314" y="132" class="val">7</text>
     <text x="20" y="165" class="lbl">2024</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="82" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <rect x="20" y="173" width="72" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
     <text x="314" y="182" class="val">2</text>
     <text x="20" y="215" class="lbl">2025</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="82" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <rect x="20" y="223" width="72" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
     <text x="314" y="232" class="val">2</text>
     <text x="20" y="265" class="lbl">2026</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="286" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="282" class="val">7</text>
+    <text x="314" y="282" class="val">8</text>
 </svg>
