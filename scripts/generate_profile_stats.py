@@ -411,6 +411,17 @@ BANNER_FONT_COLOR = "ffffff"
 BANNER_FONT_ALIGN_Y = 30  # % da altura, de cima pra baixo
 
 
+def _js_num(value):
+    """Formata numero do jeito que o JS faria ao interpolar em template string
+    (854/4 -> '213.5', mas 854/2 -> '427', nunca '427.0') -- o gerador original
+    e escrito em TS, entao inteiros nunca carregam '.0'. Sem isso a divisao
+    float do Python vaza '427.0'/'90.0' pro d= e pro transform, que diverge
+    do SVG real que o capsule-render sempre gerou."""
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)
+
+
 def _capsule_waving_content(width, height):
     """Copia exata do metodo content() de Waving (model/animationModel/
     waving.ts): duas camadas com opacity 0.4, cada uma com 4 quadros de
@@ -420,10 +431,12 @@ def _capsule_waving_content(width, height):
     width=854 padrao). O 'calcmod' (em vez de calcMode) e erro de digitacao
     do codigo-fonte real: mantido igual, o deles tambem nao aplica a
     suavizacao por spline por causa disso."""
-    half = width / 2
-    quarter = width / 4
+    half = _js_num(width / 2)
+    cy = _js_num(height / 2)
+    quarter = _js_num(width / 4)
+    quarter2 = _js_num(width / 4 * 2)
     return f'''
-      <g transform="translate({half}, {height / 2}) scale(1, 1) translate(-{quarter * 2}, -{height / 2})">
+      <g transform="translate({half}, {cy}) scale(1, 1) translate(-{half}, -{cy})">
         <path d="" fill="url(#bannerGrad)" opacity="0.4">
           <animate
               attributeName="d"
@@ -433,7 +446,7 @@ def _capsule_waving_content(width, height):
               calcmod="spline"
               keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
               begin="0s"
-              values="M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter * 2} {height - 70}T {width} {height - 45}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 40} {quarter * 2} {height - 60}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 35}Q {quarter} {height - 65} {quarter * 2} {height - 35}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter * 2} {height - 70}T {width} {height - 45}L {width} 0 Z">
+              values="M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter2} {height - 70}T {width} {height - 45}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 40} {quarter2} {height - 60}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 35}Q {quarter} {height - 65} {quarter2} {height - 35}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter2} {height - 70}T {width} {height - 45}L {width} 0 Z">
           </animate>
         </path>
         <path d="" fill="url(#bannerGrad)" opacity="0.4">
@@ -445,7 +458,7 @@ def _capsule_waving_content(width, height):
             calcmod="spline"
             keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
             begin="-10s"
-            values="M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter * 2} {height - 50}T {width} {height - 40}L {width} 0 Z;M0 0L 0 {height - 50}Q {quarter} {height - 80} {quarter * 2} {height - 80}T {width} {height - 60}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 75} {quarter * 2} {height - 50}T {width} {height - 35}L {width} 0 Z;M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter * 2} {height - 50}T {width} {height - 40}L {width} 0 Z">
+            values="M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter2} {height - 50}T {width} {height - 40}L {width} 0 Z;M0 0L 0 {height - 50}Q {quarter} {height - 80} {quarter2} {height - 80}T {width} {height - 60}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 75} {quarter2} {height - 50}T {width} {height - 35}L {width} 0 Z;M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter2} {height - 50}T {width} {height - 40}L {width} 0 Z">
           </animate>
         </path>
       </g>'''
@@ -453,23 +466,25 @@ def _capsule_waving_content(width, height):
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
     """Porte literal do banner 'waving' do capsule-render (fonte real
-    conferida em kyechan99/capsule-render). A peca que faltava nas
-    tentativas anteriores: o fade-in do nome la e feito com CSS
-    @keyframes (animation: fadeIn 1.2s ease-in-out forwards), nao SMIL --
-    e exatamente por isso que o deles sempre funcionou num <img> do
-    GitHub e as minhas tentativas com <animate attributeName="opacity">
-    nunca funcionavam (SMIL nao roda nesse contexto, CSS roda). A onda
-    em si (curvas Q+T animadas via SMIL) fica exatamente como o
-    original: nem eles conseguem anima-la de verdade dentro de um <img>,
-    entao so o quadro inicial e visivel no perfil real, igual sempre foi."""
+    conferida em kyechan99/capsule-render, byte a byte contra a saida real
+    do servico com os mesmos parametros que a URL antiga usava). O fade-in
+    do nome e feito com CSS @keyframes (animation: fadeIn 1.2s ease-in-out
+    forwards). A onda (curvas Q+T no atributo d, via <animate>/SMIL) tambem
+    roda de verdade dentro de <img> no GitHub -- confirmado testando ao
+    vivo no perfil real -- entao os path com d="" vazio ficam do jeito que
+    o servico original sempre gerou, sem precisar pre-preencher quadro
+    nenhum."""
     width, height = BANNER_WIDTH, BANNER_HEIGHT
     return (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
+        f'width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}" style="z-index:1;position:relative" role="img" aria-label="{name}">'
         '<style>'
         f'.text {{ font-size: {BANNER_FONT_SIZE}px; font-weight: 700; '
+        'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji; } '
+        '.desc { font-size: 20px; font-weight: 500; '
         'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji; }'
-        '.text { animation: fadeIn 1.2s ease-in-out forwards; }'
+        '.text, .desc { animation: fadeIn 1.2s ease-in-out forwards; }'
         '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }'
         '</style>'
         '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
@@ -477,7 +492,7 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '</linearGradient></defs>'
         f'{_capsule_waving_content(width, height)}'
         f'<text text-anchor="middle" dominant-baseline="middle" x="50%" y="{BANNER_FONT_ALIGN_Y}%" '
-        f'class="text" style="fill:#{BANNER_FONT_COLOR};">{name}</text>'
+        f'class="text" style="fill:#{BANNER_FONT_COLOR};" stroke="#none" stroke-width="1">{name}</text>'
         '</svg>'
     )
 
