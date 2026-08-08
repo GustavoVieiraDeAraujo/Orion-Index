@@ -2,19 +2,19 @@ name: Atualizar estatisticas do perfil
 
 on:
   schedule:
-    - cron: "0 */12 * * *" # a cada 12 horas
+    - cron: "10 6 * * *" # todo dia, 06:10 UTC
   workflow_dispatch: {}
   push:
     branches: [main]
     paths:
       - "scripts/generate_profile_stats.py"
-      - ".github/workflows/update_profile.yml"
+      - ".github/workflows/atualiza_estatisticas_perfil.yml"
 
 permissions:
   contents: write
 
 jobs:
-  update-profile:
+  atualiza_estatisticas_perfil:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

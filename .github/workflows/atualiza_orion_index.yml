@@ -1,4 +1,4 @@
-name: Gerar nave atirando nos commits
+name: Atualizar Orion Index
 
 on:
   schedule:
@@ -7,32 +7,32 @@ on:
   push:
     branches: [main]
     paths:
-      - "scripts/generate_spaceship.py"
-      - ".github/workflows/spaceship.yml"
+      - "scripts/generate.py"
+      - ".github/workflows/atualiza_orion_index.yml"
 
 permissions:
   contents: write
 
 jobs:
-  update:
+  atualiza_perspectivas:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Gerar animacao
+      - name: Gerar graficos
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python3 scripts/generate_spaceship.py
+        run: python3 scripts/generate.py
 
       - name: Commitar se houve mudanca
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- docs/spaceship.svg; then
+          if git diff --quiet -- docs; then
             echo "Sem mudancas."
             exit 0
           fi
-          git add docs/spaceship.svg
-          git commit -m "Atualiza nave com os commits mais recentes"
+          git add docs
+          git commit -m "Atualiza Orion Index"
           git push

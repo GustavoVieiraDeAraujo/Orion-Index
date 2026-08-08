@@ -76,9 +76,9 @@ A primeira versão da quarta perspectiva era "repositórios com push nos último
 | `scripts/generate.py` | As 4 perspectivas do Orion Index: busca na API do GitHub e gera `docs/orion-index.svg` |
 | `scripts/generate_profile_stats.py` | Automação pessoal do perfil (não é o Orion Index): estatísticas dos repositórios do autor, publicadas no README de outro repositório |
 | `scripts/generate_spaceship.py` | Automação pessoal: nave espacial animada sobre o calendário de contribuições, publicada no mesmo README de perfil |
-| `.github/workflows/update.yml` | Roda `generate.py` uma vez por mês |
-| `.github/workflows/update_profile.yml` | Roda `generate_profile_stats.py` a cada 12h |
-| `.github/workflows/spaceship.yml` | Roda `generate_spaceship.py` uma vez por dia |
+| `.github/workflows/atualiza_orion_index.yml` | Roda `generate.py` uma vez por dia |
+| `.github/workflows/atualiza_estatisticas_perfil.yml` | Roda `generate_profile_stats.py` uma vez por dia |
+| `.github/workflows/gera_nave_espacial.yml` | Roda `generate_spaceship.py` uma vez por dia |
 | `docs/orion-index.svg` | Card combinado das 4 perspectivas, em grade 2x2 |
 | `docs/github_*.svg` | Os 4 painéis individuais que compõem o combinado |
 | `docs/profile_*.svg` | Cartões de estatísticas do perfil (não fazem parte do Orion Index) |
@@ -118,9 +118,9 @@ python3 scripts/generate_spaceship.py
 
 | Workflow | Agenda | Script |
 |---|---|---|
-| `update.yml` | Todo dia 1 do mês, 06:00 UTC | `generate.py` |
-| `update_profile.yml` | A cada 12h | `generate_profile_stats.py` |
-| `spaceship.yml` | Todo dia, 06:00 UTC | `generate_spaceship.py` |
+| `atualiza_orion_index.yml` | Todo dia, 06:00 UTC | `generate.py` |
+| `atualiza_estatisticas_perfil.yml` | Todo dia, 06:10 UTC | `generate_profile_stats.py` |
+| `gera_nave_espacial.yml` | Todo dia, 06:20 UTC | `generate_spaceship.py` |
 
 Todos os três também rodam sob demanda (`workflow_dispatch`) e ao detectar push no próprio script. Nenhuma das quatro perspectivas do Orion Index precisa de ação manual — tudo é buscado do zero a cada execução, sempre com o dado mais recente disponível.
 

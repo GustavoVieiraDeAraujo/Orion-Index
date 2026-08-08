@@ -1,38 +1,38 @@
-name: Atualizar Orion Index
+name: Gerar nave atirando nos commits
 
 on:
   schedule:
-    - cron: "0 6 1 * *" # todo dia 1 do mes, 06:00 UTC
+    - cron: "20 6 * * *" # todo dia, 06:20 UTC
   workflow_dispatch: {}
   push:
     branches: [main]
     paths:
-      - "scripts/generate.py"
-      - ".github/workflows/update.yml"
+      - "scripts/generate_spaceship.py"
+      - ".github/workflows/gera_nave_espacial.yml"
 
 permissions:
   contents: write
 
 jobs:
-  update:
+  gera_animacao_nave:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Gerar graficos
+      - name: Gerar animacao
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python3 scripts/generate.py
+        run: python3 scripts/generate_spaceship.py
 
       - name: Commitar se houve mudanca
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- docs; then
+          if git diff --quiet -- docs/spaceship.svg; then
             echo "Sem mudancas."
             exit 0
           fi
-          git add docs
-          git commit -m "Atualiza Orion Index"
+          git add docs/spaceship.svg
+          git commit -m "Atualiza nave com os commits mais recentes"
           git push
