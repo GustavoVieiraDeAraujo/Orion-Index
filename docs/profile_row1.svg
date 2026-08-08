@@ -156,7 +156,7 @@
     <text x="314" y="232" class="val">69</text>
     <text x="20" y="265" class="lbl">Orion-Index</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="80" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
-    <text x="314" y="282" class="val">64</text>
+    <rect x="20" y="273" width="84" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="282" class="val">67</text>
 </g>
 </svg>
