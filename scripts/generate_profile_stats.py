@@ -409,16 +409,19 @@ def _wave_path(width, height, amplitude, period, baseline, fill_above=False, inv
 
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
-    """Banner com o nome, silhueta solida em cima e onda ondulando embaixo
-    (mesma composicao do capsule-render 'waving' original). Substitui o
-    capsule-render (servico de terceiro de um unico mantenedor) por um SVG
-    proprio: gradiente + onda animada (looping via translate). O texto fica
-    estatico (sem fade-in) porque o GitHub nao roda animacao SMIL em SVG
-    carregado via <img>, so ficaria com opacidade zero pra sempre. So
-    depende de raw.githubusercontent.com dai em diante."""
+    """Banner com o nome, silhueta solida em cima e duas ondas cruzando na
+    base (mesma composicao do capsule-render 'waving' original, mas com uma
+    segunda camada). As duas ondas tem o mesmo periodo, defasadas em meio
+    ciclo -- onde uma esta no pico, a outra esta no vale, sempre. Substitui
+    o capsule-render (servico de terceiro de um unico mantenedor) por um
+    SVG proprio: gradiente + ondas animadas (looping via translate). O
+    texto fica estatico (sem fade-in) porque o GitHub nao roda animacao
+    SMIL em SVG carregado via <img>, so ficaria com opacidade zero pra
+    sempre. So depende de raw.githubusercontent.com dai em diante."""
     width, height = 1200, 300
-    period, amplitude, baseline = 300, 18, 230
-    wave_d = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=True)
+    period, amplitude, baseline = 300, 20, 225
+    wave_back = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=False)
+    wave_front = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=True)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
@@ -426,11 +429,15 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
         '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
         '</linearGradient></defs>'
-        f'<g fill="url(#bannerGrad)"><path d="{wave_d}">'
+        f'<g fill="url(#bannerGrad)"><path d="{wave_back}">'
         f'<animateTransform attributeName="transform" type="translate" '
         f'from="0,0" to="{-period},0" dur="9s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<text x="{width / 2:.0f}" y="125" fill="#f9fafb" '
+        f'<g fill="#f9fafb" opacity="0.28"><path d="{wave_front}">'
+        f'<animateTransform attributeName="transform" type="translate" '
+        f'from="0,0" to="{-period},0" dur="9s" repeatCount="indefinite"/>'
+        '</path></g>'
+        f'<text x="{width / 2:.0f}" y="115" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
         'font-size="40" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
         f'{name}'
