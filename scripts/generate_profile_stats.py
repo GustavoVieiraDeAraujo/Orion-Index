@@ -416,21 +416,21 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
     estatico (sem fade-in) porque o GitHub nao roda animacao SMIL em SVG
     carregado via <img>, so ficaria com opacidade zero pra sempre. So
     depende de raw.githubusercontent.com dai em diante."""
-    width, height = 1200, 220
-    period, amplitude, baseline = 300, 18, 170
+    width, height = 1200, 260
+    period, amplitude, baseline = 300, 18, 200
     wave_d = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=True)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{name}">'
-        '<defs><linearGradient id="bannerGrad" x1="0" y1="0" x2="100%" y2="100%">'
-        '<stop offset="0%" stop-color="#E5E7EB"/><stop offset="100%" stop-color="#111827"/>'
+        '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
+        '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
         '</linearGradient></defs>'
         f'<g fill="url(#bannerGrad)"><path d="{wave_d}">'
         f'<animateTransform attributeName="transform" type="translate" '
         f'from="0,0" to="{-period},0" dur="9s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<text x="{width / 2:.0f}" y="95" fill="#f9fafb" '
+        f'<text x="{width / 2:.0f}" y="110" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
         'font-size="40" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
         f'{name}'
