@@ -36,7 +36,7 @@ jobs:
             exit 0
           fi
           git add docs
-          git commit -m "Atualiza cartoes de estatisticas do perfil"
+          git commit -m "Atualiza Orion Index"
           for tentativa in 1 2 3 4 5; do
             git push && break
             echo "Push rejeitado (outro workflow commitou antes), tentativa $tentativa..."

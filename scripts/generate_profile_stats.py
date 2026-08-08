@@ -428,7 +428,7 @@ def push_profile_readme(blocks, pat):
             return
 
         subprocess.run(["git", "-C", tmp, "add", "README.md"], check=True)
-        subprocess.run(["git", "-C", tmp, "commit", "-m", "Atualiza estatisticas do perfil"], check=True)
+        subprocess.run(["git", "-C", tmp, "commit", "-m", "Atualiza Orion Index"], check=True)
         subprocess.run(["git", "-C", tmp, "push"], check=True, capture_output=True, text=True)
         print("Perfil: README.md atualizado e enviado.")
     finally:
