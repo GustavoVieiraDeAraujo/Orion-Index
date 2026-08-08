@@ -398,9 +398,9 @@ def build_combined_row(panel_paths, out_path, cols=2):
 # quem abre o arquivo .svg direto num navegador.
 BANNER_WIDTH = 1200
 BANNER_HEIGHT = 300
-BANNER_WAVE_BASELINE = 250     # y central da faixa ondulada (mais perto de BANNER_HEIGHT = onda mais colada na borda de baixo)
-BANNER_WAVE_AMPLITUDE = 22     # altura do pico da onda, em pixels
-BANNER_WAVE_CYCLES = 2.5       # quantas ondas completas cabem na largura -- MAIOR = comprimento de onda MENOR (ondas mais curtas e frequentes)
+BANNER_WAVE_BASELINE = 245     # y central da faixa ondulada (mais perto de BANNER_HEIGHT = onda mais colada na borda de baixo)
+BANNER_WAVE_AMPLITUDE = 55     # altura do pico da onda, em pixels -- precisa ser grande de verdade, o banner encolhe bastante quando exibido (~846px de largura no perfil real), entao amplitude pequena vira imperceptivel
+BANNER_WAVE_CYCLES = 4.5       # quantas ondas completas cabem na largura -- MAIOR = comprimento de onda MENOR (ondas mais curtas e frequentes)
 BANNER_WAVE_LAYERS_PHASE_GAP = math.pi  # defasagem entre as duas camadas, em radianos (pi = opostas: pico de uma cai exatamente no vale da outra)
 BANNER_WAVE_ANIM_DURATION = 8  # segundos por volta completa (so importa pra quem abre o svg direto)
 BANNER_WAVE_LAYER_OPACITY = 0.55
