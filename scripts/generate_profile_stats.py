@@ -7,6 +7,7 @@
 # README de la.
 import datetime
 import json
+import math
 import os
 import re
 import shutil
@@ -389,60 +390,67 @@ def build_combined_row(panel_paths, out_path, cols=2):
         f.write(combined)
 
 
-def _single_wave_path(width, y0, yctrl, ymid, yend, cycles=4):
-    """Onda em S (Q + T, mesma tecnica do capsule-render) repetida
-    `cycles` vezes lado a lado -- controla o comprimento de onda: mais
-    ciclos = ondas mais curtas/frequentes na horizontal. Preenche do topo
-    (y=0) ate a linha da onda em cada segmento."""
-    seg = width / cycles
-    d = f"M0,0 L0,{y0:.1f}"
-    x = 0.0
-    for _ in range(cycles):
-        quarter = x + seg / 4
-        half = x + seg / 2
-        d += f" Q{quarter:.1f},{yctrl:.1f} {half:.1f},{ymid:.1f} T{x + seg:.1f},{yend:.1f}"
-        x += seg
+# Parametros do banner, todos num lugar so pra ajustar e regenerar sem
+# precisar entender a matematica por baixo. O que importa de verdade e o
+# BANNER_WAVE_PHASE_0 (primeiro quadro): o GitHub nunca roda a animacao
+# SMIL num SVG carregado via <img>, entao so esse quadro parado e o que
+# qualquer visitante do perfil realmente ve -- os outros so aparecem pra
+# quem abre o arquivo .svg direto num navegador.
+BANNER_WIDTH = 1200
+BANNER_HEIGHT = 300
+BANNER_WAVE_BASELINE = 250     # y central da faixa ondulada (mais perto de BANNER_HEIGHT = onda mais colada na borda de baixo)
+BANNER_WAVE_AMPLITUDE = 22     # altura do pico da onda, em pixels
+BANNER_WAVE_CYCLES = 2.5       # quantas ondas completas cabem na largura -- MAIOR = comprimento de onda MENOR (ondas mais curtas e frequentes)
+BANNER_WAVE_LAYERS_PHASE_GAP = math.pi  # defasagem entre as duas camadas, em radianos (pi = opostas: pico de uma cai exatamente no vale da outra)
+BANNER_WAVE_ANIM_DURATION = 8  # segundos por volta completa (so importa pra quem abre o svg direto)
+BANNER_WAVE_LAYER_OPACITY = 0.55
+
+
+def _sine_wave_path(width, baseline, amplitude, cycles, phase=0.0, samples_per_cycle=24):
+    """Onda de verdade: amostra pontos ao longo de uma senoide e liga com
+    segmentos de reta curtos (curto o bastante pra parecer curva suave).
+    amplitude e cycles controlam altura e comprimento de onda direto, sem
+    precisar calcular pontos de controle de curva Bezier a mao."""
+    n = max(8, round(cycles * samples_per_cycle))
+    d = "M0,0"
+    for i in range(n + 1):
+        x = width * i / n
+        y = baseline + amplitude * math.sin(2 * math.pi * cycles * i / n + phase)
+        d += f" L{x:.1f},{y:.1f}"
     d += f" L{width:.1f},0 Z"
     return d
 
 
-def _wave_keyframes(width, baseline, frames_deltas):
-    """frames_deltas: lista de (dy0,dyctrl,dymid,dyend) relativos a
-    baseline, um por quadro -- ultimo quadro deve repetir o primeiro pra
-    looping sem salto."""
+def _sine_wave_frames(width, baseline, amplitude, cycles, phase0, steps=8):
+    """Quadros de uma volta completa (fase de 0 a 2*pi), pra animar via
+    morph do atributo d -- a onda flui de verdade (equivale a andar da
+    esquerda pra direita), nao so balanca no lugar."""
     return [
-        _single_wave_path(width, baseline + dy0, baseline + dyctrl, baseline + dymid, baseline + dyend)
-        for dy0, dyctrl, dymid, dyend in frames_deltas
+        _sine_wave_path(width, baseline, amplitude, cycles, phase=phase0 + 2 * math.pi * i / steps)
+        for i in range(steps + 1)
     ]
 
 
-# Deltas dos 4 quadros de cada camada, em pixels a partir da baseline --
-# adaptado dos valores reais do capsule-render (model/animationModel/
-# waving.ts), so trocando escala pra caber na nossa altura de banner.
-# Ultimo quadro repete o primeiro pra fechar o loop sem salto.
-_WAVE_FRAMES_BACK = [(-35, 45, -15, 38), (25, 45, 38, -25), (45, -15, -30, -25), (-35, 45, -15, 38)]
-_WAVE_FRAMES_FRONT = [(10, -25, 25, -15), (38, -45, -30, 15), (-15, 25, -25, 45), (10, -25, 25, -15)]
-
-
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
-    """Banner com o nome, silhueta solida em cima e duas ondas na base --
-    tecnica base do capsule-render original (fonte real conferida em
-    kyechan99/capsule-render): cada onda usa curvas em S (Q + T), mas aqui
-    repetidas em varios ciclos lado a lado (comprimento de onda mais
-    curto, mais ondulacoes visiveis, diferente do original que faz um S
-    so cobrindo a largura toda). Duas camadas translucidas sobrepostas da
-    mesma cor, animando via morph direto do atributo d (nao translate). A
-    segunda camada comeca com metade do ciclo ja percorrido (begin
-    negativo) em vez da primeira, entao uma esta sempre num ponto bem
-    diferente da outra. O texto fica estatico (sem fade-in) porque o
-    GitHub nao roda animacao SMIL em SVG carregado via <img>, so ficaria
-    com opacidade zero pra sempre. So depende de raw.githubusercontent.com
-    dai em diante."""
-    width, height = 1200, 300
-    baseline = 255
-    dur = 9
-    back_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_BACK)
-    front_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_FRONT)
+    """Banner com o nome, silhueta solida em cima e duas ondas (senoides
+    de verdade, nao aproximacao por curva Bezier) cruzando na base, com
+    defasagem fixa de meio ciclo entre elas -- onde uma esta no pico, a
+    outra esta sempre no vale. Cada camada anima via morph do atributo d
+    percorrendo uma volta completa de fase, criando um fluxo real (nao um
+    translate simples). Inspirado na tecnica do capsule-render original
+    (kyechan99/capsule-render, model/animationModel/waving.ts: duas
+    camadas translucidas da mesma cor, dur diferente por camada), mas com
+    onda calculada por seno em vez de curvas Bezier chutadas a mao -- da
+    pra ajustar amplitude/comprimento de onda direto pelas constantes
+    BANNER_WAVE_* no topo do arquivo, sem mexer no resto do codigo. O
+    texto fica estatico (sem fade-in) porque o GitHub nao roda animacao
+    SMIL em SVG carregado via <img>, so ficaria com opacidade zero pra
+    sempre. So depende de raw.githubusercontent.com dai em diante."""
+    width, height = BANNER_WIDTH, BANNER_HEIGHT
+    dur = BANNER_WAVE_ANIM_DURATION
+    back_frames = _sine_wave_frames(width, BANNER_WAVE_BASELINE, BANNER_WAVE_AMPLITUDE, BANNER_WAVE_CYCLES, 0.0)
+    front_frames = _sine_wave_frames(width, BANNER_WAVE_BASELINE, BANNER_WAVE_AMPLITUDE, BANNER_WAVE_CYCLES,
+                                      BANNER_WAVE_LAYERS_PHASE_GAP)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
@@ -450,13 +458,11 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
         '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
         '</linearGradient></defs>'
-        f'<g fill="url(#bannerGrad)"><path d="{back_frames[0]}" opacity="0.55">'
-        f'<animate attributeName="d" values="{";".join(back_frames)}" '
-        f'keyTimes="0;0.333;0.667;1" dur="{dur}s" begin="0s" repeatCount="indefinite"/>'
+        f'<g fill="url(#bannerGrad)"><path d="{back_frames[0]}" opacity="{BANNER_WAVE_LAYER_OPACITY}">'
+        f'<animate attributeName="d" values="{";".join(back_frames)}" dur="{dur}s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<g fill="url(#bannerGrad)"><path d="{front_frames[0]}" opacity="0.55">'
-        f'<animate attributeName="d" values="{";".join(front_frames)}" '
-        f'keyTimes="0;0.333;0.667;1" dur="{dur}s" begin="-{dur / 2}s" repeatCount="indefinite"/>'
+        f'<g fill="url(#bannerGrad)"><path d="{front_frames[0]}" opacity="{BANNER_WAVE_LAYER_OPACITY}">'
+        f'<animate attributeName="d" values="{";".join(front_frames)}" dur="{dur}s" repeatCount="indefinite"/>'
         '</path></g>'
         f'<text x="{width / 2:.0f}" y="105" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
