@@ -36,4 +36,8 @@ jobs:
           fi
           git add docs
           git commit -m "Atualiza cartoes de estatisticas do perfil"
-          git push
+          for tentativa in 1 2 3 4 5; do
+            git push && break
+            echo "Push rejeitado (outro workflow commitou antes), tentativa $tentativa..."
+            git pull --rebase origin main
+          done

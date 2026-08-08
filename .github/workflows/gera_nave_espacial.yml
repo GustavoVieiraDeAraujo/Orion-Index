@@ -35,4 +35,8 @@ jobs:
           fi
           git add docs/spaceship.svg
           git commit -m "Atualiza nave com os commits mais recentes"
-          git push
+          for tentativa in 1 2 3 4 5; do
+            git push && break
+            echo "Push rejeitado (outro workflow commitou antes), tentativa $tentativa..."
+            git pull --rebase origin main
+          done
