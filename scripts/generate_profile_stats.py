@@ -24,7 +24,8 @@ ORION_INDEX_SVG = "https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion
 ORION_INDEX_REPO = "https://github.com/GustavoVieiraDeAraujo/Orion-Index"
 
 MARKERS = {
-    "STATS": ("<!-- STATS:START -->", "<!-- STATS:END -->"),
+    "STATS_MINE_IMG": ("<!-- STATS_MINE_IMG:START -->", "<!-- STATS_MINE_IMG:END -->"),
+    "STATS_WORLD_IMG": ("<!-- STATS_WORLD_IMG:START -->", "<!-- STATS_WORLD_IMG:END -->"),
     "SKILLS": ("<!-- SKILLS:START -->", "<!-- SKILLS:END -->"),
 }
 
@@ -338,41 +339,22 @@ def build_combined_row(panel_paths, out_path, cols=2):
         f.write(combined)
 
 
-def build_stats_block(grand_total_lines, n_repos):
-    linhas_fmt = f"{grand_total_lines:,}".replace(",", ".")
+def build_mine_img_block():
+    """So a imagem + data: o texto de nota ao redor fica fixo no README,
+    fora de qualquer marcador, pra edicao manual nunca ser sobrescrita."""
     my_updated = datetime.date.today().strftime("%d/%m/%Y")
+    return (
+        '<p align="center">\n'
+        '<img src="https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/profile_row1.svg" alt="repositorios mais extensos, linguagens por linhas de codigo, repositorios por ano, repositorios por numero de commits" width="100%" />\n'
+        '</p>\n\n'
+        f'<p align="center"><sub>Última atualização: {my_updated}</sub></p>'
+    )
+
+
+def build_world_img_block():
+    """Mesma ideia de build_mine_img_block, pro card do Orion Index."""
     orion_updated = orion_index_last_update() or "veja no repositório do Orion Index"
     return (
-        '### 📁 Estatísticas do Meu Repositório\n\n'
-        '> [!NOTE]\n'
-        f'> Contagem própria: {linhas_fmt} linhas de código analisadas em {n_repos} repositórios públicos meus, '
-        f'gerada em [Orion-Index/scripts/generate_profile_stats.py]({ORION_INDEX_REPO}/blob/main/scripts/generate_profile_stats.py), '
-        'que clona cada repositório e conta linhas não vazias por extensão de arquivo. HTML e CSS ficam de fora: '
-        'são marcação e estilo, não linguagem de programação.\n'
-        '> - **Repositórios Mais Extensos**: meus repositórios com mais linhas de código.\n'
-        '> - **Linguagens por Linhas**: % de linhas de código por linguagem, somando todos os meus repositórios.\n'
-        '> - **Repositórios por Ano**: quantos repositórios eu criei por ano, mostra o crescimento do portfólio '
-        'ao longo do tempo.\n'
-        '> - **Repositórios por Commits**: meus repositórios com mais commits (diferente de "mais extenso": '
-        'um repositório pode ter poucas linhas e muitos commits, ou o contrário).\n\n'
-        '<p align="center">\n'
-        f'<img src="https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/profile_row1.svg" alt="repositorios mais extensos, linguagens por linhas de codigo, repositorios por ano, repositorios por numero de commits" width="100%" />\n'
-        '</p>\n\n'
-        f'<p align="center"><sub>Última atualização: {my_updated}</sub></p>\n\n'
-        '---\n\n'
-        '### 🌍 Estatísticas do GitHub\n\n'
-        '> [!NOTE]\n'
-        f'> Não é sobre mim, é sobre todo mundo: vem do próprio [Orion Index]({ORION_INDEX_REPO}), que busca ao '
-        'vivo direto da API oficial do GitHub, sem depender de terceiro nenhum.\n'
-        '> - **Repositórios Novos**: quantos foram criados nos últimos 30 dias, por linguagem.\n'
-        '> - **Repositórios Totais**: quantos repositórios públicos existem por linguagem no GitHub inteiro, '
-        'acumulado histórico.\n'
-        '> - **Repositórios por Finalidade**: quantos repositórios existem por tópico de propósito (IA, APIs, '
-        'automação, dados...), sem olhar linguagem nenhuma.\n'
-        '> - **Crescimento Relativo**: novos ÷ totais: qual linguagem está crescendo mais rápido em relação ao '
-        'próprio tamanho, não só em número absoluto.\n'
-        '>\n'
-        f'> Detalhes de cada fonte no [README do Orion Index]({ORION_INDEX_REPO}#readme).\n\n'
         '<p align="center">\n'
         f'<img src="{ORION_INDEX_SVG}" alt="Orion Index: linguagens mais usadas no mundo segundo o GitHub (repositorios novos, totais, por finalidade e crescimento relativo)" width="100%" />\n'
         '</p>\n\n'
@@ -525,7 +507,8 @@ def main():
     build_combined_row(row1_paths, os.path.join(DOCS_DIR, "profile_row1.svg"))
 
     blocks = {
-        "STATS": build_stats_block(grand_total, len(repos)),
+        "STATS_MINE_IMG": build_mine_img_block(),
+        "STATS_WORLD_IMG": build_world_img_block(),
         "SKILLS": build_skills_block(topics_count, total_lines),
     }
 
