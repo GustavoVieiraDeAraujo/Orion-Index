@@ -24,7 +24,7 @@
     <text x="20" y="115" class="lbl">C</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="276" height="11" rx="5.5" fill="#555555" class="bar"/>
-    <text x="314" y="132" class="val">22.1%</text>
+    <text x="314" y="132" class="val">22.0%</text>
     <text x="20" y="165" class="lbl">JavaScript</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="173" width="234" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
@@ -35,6 +35,6 @@
     <text x="314" y="232" class="val">16.7%</text>
     <text x="20" y="265" class="lbl">Python</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="125" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <rect x="20" y="273" width="126" height="11" rx="5.5" fill="#3572A5" class="bar"/>
     <text x="314" y="282" class="val">10.0%</text>
 </svg>
