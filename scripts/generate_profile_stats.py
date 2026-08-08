@@ -7,7 +7,6 @@
 # README de la.
 import datetime
 import json
-import math
 import os
 import re
 import shutil
@@ -396,94 +395,106 @@ def build_combined_row(panel_paths, out_path, cols=2):
 # SMIL num SVG carregado via <img>, entao so esse quadro parado e o que
 # qualquer visitante do perfil realmente ve -- os outros so aparecem pra
 # quem abre o arquivo .svg direto num navegador.
-BANNER_WIDTH = 1200
-BANNER_HEIGHT = 300
-BANNER_WAVE_BASELINE = 245     # y central da faixa ondulada (mais perto de BANNER_HEIGHT = onda mais colada na borda de baixo)
-BANNER_WAVE_AMPLITUDE = 55     # altura do pico da onda, em pixels -- precisa ser grande de verdade, o banner encolhe bastante quando exibido (~846px de largura no perfil real), entao amplitude pequena vira imperceptivel
-BANNER_WAVE_CYCLES = 4.5       # quantas ondas completas cabem na largura -- MAIOR = comprimento de onda MENOR (ondas mais curtas e frequentes)
-BANNER_WAVE_LAYERS_PHASE_GAP = math.pi * 0.6  # defasagem entre as duas camadas, em radianos. Nao usar exatamente pi (meio ciclo): com a mesma amplitude, fica simetrico demais e as duas camadas se encaixam perfeitamente, parecendo "uma onda so" em vez de duas cruzando
-BANNER_WAVE_ANIM_DURATION = 8  # segundos por volta completa (so importa pra quem abre o svg direto)
-BANNER_WAVE_LAYER_OPACITY = 0.55
+# Porte literal de kyechan99/capsule-render (model/animationModel/waving.ts
+# + model/model.ts + model/animationModel/animationModel.ts + utils/render.ts),
+# a mesma dependencia externa que usavamos antes -- mesmos numeros, mesma
+# estrutura, so trocando pra SVG proprio servido por raw.githubusercontent.com.
+# width=854 e o default deles (Model.width); height=180, fontSize=32,
+# fontColor=ffffff, fontAlignY=30 batem com os parametros que a URL antiga
+# (capsule-render.vercel.app/api?type=waving&...) realmente usava.
+BANNER_WIDTH = 854
+BANNER_HEIGHT = 180
+BANNER_GRAD_FROM = "D1D5DB"
+BANNER_GRAD_TO = "374151"
+BANNER_FONT_SIZE = 32
+BANNER_FONT_COLOR = "ffffff"
+BANNER_FONT_ALIGN_Y = 30  # % da altura, de cima pra baixo
 
 
-def _sine_wave_path(width, baseline, amplitude, cycles, phase=0.0, samples_per_cycle=24):
-    """Onda de verdade: amostra pontos ao longo de uma senoide e liga com
-    segmentos de reta curtos (curto o bastante pra parecer curva suave).
-    amplitude e cycles controlam altura e comprimento de onda direto, sem
-    precisar calcular pontos de controle de curva Bezier a mao."""
-    n = max(8, round(cycles * samples_per_cycle))
-    d = "M0,0"
-    for i in range(n + 1):
-        x = width * i / n
-        y = baseline + amplitude * math.sin(2 * math.pi * cycles * i / n + phase)
-        d += f" L{x:.1f},{y:.1f}"
-    d += f" L{width:.1f},0 Z"
-    return d
-
-
-def _sine_wave_frames(width, baseline, amplitude, cycles, phase0, steps=8):
-    """Quadros de uma volta completa (fase de 0 a 2*pi), pra animar via
-    morph do atributo d -- a onda flui de verdade (equivale a andar da
-    esquerda pra direita), nao so balanca no lugar."""
-    return [
-        _sine_wave_path(width, baseline, amplitude, cycles, phase=phase0 + 2 * math.pi * i / steps)
-        for i in range(steps + 1)
-    ]
+def _capsule_waving_content(width, height):
+    """Copia exata do metodo content() de Waving (model/animationModel/
+    waving.ts): duas camadas com opacity 0.4, cada uma com 4 quadros de
+    animate no atributo d (curvas Q + T, nao senoide), a segunda comecando
+    em begin=-10s (metade dos 20s de duracao) -- mesmos numeros literais
+    do arquivo original deles (213.5 e 427 sao width/4 e width/2 pro
+    width=854 padrao). O 'calcmod' (em vez de calcMode) e erro de digitacao
+    do codigo-fonte real: mantido igual, o deles tambem nao aplica a
+    suavizacao por spline por causa disso."""
+    half = width / 2
+    quarter = width / 4
+    return f'''
+      <g transform="translate({half}, {height / 2}) scale(1, 1) translate(-{quarter * 2}, -{height / 2})">
+        <path d="" fill="url(#bannerGrad)" opacity="0.4">
+          <animate
+              attributeName="d"
+              dur="20s"
+              repeatCount="indefinite"
+              keyTimes="0;0.333;0.667;1"
+              calcmod="spline"
+              keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
+              begin="0s"
+              values="M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter * 2} {height - 70}T {width} {height - 45}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 40} {quarter * 2} {height - 60}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 35}Q {quarter} {height - 65} {quarter * 2} {height - 35}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter * 2} {height - 70}T {width} {height - 45}L {width} 0 Z">
+          </animate>
+        </path>
+        <path d="" fill="url(#bannerGrad)" opacity="0.4">
+          <animate
+            attributeName="d"
+            dur="20s"
+            repeatCount="indefinite"
+            keyTimes="0;0.333;0.667;1"
+            calcmod="spline"
+            keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
+            begin="-10s"
+            values="M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter * 2} {height - 50}T {width} {height - 40}L {width} 0 Z;M0 0L 0 {height - 50}Q {quarter} {height - 80} {quarter * 2} {height - 80}T {width} {height - 60}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 75} {quarter * 2} {height - 50}T {width} {height - 35}L {width} 0 Z;M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter * 2} {height - 50}T {width} {height - 40}L {width} 0 Z">
+          </animate>
+        </path>
+      </g>'''
 
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
-    """Banner com o nome, silhueta solida em cima e duas ondas (senoides
-    de verdade, nao aproximacao por curva Bezier) cruzando na base, com
-    defasagem fixa de meio ciclo entre elas -- onde uma esta no pico, a
-    outra esta sempre no vale. Cada camada anima via morph do atributo d
-    percorrendo uma volta completa de fase, criando um fluxo real (nao um
-    translate simples). Inspirado na tecnica do capsule-render original
-    (kyechan99/capsule-render, model/animationModel/waving.ts: duas
-    camadas translucidas da mesma cor, a segunda comecando com metade do
-    ciclo ja percorrido via begin negativo), mas com onda calculada por
-    seno em vez de curvas Bezier chutadas a mao -- da pra ajustar
-    amplitude/comprimento de onda direto pelas constantes BANNER_WAVE_*
-    no topo do arquivo, sem mexer no resto do codigo. O
-    texto fica estatico (sem fade-in) porque o GitHub nao roda animacao
-    SMIL em SVG carregado via <img>, so ficaria com opacidade zero pra
-    sempre. So depende de raw.githubusercontent.com dai em diante."""
+    """Porte literal do banner 'waving' do capsule-render (fonte real
+    conferida em kyechan99/capsule-render). A peca que faltava nas
+    tentativas anteriores: o fade-in do nome la e feito com CSS
+    @keyframes (animation: fadeIn 1.2s ease-in-out forwards), nao SMIL --
+    e exatamente por isso que o deles sempre funcionou num <img> do
+    GitHub e as minhas tentativas com <animate attributeName="opacity">
+    nunca funcionavam (SMIL nao roda nesse contexto, CSS roda). A onda
+    em si (curvas Q+T animadas via SMIL) fica exatamente como o
+    original: nem eles conseguem anima-la de verdade dentro de um <img>,
+    entao so o quadro inicial e visivel no perfil real, igual sempre foi."""
     width, height = BANNER_WIDTH, BANNER_HEIGHT
-    dur = BANNER_WAVE_ANIM_DURATION
-    back_frames = _sine_wave_frames(width, BANNER_WAVE_BASELINE, BANNER_WAVE_AMPLITUDE, BANNER_WAVE_CYCLES, 0.0)
-    front_frames = _sine_wave_frames(width, BANNER_WAVE_BASELINE, BANNER_WAVE_AMPLITUDE, BANNER_WAVE_CYCLES,
-                                      BANNER_WAVE_LAYERS_PHASE_GAP)
-
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}" role="img" aria-label="{name}">'
+        f'viewBox="0 0 {width} {height}" style="z-index:1;position:relative" role="img" aria-label="{name}">'
+        '<style>'
+        f'.text {{ font-size: {BANNER_FONT_SIZE}px; font-weight: 700; '
+        'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji; }'
+        '.text { animation: fadeIn 1.2s ease-in-out forwards; }'
+        '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }'
+        '</style>'
         '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
-        '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
+        f'<stop offset="0%" stop-color="#{BANNER_GRAD_FROM}"/><stop offset="100%" stop-color="#{BANNER_GRAD_TO}"/>'
         '</linearGradient></defs>'
-        f'<g fill="url(#bannerGrad)"><path d="{back_frames[0]}" opacity="{BANNER_WAVE_LAYER_OPACITY}">'
-        f'<animate attributeName="d" values="{";".join(back_frames)}" dur="{dur}s" begin="0s" repeatCount="indefinite"/>'
-        '</path></g>'
-        f'<g fill="url(#bannerGrad)"><path d="{front_frames[0]}" opacity="{BANNER_WAVE_LAYER_OPACITY}">'
-        f'<animate attributeName="d" values="{";".join(front_frames)}" dur="{dur}s" begin="-{dur / 2}s" repeatCount="indefinite"/>'
-        '</path></g>'
-        f'<text x="{width / 2:.0f}" y="105" fill="#f9fafb" '
-        'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
-        'font-size="40" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
-        f'{name}'
-        '</text></svg>'
+        f'{_capsule_waving_content(width, height)}'
+        f'<text text-anchor="middle" dominant-baseline="middle" x="50%" y="{BANNER_FONT_ALIGN_Y}%" '
+        f'class="text" style="fill:#{BANNER_FONT_COLOR};">{name}</text>'
+        '</svg>'
     )
 
 
 def build_divider_svg():
-    """Linha divisoria fina entre secoes, mesmo gradiente do banner --
-    tambem trocando o capsule-render por um SVG proprio."""
-    width, height = 1500, 4
+    """Porte literal do tipo 'rect' do capsule-render (model/normalModel/
+    rect.ts): retangulo solido preenchido com o mesmo gradiente, sem
+    animacao nenhuma (o tipo rect nunca teve). width=854 pra bater com o
+    default deles, height=4 igual ao parametro que a URL antiga usava."""
+    width, height = BANNER_WIDTH, 4
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}">'
-        '<defs><linearGradient id="dividerGrad" x1="0" y1="0" x2="100%" y2="0">'
-        '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
+        '<defs><linearGradient id="dividerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
+        f'<stop offset="0%" stop-color="#{BANNER_GRAD_FROM}"/><stop offset="100%" stop-color="#{BANNER_GRAD_TO}"/>'
         '</linearGradient></defs>'
-        f'<rect width="{width}" height="{height}" fill="url(#dividerGrad)"/></svg>'
+        f'<path fill="url(#dividerGrad)" fill-opacity="1" d="m 0 0 l 0 {height} l {width} 0 l 0 -{height} z"/></svg>'
     )
 
 
