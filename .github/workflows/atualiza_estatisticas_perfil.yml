@@ -1,8 +1,9 @@
 name: Atualizar estatisticas do perfil
 
 on:
-  schedule:
-    - cron: "10 6 * * *" # todo dia, 06:10 UTC
+  workflow_run:
+    workflows: ["Atualizar Orion Index"]
+    types: [completed]
   workflow_dispatch: {}
   push:
     branches: [main]

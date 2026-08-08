@@ -76,9 +76,9 @@ A primeira versão da quarta perspectiva era "repositórios com push nos último
 | `scripts/generate.py` | As 4 perspectivas do Orion Index: busca na API do GitHub e gera `docs/orion-index.svg` |
 | `scripts/generate_profile_stats.py` | Automação pessoal do perfil (não é o Orion Index): estatísticas dos repositórios do autor, publicadas no README de outro repositório |
 | `scripts/generate_spaceship.py` | Automação pessoal: nave espacial animada sobre o calendário de contribuições, publicada no mesmo README de perfil |
-| `.github/workflows/atualiza_orion_index.yml` | Roda `generate.py` uma vez por dia |
-| `.github/workflows/atualiza_estatisticas_perfil.yml` | Roda `generate_profile_stats.py` uma vez por dia |
-| `.github/workflows/gera_nave_espacial.yml` | Roda `generate_spaceship.py` uma vez por dia |
+| `.github/workflows/atualiza_orion_index.yml` | Roda `generate.py` uma vez por dia, dispara o próximo da cadeia ao terminar |
+| `.github/workflows/atualiza_estatisticas_perfil.yml` | Roda `generate_profile_stats.py` quando o workflow anterior termina |
+| `.github/workflows/gera_nave_espacial.yml` | Roda `generate_spaceship.py` quando o workflow anterior termina |
 | `docs/orion-index.svg` | Card combinado das 4 perspectivas, em grade 2x2 |
 | `docs/github_*.svg` | Os 4 painéis individuais que compõem o combinado |
 | `docs/profile_*.svg` | Cartões de estatísticas do perfil (não fazem parte do Orion Index) |
@@ -116,13 +116,13 @@ python3 scripts/generate_spaceship.py
 
 ## Automação
 
-| Workflow | Agenda | Script |
+| Workflow | Dispara quando | Script |
 |---|---|---|
-| `atualiza_orion_index.yml` | Todo dia, 06:00 UTC | `generate.py` |
-| `atualiza_estatisticas_perfil.yml` | Todo dia, 06:10 UTC | `generate_profile_stats.py` |
-| `gera_nave_espacial.yml` | Todo dia, 06:20 UTC | `generate_spaceship.py` |
+| `atualiza_orion_index.yml` | Todo dia, 06:00 UTC (cron) | `generate.py` |
+| `atualiza_estatisticas_perfil.yml` | `atualiza_orion_index.yml` termina (`workflow_run`) | `generate_profile_stats.py` |
+| `gera_nave_espacial.yml` | `atualiza_estatisticas_perfil.yml` termina (`workflow_run`) | `generate_spaceship.py` |
 
-Todos os três também rodam sob demanda (`workflow_dispatch`) e ao detectar push no próprio script. Nenhuma das quatro perspectivas do Orion Index precisa de ação manual — tudo é buscado do zero a cada execução, sempre com o dado mais recente disponível.
+Os três formam uma corrente: só o primeiro tem agenda fixa, os outros dois disparam via `workflow_run` assim que o anterior termina — evita dois workflows commitando ao mesmo tempo no mesmo repositório, sem precisar chutar um intervalo de segurança entre horários fixos. Todos também rodam sob demanda (`workflow_dispatch`) e ao detectar push no próprio script. Nenhuma das quatro perspectivas do Orion Index precisa de ação manual — tudo é buscado do zero a cada execução, sempre com o dado mais recente disponível.
 
 ---
 

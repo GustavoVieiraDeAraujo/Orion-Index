@@ -1,8 +1,9 @@
 name: Gerar nave atirando nos commits
 
 on:
-  schedule:
-    - cron: "20 6 * * *" # todo dia, 06:20 UTC
+  workflow_run:
+    workflows: ["Atualizar estatisticas do perfil"]
+    types: [completed]
   workflow_dispatch: {}
   push:
     branches: [main]
