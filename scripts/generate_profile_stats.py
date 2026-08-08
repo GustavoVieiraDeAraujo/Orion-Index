@@ -439,10 +439,11 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
     percorrendo uma volta completa de fase, criando um fluxo real (nao um
     translate simples). Inspirado na tecnica do capsule-render original
     (kyechan99/capsule-render, model/animationModel/waving.ts: duas
-    camadas translucidas da mesma cor, dur diferente por camada), mas com
-    onda calculada por seno em vez de curvas Bezier chutadas a mao -- da
-    pra ajustar amplitude/comprimento de onda direto pelas constantes
-    BANNER_WAVE_* no topo do arquivo, sem mexer no resto do codigo. O
+    camadas translucidas da mesma cor, a segunda comecando com metade do
+    ciclo ja percorrido via begin negativo), mas com onda calculada por
+    seno em vez de curvas Bezier chutadas a mao -- da pra ajustar
+    amplitude/comprimento de onda direto pelas constantes BANNER_WAVE_*
+    no topo do arquivo, sem mexer no resto do codigo. O
     texto fica estatico (sem fade-in) porque o GitHub nao roda animacao
     SMIL em SVG carregado via <img>, so ficaria com opacidade zero pra
     sempre. So depende de raw.githubusercontent.com dai em diante."""
@@ -459,10 +460,10 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
         '</linearGradient></defs>'
         f'<g fill="url(#bannerGrad)"><path d="{back_frames[0]}" opacity="{BANNER_WAVE_LAYER_OPACITY}">'
-        f'<animate attributeName="d" values="{";".join(back_frames)}" dur="{dur}s" repeatCount="indefinite"/>'
+        f'<animate attributeName="d" values="{";".join(back_frames)}" dur="{dur}s" begin="0s" repeatCount="indefinite"/>'
         '</path></g>'
         f'<g fill="url(#bannerGrad)"><path d="{front_frames[0]}" opacity="{BANNER_WAVE_LAYER_OPACITY}">'
-        f'<animate attributeName="d" values="{";".join(front_frames)}" dur="{dur}s" repeatCount="indefinite"/>'
+        f'<animate attributeName="d" values="{";".join(front_frames)}" dur="{dur}s" begin="-{dur / 2}s" repeatCount="indefinite"/>'
         '</path></g>'
         f'<text x="{width / 2:.0f}" y="105" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
