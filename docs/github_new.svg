@@ -19,21 +19,21 @@
     <text x="104" y="70.0" text-anchor="end" class="lbl">Python</text>
     <rect x="114" y="60.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="60.0" width="190" height="12" rx="6" fill="#3572A5"/>
-    <text x="314" y="70.0" class="val">1157.6k</text>
+    <text x="314" y="70.0" class="val">1115.7k</text>
     <text x="104" y="102.0" text-anchor="end" class="lbl">JavaScript</text>
     <rect x="114" y="92.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="92.0" width="145" height="12" rx="6" fill="#f1e05a"/>
-    <text x="314" y="102.0" class="val">883.7k</text>
+    <text x="314" y="102.0" class="val">851.3k</text>
     <text x="104" y="134.0" text-anchor="end" class="lbl">TypeScript</text>
     <rect x="114" y="124.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="124.0" width="133" height="12" rx="6" fill="#3178c6"/>
-    <text x="314" y="134.0" class="val">809.7k</text>
+    <text x="314" y="134.0" class="val">781.5k</text>
     <text x="104" y="166.0" text-anchor="end" class="lbl">Java</text>
     <rect x="114" y="156.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="156.0" width="36" height="12" rx="6" fill="#b07219"/>
-    <text x="314" y="166.0" class="val">220.6k</text>
+    <text x="314" y="166.0" class="val">212.7k</text>
     <text x="104" y="198.0" text-anchor="end" class="lbl">C++</text>
     <rect x="114" y="188.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="188.0" width="17" height="12" rx="6" fill="#f34b7d"/>
-    <text x="314" y="198.0" class="val">104.3k</text>
+    <text x="314" y="198.0" class="val">100.6k</text>
 </svg>
