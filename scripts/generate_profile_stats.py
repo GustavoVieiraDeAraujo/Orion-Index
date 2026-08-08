@@ -24,8 +24,8 @@ ORION_INDEX_SVG = "https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion
 ORION_INDEX_REPO = "https://github.com/GustavoVieiraDeAraujo/Orion-Index"
 
 MARKERS = {
-    "STATS_MINE_IMG": ("<!-- STATS_MINE_IMG:START -->", "<!-- STATS_MINE_IMG:END -->"),
-    "STATS_WORLD_IMG": ("<!-- STATS_WORLD_IMG:START -->", "<!-- STATS_WORLD_IMG:END -->"),
+    "STATS_MEU_REPO_CARTAO": ("<!-- STATS_MEU_REPO_CARTAO:START -->", "<!-- STATS_MEU_REPO_CARTAO:END -->"),
+    "STATS_MUNDO_CARTAO": ("<!-- STATS_MUNDO_CARTAO:START -->", "<!-- STATS_MUNDO_CARTAO:END -->"),
     "SKILLS": ("<!-- SKILLS:START -->", "<!-- SKILLS:END -->"),
 }
 
@@ -507,8 +507,8 @@ def main():
     build_combined_row(row1_paths, os.path.join(DOCS_DIR, "profile_row1.svg"))
 
     blocks = {
-        "STATS_MINE_IMG": build_mine_img_block(),
-        "STATS_WORLD_IMG": build_world_img_block(),
+        "STATS_MEU_REPO_CARTAO": build_mine_img_block(),
+        "STATS_MUNDO_CARTAO": build_world_img_block(),
         "SKILLS": build_skills_block(topics_count, total_lines),
     }
 
