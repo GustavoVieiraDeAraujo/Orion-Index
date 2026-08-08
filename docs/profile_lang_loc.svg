@@ -19,21 +19,21 @@
     <text x="20" y="64" class="lbl">C</text>
     <rect x="20" y="72" width="286" height="10" rx="5" class="track"/>
     <rect x="20" y="72" width="286" height="10" rx="5" fill="#555555"/>
-    <text x="314" y="80" class="val">22.5%</text>
+    <text x="314" y="80" class="val">22.3%</text>
     <text x="20" y="114" class="lbl">JavaScript</text>
     <rect x="20" y="122" width="286" height="10" rx="5" class="track"/>
     <rect x="20" y="122" width="276" height="10" rx="5" fill="#f1e05a"/>
-    <text x="314" y="130" class="val">21.7%</text>
+    <text x="314" y="130" class="val">21.5%</text>
     <text x="20" y="164" class="lbl">Ruby</text>
     <rect x="20" y="172" width="286" height="10" rx="5" class="track"/>
     <rect x="20" y="172" width="247" height="10" rx="5" fill="#701516"/>
-    <text x="314" y="180" class="val">19.4%</text>
+    <text x="314" y="180" class="val">19.2%</text>
     <text x="20" y="214" class="lbl">C++</text>
     <rect x="20" y="222" width="286" height="10" rx="5" class="track"/>
     <rect x="20" y="222" width="205" height="10" rx="5" fill="#f34b7d"/>
-    <text x="314" y="230" class="val">16.1%</text>
+    <text x="314" y="230" class="val">16.0%</text>
     <text x="20" y="264" class="lbl">Python</text>
     <rect x="20" y="272" width="286" height="10" rx="5" class="track"/>
-    <rect x="20" y="272" width="128" height="10" rx="5" fill="#3572A5"/>
-    <text x="314" y="280" class="val">10.0%</text>
+    <rect x="20" y="272" width="139" height="10" rx="5" fill="#3572A5"/>
+    <text x="314" y="280" class="val">10.8%</text>
 </svg>
