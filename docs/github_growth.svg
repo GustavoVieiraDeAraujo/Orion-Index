@@ -19,15 +19,15 @@
     <text x="104" y="70.0" text-anchor="end" class="lbl">TypeScript</text>
     <rect x="114" y="60.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="60.0" width="190" height="12" rx="6" fill="#3178c6"/>
-    <text x="314" y="70.0" class="val">4.6%</text>
+    <text x="314" y="70.0" class="val">4.5%</text>
     <text x="104" y="102.0" text-anchor="end" class="lbl">Rust</text>
     <rect x="114" y="92.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="92.0" width="155" height="12" rx="6" fill="#dea584"/>
-    <text x="314" y="102.0" class="val">3.8%</text>
+    <text x="314" y="102.0" class="val">3.6%</text>
     <text x="104" y="134.0" text-anchor="end" class="lbl">Python</text>
     <rect x="114" y="124.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="124.0" width="148" height="12" rx="6" fill="#3572A5"/>
-    <text x="314" y="134.0" class="val">3.6%</text>
+    <text x="314" y="134.0" class="val">3.5%</text>
     <text x="104" y="166.0" text-anchor="end" class="lbl">Shell</text>
     <rect x="114" y="156.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="156.0" width="96" height="12" rx="6" fill="#89e051"/>
@@ -35,5 +35,5 @@
     <text x="104" y="198.0" text-anchor="end" class="lbl">Dart</text>
     <rect x="114" y="188.0" width="190" height="12" rx="6" class="track"/>
     <rect x="114" y="188.0" width="95" height="12" rx="6" fill="#8a8a8a"/>
-    <text x="314" y="198.0" class="val">2.3%</text>
+    <text x="314" y="198.0" class="val">2.2%</text>
 </svg>
