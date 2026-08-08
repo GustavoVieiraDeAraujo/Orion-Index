@@ -7,7 +7,6 @@
 # README de la.
 import datetime
 import json
-import math
 import os
 import re
 import shutil
@@ -390,59 +389,55 @@ def build_combined_row(panel_paths, out_path, cols=2):
         f.write(combined)
 
 
-def _wave_path(width, height, amplitude, period, baseline, fill_above=False, phase_shift=0.0):
-    """Gera uma onda suave com curvas quadraticas alternando pra cima e pra
-    baixo -- vira uma silhueta de onda preenchivel. Com fill_above=True a
-    silhueta fecha pra cima (preenche entre o topo e a onda, onda fica
-    embaixo); por padrao fecha pra baixo (preenche entre a onda e a base).
-    phase_shift desloca o inicio da onda em pixels (positivo = onda comeca
-    mais pra direita); comeca um periodo antes de x=0 pra cobrir esse
-    deslocamento sem deixar buraco na borda esquerda."""
-    start = -period + (phase_shift % period)
-    d = f"M{start:.1f},{baseline:.1f}"
-    x = start
-    while x < width:
-        d += f" Q{x + period / 4:.1f},{baseline - amplitude:.1f} {x + period / 2:.1f},{baseline:.1f}"
-        d += f" Q{x + period * 3 / 4:.1f},{baseline + amplitude:.1f} {x + period:.1f},{baseline:.1f}"
-        x += period
-    edge = 0 if fill_above else height
-    d += f" L{x:.1f},{edge} L{start:.1f},{edge} Z"
-    return d
+def _single_wave_path(width, y0, yctrl, ymid, yend):
+    """Uma onda em S cobrindo a largura inteira (Q + T), igual ao
+    capsule-render de verdade faz -- nao um padrao pequeno repetido lado a
+    lado. Preenche do topo (y=0) ate a linha da onda: M0,0 desce ate y0,
+    curva ate o meio (ymid, controlado por yctrl), T continua simetrico
+    ate yend na borda direita, fecha por cima de volta a origem."""
+    half = width / 2
+    quarter = width / 4
+    return (
+        f"M0,0 L0,{y0:.1f} Q{quarter:.1f},{yctrl:.1f} {half:.1f},{ymid:.1f} "
+        f"T{width:.1f},{yend:.1f} L{width:.1f},0 Z"
+    )
 
 
-def _wave_bob_keyframes(width, height, amplitude, period, baseline, fill_above, phase_shift, bob, steps=8):
-    """Gera path 'd' pra cada fase de um ciclo de sobe-e-desce: a onda toda
-    balanca verticalmente (baseline oscila em seno) mantendo fase e forma
-    -- da pra animar o atributo d direto entre esses quadros, morphing em
-    vez de so arrastar a forma de lado."""
-    frames = []
-    for i in range(steps + 1):
-        t = i / steps
-        b = baseline + bob * math.sin(2 * math.pi * t)
-        frames.append(_wave_path(width, height, amplitude, period, b, fill_above=fill_above, phase_shift=phase_shift))
-    return frames
+def _wave_keyframes(width, baseline, frames_deltas):
+    """frames_deltas: lista de (dy0,dyctrl,dymid,dyend) relativos a
+    baseline, um por quadro -- ultimo quadro deve repetir o primeiro pra
+    looping sem salto."""
+    return [
+        _single_wave_path(width, baseline + dy0, baseline + dyctrl, baseline + dymid, baseline + dyend)
+        for dy0, dyctrl, dymid, dyend in frames_deltas
+    ]
+
+
+# Deltas dos 4 quadros de cada camada, em pixels a partir da baseline --
+# adaptado dos valores reais do capsule-render (model/animationModel/
+# waving.ts), so trocando escala pra caber na nossa altura de banner.
+# Ultimo quadro repete o primeiro pra fechar o loop sem salto.
+_WAVE_FRAMES_BACK = [(-95, -45, -80, -50), (-65, -45, -70, -85), (-40, -75, -40, -85), (-95, -45, -80, -50)]
+_WAVE_FRAMES_FRONT = [(-75, -20, -55, -45), (-55, -90, -90, -65), (-60, -85, -55, -35), (-75, -20, -55, -45)]
 
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
-    """Banner com o nome, silhueta solida em cima e duas ondas cruzando na
-    base (mesma composicao do capsule-render 'waving' original, mas com uma
-    segunda camada). As duas ondas tem o mesmo periodo, mas a de cima
-    comeca deslocada (nao exatamente meio ciclo, senao vira espelho perfeito
-    e fica parado/simetrico demais) -- picos e vales cruzam de forma menos
-    previsivel. Cada onda balanca pra cima e pra baixo (morph do atributo
-    d entre quadros pre-calculados, nao so um translate de lado)  pra
-    parecer sobe-e-desce de agua de verdade, nao duas imagens deslizando.
-    Substitui o capsule-render (servico de terceiro de um unico mantenedor)
-    por um SVG proprio. O texto fica estatico (sem fade-in) porque o
-    GitHub nao roda animacao SMIL em SVG carregado via <img>, so ficaria
-    com opacidade zero pra sempre. So depende de raw.githubusercontent.com
-    dai em diante."""
+    """Banner com o nome, silhueta solida em cima e duas ondas na base --
+    mesma tecnica do capsule-render original (fonte real conferida em
+    kyechan99/capsule-render): cada onda e uma curva unica em S cobrindo a
+    largura inteira (nao um padrao pequeno repetido), duas camadas
+    translucidas sobrepostas da mesma cor, animando via morph direto do
+    atributo d (nao translate). A segunda camada comeca com metade do
+    ciclo ja percorrido (begin negativo) em vez da primeira, entao uma
+    esta sempre num ponto bem diferente da outra. O texto fica estatico
+    (sem fade-in) porque o GitHub nao roda animacao SMIL em SVG carregado
+    via <img>, so ficaria com opacidade zero pra sempre. So depende de
+    raw.githubusercontent.com dai em diante."""
     width, height = 1200, 300
-    period, amplitude, baseline = 300, 20, 225
-    back_frames = _wave_bob_keyframes(width + period, height, amplitude, period, baseline,
-                                       fill_above=True, phase_shift=0, bob=14)
-    front_frames = _wave_bob_keyframes(width + period, height, amplitude, period, baseline,
-                                        fill_above=True, phase_shift=period * 0.4, bob=14)
+    baseline = 210
+    dur = 16
+    back_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_BACK)
+    front_frames = _wave_keyframes(width, baseline, _WAVE_FRAMES_FRONT)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
@@ -450,15 +445,15 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
         '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
         '</linearGradient></defs>'
-        f'<g fill="url(#bannerGrad)"><path d="{back_frames[0]}">'
+        f'<g fill="url(#bannerGrad)"><path d="{back_frames[0]}" opacity="0.55">'
         f'<animate attributeName="d" values="{";".join(back_frames)}" '
-        f'dur="6s" repeatCount="indefinite"/>'
+        f'keyTimes="0;0.333;0.667;1" dur="{dur}s" begin="0s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<g fill="#f9fafb" opacity="0.28"><path d="{front_frames[0]}">'
+        f'<g fill="url(#bannerGrad)"><path d="{front_frames[0]}" opacity="0.55">'
         f'<animate attributeName="d" values="{";".join(front_frames)}" '
-        f'dur="7s" repeatCount="indefinite"/>'
+        f'keyTimes="0;0.333;0.667;1" dur="{dur}s" begin="-{dur / 2}s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<text x="{width / 2:.0f}" y="115" fill="#f9fafb" '
+        f'<text x="{width / 2:.0f}" y="105" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
         'font-size="40" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
         f'{name}'
