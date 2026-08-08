@@ -390,16 +390,18 @@ def build_combined_row(panel_paths, out_path, cols=2):
         f.write(combined)
 
 
-def _wave_path(width, height, amplitude, period, baseline, fill_above=False):
+def _wave_path(width, height, amplitude, period, baseline, fill_above=False, invert=False):
     """Gera uma onda suave com curvas quadraticas alternando pra cima e pra
     baixo -- vira uma silhueta de onda preenchivel. Com fill_above=True a
     silhueta fecha pra cima (preenche entre o topo e a onda, onda fica
-    embaixo); por padrao fecha pra baixo (preenche entre a onda e a base)."""
+    embaixo); por padrao fecha pra baixo (preenche entre a onda e a base).
+    invert=True troca a fase (crista vira vale e vice-versa)."""
+    sign = -1 if invert else 1
     d = f"M0,{baseline:.1f}"
     x = 0.0
     while x < width:
-        d += f" Q{x + period / 4:.1f},{baseline - amplitude:.1f} {x + period / 2:.1f},{baseline:.1f}"
-        d += f" Q{x + period * 3 / 4:.1f},{baseline + amplitude:.1f} {x + period:.1f},{baseline:.1f}"
+        d += f" Q{x + period / 4:.1f},{baseline - amplitude * sign:.1f} {x + period / 2:.1f},{baseline:.1f}"
+        d += f" Q{x + period * 3 / 4:.1f},{baseline + amplitude * sign:.1f} {x + period:.1f},{baseline:.1f}"
         x += period
     edge = 0 if fill_above else height
     d += f" L{x:.1f},{edge} L0,{edge} Z"
@@ -416,13 +418,13 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
     depende de raw.githubusercontent.com dai em diante."""
     width, height = 1200, 220
     period, amplitude, baseline = 300, 18, 170
-    wave_d = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True)
+    wave_d = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=True)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{name}">'
         '<defs><linearGradient id="bannerGrad" x1="0" y1="0" x2="100%" y2="100%">'
-        '<stop offset="0%" stop-color="#D1D5DB"/><stop offset="100%" stop-color="#374151"/>'
+        '<stop offset="0%" stop-color="#E5E7EB"/><stop offset="100%" stop-color="#111827"/>'
         '</linearGradient></defs>'
         f'<g fill="url(#bannerGrad)"><path d="{wave_d}">'
         f'<animateTransform attributeName="transform" type="translate" '
