@@ -416,8 +416,8 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
     estatico (sem fade-in) porque o GitHub nao roda animacao SMIL em SVG
     carregado via <img>, so ficaria com opacidade zero pra sempre. So
     depende de raw.githubusercontent.com dai em diante."""
-    width, height = 1200, 260
-    period, amplitude, baseline = 300, 18, 200
+    width, height = 1200, 300
+    period, amplitude, baseline = 300, 18, 230
     wave_d = _wave_path(width + period, height, amplitude, period, baseline, fill_above=True, invert=True)
 
     return (
@@ -430,7 +430,7 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         f'<animateTransform attributeName="transform" type="translate" '
         f'from="0,0" to="{-period},0" dur="9s" repeatCount="indefinite"/>'
         '</path></g>'
-        f'<text x="{width / 2:.0f}" y="110" fill="#f9fafb" '
+        f'<text x="{width / 2:.0f}" y="125" fill="#f9fafb" '
         'font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Helvetica, Arial, sans-serif" '
         'font-size="40" font-weight="700" text-anchor="middle" dominant-baseline="middle">'
         f'{name}'
