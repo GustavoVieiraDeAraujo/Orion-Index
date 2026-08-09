@@ -69,7 +69,7 @@
     <text x="20" y="65" class="lbl">C++</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
-    <text x="314" y="82" class="val">22.8%</text>
+    <text x="314" y="82" class="val">22.7%</text>
     <text x="20" y="115" class="lbl">C</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="276" height="11" rx="5.5" fill="#555555" class="bar"/>
@@ -77,15 +77,15 @@
     <text x="20" y="165" class="lbl">JavaScript</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="173" width="234" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
-    <text x="314" y="182" class="val">18.7%</text>
+    <text x="314" y="182" class="val">18.6%</text>
     <text x="20" y="215" class="lbl">Ruby</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="223" width="209" height="11" rx="5.5" fill="#701516" class="bar"/>
-    <text x="314" y="232" class="val">16.7%</text>
+    <text x="314" y="232" class="val">16.6%</text>
     <text x="20" y="265" class="lbl">Python</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="128" height="11" rx="5.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="282" class="val">10.2%</text>
+    <rect x="20" y="273" width="131" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <text x="314" y="282" class="val">10.4%</text>
 </g>
 <g transform="translate(0.0,336.0)">
   <defs>
@@ -160,8 +160,8 @@
     <text x="314" y="82" class="val">228</text>
     <text x="20" y="115" class="lbl">Orion-Index</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="158" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
-    <text x="314" y="132" class="val">126</text>
+    <rect x="20" y="123" width="164" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <text x="314" y="132" class="val">131</text>
     <text x="20" y="165" class="lbl">Ciplus-Front-End</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="173" width="122" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
