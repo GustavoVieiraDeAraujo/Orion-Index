@@ -15,6 +15,17 @@ DOCS_DIR = os.path.join(os.path.dirname(__file__), "..", "docs")
 # de proposito geral. Ficam de fora do top 5 de qualquer fonte.
 NOT_PROGRAMMING_LANGUAGES = {"HTML/CSS", "HTML", "CSS"}
 
+# Tema escuro dos cartoes -- mesma paleta usada em generate_profile_stats.py,
+# pra manter o padrao visual identico entre os cartoes do perfil e os do
+# Orion Index.
+CARD_BG_FROM = "#161b22"
+CARD_BG_TO = "#0d1117"
+CARD_STROKE = "#30363d"
+CARD_TITLE_COLOR = "#f0f6fc"
+CARD_LABEL_COLOR = "#e6edf3"
+CARD_VALUE_COLOR = "#8b949e"
+CARD_TRACK_COLOR = "#21262d"
+
 LANG_COLORS = {
     "Python": "#3572A5", "JavaScript": "#f1e05a", "TypeScript": "#3178c6",
     "Ruby": "#701516", "Go": "#00ADD8", "Java": "#b07219", "C": "#555555",
@@ -123,7 +134,7 @@ def short_label(text, max_chars=22):
 
 
 def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
-                      gradient=("#D1D5DB", "#374151"), top_n=5, grad_id="cardBg",
+                      gradient=(CARD_BG_FROM, CARD_BG_TO), top_n=5, grad_id="cardBg",
                       default_color="#8a8a8a"):
     """Renderiza um cartao de barras: rotulo em cima, barra full-width embaixo."""
     filtered = {k: v for k, v in data.items() if k not in NOT_PROGRAMMING_LANGUAGES}
@@ -168,12 +179,12 @@ def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
   </defs>
   <style>
     text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }}
-    .card {{ fill: url(#{grad_id}); stroke: #4b5563; stroke-width: 1; }}
-    .title {{ fill: #1f2937; font-weight: 700; font-size: 15.5px; }}
-    .lbl {{ fill: #1f2937; font-weight: 600; }}
-    .val {{ fill: #f9fafb; }}
-    .track {{ fill: rgba(0,0,0,0.15); }}
-    .bar {{ stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }}
+    .card {{ fill: url(#{grad_id}); stroke: {CARD_STROKE}; stroke-width: 1; }}
+    .title {{ fill: {CARD_TITLE_COLOR}; font-weight: 700; font-size: 15.5px; }}
+    .lbl {{ fill: {CARD_LABEL_COLOR}; font-weight: 600; }}
+    .val {{ fill: {CARD_VALUE_COLOR}; }}
+    .track {{ fill: {CARD_TRACK_COLOR}; }}
+    .bar {{ stroke: rgba(255,255,255,0.2); stroke-width: 0.75; }}
   </style>
   <rect x="0" y="0" width="{width}" height="{height}" rx="14" class="card"/>
   <text x="{card_pad}" y="{card_pad + 17}" class="title">{title}</text>

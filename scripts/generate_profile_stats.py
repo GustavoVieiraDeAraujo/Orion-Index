@@ -7,7 +7,9 @@
 # README de la.
 import datetime
 import json
+import math
 import os
+import random
 import re
 import shutil
 import subprocess
@@ -34,6 +36,16 @@ MARKERS = {
 # cartao do mesmo tamanho quando exibida a 100% da largura no README.
 CARD_NATIVE_W = 380
 CARD_GAP = 16
+
+# Tema escuro dos cartoes -- muda aqui e todos os cartoes de estatistica
+# (render_bar_card) seguem junto.
+CARD_BG_FROM = "#161b22"
+CARD_BG_TO = "#0d1117"
+CARD_STROKE = "#30363d"
+CARD_TITLE_COLOR = "#f0f6fc"
+CARD_LABEL_COLOR = "#e6edf3"
+CARD_VALUE_COLOR = "#8b949e"
+CARD_TRACK_COLOR = "#21262d"
 
 LANG_COLORS = {
     "Python": "#3572A5", "JavaScript": "#f1e05a", "TypeScript": "#3178c6",
@@ -330,23 +342,33 @@ def render_bar_card(data, title, svg_path, unit="pct", color_map=None,
     <rect x="{bar_x}" y="{cy - 6.5}" width="{bar_w}" height="13" rx="6.5" fill="{color}" class="bar"/>
     <text x="{bar_x + bar_max_w + 10}" y="{cy + 4}" class="val">{val_label}</text>''')
 
+    card_particles = _particle_network_content(
+        width, height, CARD_PARTICLE_COUNT, CARD_PARTICLE_SEED,
+        CARD_PARTICLE_LINK_DIST, CARD_PARTICLE_COLOR, CARD_PARTICLE_MOVE_RANGE, CARD_PARTICLE_DUR_RANGE,
+        radius_range=(1, 2), opacity_scale=CARD_PARTICLE_OPACITY, pulse=False,
+    )
+
     svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}">
   <defs>
     <linearGradient id="{grad_id}" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#D1D5DB"/>
-      <stop offset="100%" stop-color="#374151"/>
+      <stop offset="0%" stop-color="{CARD_BG_FROM}"/>
+      <stop offset="100%" stop-color="{CARD_BG_TO}"/>
     </linearGradient>
+    <clipPath id="cardClip{grad_id}">
+      <rect x="0" y="0" width="{width}" height="{height}" rx="14"/>
+    </clipPath>
   </defs>
   <style>
     text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }}
-    .card {{ fill: url(#{grad_id}); stroke: #4b5563; stroke-width: 1; }}
-    .title {{ fill: #1f2937; font-weight: 700; font-size: 15.5px; }}
-    .lbl {{ fill: #1f2937; font-weight: 600; }}
-    .val {{ fill: #f9fafb; }}
-    .track {{ fill: rgba(0,0,0,0.15); }}
-    .bar {{ stroke: rgba(255,255,255,0.55); stroke-width: 0.75; }}
+    .card {{ fill: url(#{grad_id}); stroke: {CARD_STROKE}; stroke-width: 1; }}
+    .title {{ fill: {CARD_TITLE_COLOR}; font-weight: 700; font-size: 15.5px; }}
+    .lbl {{ fill: {CARD_LABEL_COLOR}; font-weight: 600; }}
+    .val {{ fill: {CARD_VALUE_COLOR}; }}
+    .track {{ fill: {CARD_TRACK_COLOR}; }}
+    .bar {{ stroke: rgba(255,255,255,0.2); stroke-width: 0.75; }}
   </style>
   <rect x="0" y="0" width="{width}" height="{height}" rx="14" class="card"/>
+  <g clip-path="url(#cardClip{grad_id})">{card_particles}</g>
   <text x="{card_pad}" y="{card_pad + 17}" class="title">{title}</text>
   {"".join(rows)}
 </svg>'''
@@ -391,149 +413,165 @@ def build_combined_row(panel_paths, out_path, cols=2):
 
 # Parametros do banner, todos num lugar so pra ajustar e regenerar sem
 # precisar entender a matematica por baixo. O que importa de verdade e o
-# BANNER_WAVE_PHASE_0 (primeiro quadro): o GitHub nunca roda a animacao
-# SMIL num SVG carregado via <img>, entao so esse quadro parado e o que
-# qualquer visitante do perfil realmente ve -- os outros so aparecem pra
-# quem abre o arquivo .svg direto num navegador.
-# Porte literal de kyechan99/capsule-render (model/animationModel/waving.ts
-# + model/model.ts + model/animationModel/animationModel.ts + utils/render.ts),
-# a mesma dependencia externa que usavamos antes -- mesmos numeros, mesma
-# estrutura, so trocando pra SVG proprio servido por raw.githubusercontent.com.
-# width=854 e o default deles (Model.width); height=180, fontSize=32,
-# fontColor=ffffff, fontAlignY=30 batem com os parametros que a URL antiga
-# (capsule-render.vercel.app/api?type=waving&...) realmente usava.
+# Banner/divisor no tema escuro, pra bater com os cartoes de estatistica
+# (CARD_BG_* acima). Nada disso depende de servico externo -- os pontos e
+# conexoes sao calculados aqui mesmo, com posicao pseudo-aleatoria fixa
+# (mesma seed sempre), animando via SMIL (roda normalmente dentro de <img>
+# no GitHub, confirmado ao vivo). Ajuste as constantes e regenere pra ver
+# o resultado na hora.
 BANNER_WIDTH = 854
 BANNER_HEIGHT = 180
-BANNER_GRAD_FROM = "D1D5DB"
-BANNER_GRAD_TO = "374151"
-BANNER_FONT_SIZE = 32
-BANNER_FONT_COLOR = "ffffff"
-BANNER_FONT_ALIGN_Y = 30  # % da altura, de cima pra baixo
-BANNER_WAVE_REPEATS = 3   # quantas vezes repetir o mesmo desenho de onda lado a lado (1 = identico ao capsule-render original, que so tem uma onda cobrindo a largura toda)
+BANNER_BG = "#12161c"
+BANNER_FONT_COLOR = "f0f6fc"
+BANNER_PARTICLE_COUNT = 48        # grade com jitter (nao sorteio puro) -- cobre a faixa toda de forma uniforme, sem aglomerar
+BANNER_PARTICLE_SEED = 11         # fixa o layout dos pontos (troca a "cara" da rede sem ser aleatorio a cada execucao)
+BANNER_PARTICLE_LINK_DIST = 115   # distancia maxima (px) pra dois pontos ficarem ligados por uma linha
+BANNER_PARTICLE_COLOR = "#8b949e"
+BANNER_PARTICLE_MOVE_RANGE = (24, 18)  # deslocamento maximo em x, y (px) durante a animacao
+BANNER_PARTICLE_DUR_RANGE = (5, 11)    # duracao minima/maxima (s) do movimento de cada ponto
 
-# Deltas relativos a height de cada um dos 4 quadros de animacao de cada
-# camada -- copiados literalmente dos values= do waving.ts original
-# (height-80, height-40, height-70, height-45 etc). O ultimo quadro repete
-# o primeiro pra fechar o loop sem salto quando anima.
-_WAVING_LAYER1_FRAMES = [(80, 40, 70, 45), (55, 40, 60, 70), (35, 65, 35, 70), (80, 40, 70, 45)]
-_WAVING_LAYER2_FRAMES = [(65, 20, 50, 40), (50, 80, 80, 60), (55, 75, 50, 35), (65, 20, 50, 40)]
+# Versao discreta pras tabelas: menos pontos que o banner e sem pulsar de
+# tamanho, opacidade baixa pra nao atrapalhar a leitura das barras/texto.
+CARD_PARTICLE_COUNT = 20
+CARD_PARTICLE_SEED = 4
+CARD_PARTICLE_LINK_DIST = 80
+CARD_PARTICLE_COLOR = "#8b949e"
+CARD_PARTICLE_MOVE_RANGE = (10, 8)
+CARD_PARTICLE_DUR_RANGE = (6, 12)
+CARD_PARTICLE_OPACITY = 0.4
 
 
 def _js_num(value):
     """Formata numero do jeito que o JS faria ao interpolar em template string
-    (854/4 -> '213.5', mas 854/2 -> '427', nunca '427.0') -- o gerador original
-    e escrito em TS, entao inteiros nunca carregam '.0'. Sem isso a divisao
-    float do Python vaza '427.0'/'90.0' pro d= e pro transform, que diverge
-    do SVG real que o capsule-render sempre gerou."""
-    if isinstance(value, float) and value.is_integer():
-        return str(int(value))
+    (854/4 -> '213.5', mas 854/2 -> '427', nunca '427.0')."""
+    if isinstance(value, float):
+        value = round(value, 2)
+        if value.is_integer():
+            return str(int(value))
     return str(value)
 
 
-def _waving_frame_path(width, height, repeats, off_y0, off_yctrl, off_ymid, off_yend):
-    """Um quadro da onda: mesma curva Q+T do capsule-render original,
-    repetida `repeats` vezes lado a lado (cada repeticao usa os mesmos
-    deltas relativos a height, so muda a posicao x). Com repeats=1 fica
-    byte a byte igual ao 'M0 0L 0 {h-off_y0}Q ... T {width} {h-off_yend}L
-    {width} 0 Z' original."""
-    y0 = _js_num(height - off_y0)
-    yctrl = _js_num(height - off_yctrl)
-    ymid = _js_num(height - off_ymid)
-    yend = _js_num(height - off_yend)
-    seg = width / repeats
-    d = f"M0 0L 0 {y0}"
-    x = 0.0
-    for _ in range(repeats):
-        q1 = _js_num(x + seg / 4)
-        q2 = _js_num(x + seg / 2)
-        t = _js_num(x + seg)
-        d += f"Q {q1} {yctrl} {q2} {ymid}T {t} {yend}"
-        x += seg
-    d += f"L {_js_num(width)} 0 Z"
-    return d
+def _grid_points(width, height, count, seed, pad=15, jitter=0.4):
+    """Distribui `count` pontos numa grade com leve variacao aleatoria --
+    mais uniforme pelo espaco todo do que sorteio puramente aleatorio, que
+    tende a formar aglomerados e deixar cantos vazios (era o que
+    acontecia antes, com rnd.uniform puro)."""
+    rnd = random.Random(seed)
+    cols = max(1, round(math.sqrt(count * width / height)))
+    rows = max(1, math.ceil(count / cols))
+    cell_w = (width - 2 * pad) / cols
+    cell_h = (height - 2 * pad) / rows
+    pts = []
+    for r in range(rows):
+        for c in range(cols):
+            if len(pts) >= count:
+                break
+            cx = pad + cell_w * (c + 0.5) + rnd.uniform(-cell_w * jitter, cell_w * jitter)
+            cy = pad + cell_h * (r + 0.5) + rnd.uniform(-cell_h * jitter, cell_h * jitter)
+            pts.append((cx, cy))
+    return pts, rnd
 
 
-def _waving_layer_animate(width, height, repeats, frames, begin):
-    values = ";".join(_waving_frame_path(width, height, repeats, *frame) for frame in frames)
-    return f'''<path d="" fill="url(#bannerGrad)" opacity="0.4">
-          <animate
-              attributeName="d"
-              dur="20s"
-              repeatCount="indefinite"
-              keyTimes="0;0.333;0.667;1"
-              calcmod="spline"
-              keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
-              begin="{begin}"
-              values="{values}">
-          </animate>
-        </path>'''
+def _particle_network_content(width, height, count, seed, link_dist, color,
+                               move_range, dur_range, radius_range=(1.8, 4),
+                               opacity_scale=1.0, pulse=True):
+    """Rede de pontos conectados por linhas, todos flutuando devagar --
+    cada linha segue os MESMOS quadros de movimento dos dois pontos que
+    ela liga (senao ela fica parada enquanto os pontos se afastam,
+    parecendo elastico furado). Generico o bastante pra usar tanto no
+    banner (mais pontos, mais visivel) quanto dentro dos cartoes de
+    estatistica (poucos pontos, bem discreto, opacity_scale baixo)."""
+    grid, rnd = _grid_points(width, height, count, seed)
+    pts = []
+    for x, y in grid:
+        pts.append({
+            "x": x, "y": y,
+            "dx": rnd.uniform(-move_range[0], move_range[0]),
+            "dy": rnd.uniform(-move_range[1], move_range[1]),
+            "dur": rnd.uniform(*dur_range),
+            "r": rnd.uniform(*radius_range),
+        })
+
+    lines = []
+    for i in range(len(pts)):
+        for j in range(i + 1, len(pts)):
+            a, b = pts[i], pts[j]
+            dist = math.hypot(a["x"] - b["x"], a["y"] - b["y"])
+            if dist < link_dist:
+                lines.append((a, b, dist))
+
+    parts = []
+    for a, b, dist in lines:
+        opacity = max(0.06, 0.35 - dist / 400) * opacity_scale
+        parts.append(
+            f'<line x1="{_js_num(a["x"])}" y1="{_js_num(a["y"])}" x2="{_js_num(b["x"])}" y2="{_js_num(b["y"])}" '
+            f'stroke="{color}" stroke-width="1" opacity="{opacity:.2f}">'
+            f'<animate attributeName="x1" values="{_js_num(a["x"])};{_js_num(a["x"]+a["dx"])};{_js_num(a["x"])}" dur="{a["dur"]:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="y1" values="{_js_num(a["y"])};{_js_num(a["y"]+a["dy"])};{_js_num(a["y"])}" dur="{a["dur"]*1.2:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="x2" values="{_js_num(b["x"])};{_js_num(b["x"]+b["dx"])};{_js_num(b["x"])}" dur="{b["dur"]:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="y2" values="{_js_num(b["y"])};{_js_num(b["y"]+b["dy"])};{_js_num(b["y"])}" dur="{b["dur"]*1.2:.1f}s" repeatCount="indefinite"/>'
+            f'</line>'
+        )
+    for p in pts:
+        opacity_attr = f' opacity="{opacity_scale:.2f}"' if opacity_scale != 1.0 else ""
+        pulse_anim = (
+            f'<animate attributeName="r" values="{p["r"]:.1f};{p["r"]*1.8:.1f};{p["r"]:.1f}" dur="{rnd.uniform(2,4):.1f}s" repeatCount="indefinite"/>'
+            if pulse else ""
+        )
+        parts.append(
+            f'<circle cx="{_js_num(p["x"])}" cy="{_js_num(p["y"])}" r="{p["r"]:.1f}" fill="{color}"{opacity_attr}>'
+            f'<animate attributeName="cx" values="{_js_num(p["x"])};{_js_num(p["x"]+p["dx"])};{_js_num(p["x"])}" dur="{p["dur"]:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="cy" values="{_js_num(p["y"])};{_js_num(p["y"]+p["dy"])};{_js_num(p["y"])}" dur="{p["dur"]*1.2:.1f}s" repeatCount="indefinite"/>'
+            f'{pulse_anim}'
+            f'</circle>'
+        )
+    return "".join(parts)
 
 
-def _capsule_waving_content(width, height, repeats=1):
-    """Copia do metodo content() de Waving (model/animationModel/
-    waving.ts): duas camadas com opacity 0.4, cada uma com 4 quadros de
-    animate no atributo d (curvas Q + T, nao senoide), a segunda comecando
-    em begin=-10s (metade dos 20s de duracao). Com repeats=1 fica byte a
-    byte igual ao original (213.5 e 427 = width/4 e width/2 pro width=854
-    padrao); repeats>1 repete o mesmo desenho de onda lado a lado pra
-    caber mais cristas/vales na mesma largura. O 'calcmod' (em vez de
-    calcMode) e erro de digitacao do codigo-fonte real: mantido igual, o
-    deles tambem nao aplica a suavizacao por spline por causa disso."""
-    half = _js_num(width / 2)
-    cy = _js_num(height / 2)
-    return f'''
-      <g transform="translate({half}, {cy}) scale(1, 1) translate(-{half}, -{cy})">
-        {_waving_layer_animate(width, height, repeats, _WAVING_LAYER1_FRAMES, "0s")}
-        {_waving_layer_animate(width, height, repeats, _WAVING_LAYER2_FRAMES, "-10s")}
-      </g>'''
+
+BANNER_FONT_SIZE = 40
+BANNER_FONT_ALIGN_Y = 50  # % da altura, de cima pra baixo -- centralizado
 
 
 def build_banner_svg(name="Gustavo Vieira de Araújo"):
-    """Porte literal do banner 'waving' do capsule-render (fonte real
-    conferida em kyechan99/capsule-render, byte a byte contra a saida real
-    do servico com os mesmos parametros que a URL antiga usava). O fade-in
-    do nome e feito com CSS @keyframes (animation: fadeIn 1.2s ease-in-out
-    forwards). A onda (curvas Q+T no atributo d, via <animate>/SMIL) tambem
-    roda de verdade dentro de <img> no GitHub -- confirmado testando ao
-    vivo no perfil real -- entao os path com d="" vazio ficam do jeito que
-    o servico original sempre gerou, sem precisar pre-preencher quadro
-    nenhum."""
+    """Banner com o nome escrito normal (texto de verdade, legivel) sobre
+    uma rede de particulas abstrata (nao tenta desenhar o nome, so
+    decoracao de fundo), distribuida em grade com jitter pra cobrir a
+    faixa toda de forma uniforme, sem aglomerar num canto. Tema escuro
+    pra bater com os cartoes de estatistica. O fade-in do texto usa CSS
+    @keyframes (roda normalmente dentro de <img> no GitHub); os pontos da
+    rede animam via SMIL (tambem confirmado rodando ao vivo). Ajuste
+    BANNER_PARTICLE_* no topo do arquivo pra mudar quantidade de pontos,
+    alcance de movimento, cor etc."""
     width, height = BANNER_WIDTH, BANNER_HEIGHT
+    particles = _particle_network_content(
+        width, height, BANNER_PARTICLE_COUNT, BANNER_PARTICLE_SEED,
+        BANNER_PARTICLE_LINK_DIST, BANNER_PARTICLE_COLOR, BANNER_PARTICLE_MOVE_RANGE, BANNER_PARTICLE_DUR_RANGE,
+    )
     return (
-        f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
-        f'width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}" style="z-index:1;position:relative" role="img" aria-label="{name}">'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" role="img" aria-label="{name}">'
         '<style>'
         f'.text {{ font-size: {BANNER_FONT_SIZE}px; font-weight: 700; '
-        'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji; } '
-        '.desc { font-size: 20px; font-weight: 500; '
-        'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji; }'
-        '.text, .desc { animation: fadeIn 1.2s ease-in-out forwards; }'
+        'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji; '
+        'animation: fadeIn 1.2s ease-in-out forwards; }'
         '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }'
         '</style>'
-        '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
-        f'<stop offset="0%" stop-color="#{BANNER_GRAD_FROM}"/><stop offset="100%" stop-color="#{BANNER_GRAD_TO}"/>'
-        '</linearGradient></defs>'
-        f'{_capsule_waving_content(width, height, BANNER_WAVE_REPEATS)}'
+        f'<rect width="{width}" height="{height}" fill="{BANNER_BG}"/>'
+        f'{particles}'
         f'<text text-anchor="middle" dominant-baseline="middle" x="50%" y="{BANNER_FONT_ALIGN_Y}%" '
-        f'class="text" style="fill:#{BANNER_FONT_COLOR};" stroke="#none" stroke-width="1">{name}</text>'
+        f'class="text" fill="#{BANNER_FONT_COLOR}">{name}</text>'
         '</svg>'
     )
 
 
 def build_divider_svg():
-    """Porte literal do tipo 'rect' do capsule-render (model/normalModel/
-    rect.ts): retangulo solido preenchido com o mesmo gradiente, sem
-    animacao nenhuma (o tipo rect nunca teve). width=854 pra bater com o
-    default deles, height=4 igual ao parametro que a URL antiga usava."""
+    """Linha divisoria fina, mesmo tom do fundo do banner/cartoes."""
     width, height = BANNER_WIDTH, 4
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}">'
-        '<defs><linearGradient id="dividerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
-        f'<stop offset="0%" stop-color="#{BANNER_GRAD_FROM}"/><stop offset="100%" stop-color="#{BANNER_GRAD_TO}"/>'
-        '</linearGradient></defs>'
-        f'<path fill="url(#dividerGrad)" fill-opacity="1" d="m 0 0 l 0 {height} l {width} 0 l 0 -{height} z"/></svg>'
+        f'<rect width="{width}" height="{height}" fill="{CARD_STROKE}"/></svg>'
     )
 
 
