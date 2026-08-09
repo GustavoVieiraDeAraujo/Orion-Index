@@ -423,7 +423,7 @@ BANNER_WIDTH = 854
 BANNER_HEIGHT = 180
 BANNER_BG = "#12161c"
 BANNER_FONT_COLOR = "f0f6fc"
-BANNER_PARTICLE_COUNT = 48        # grade com jitter (nao sorteio puro) -- cobre a faixa toda de forma uniforme, sem aglomerar
+BANNER_PARTICLE_COUNT = 54        # grade com jitter (nao sorteio puro) -- cobre a faixa toda de forma uniforme, sem aglomerar
 BANNER_PARTICLE_SEED = 11         # fixa o layout dos pontos (troca a "cara" da rede sem ser aleatorio a cada execucao)
 BANNER_PARTICLE_LINK_DIST = 115   # distancia maxima (px) pra dois pontos ficarem ligados por uma linha
 BANNER_PARTICLE_COLOR = "#8b949e"
@@ -451,37 +451,62 @@ def _js_num(value):
     return str(value)
 
 
-def _grid_points(width, height, count, seed, pad=15, jitter=0.4):
+def _grid_points(width, height, count, seed, pad=15, jitter=0.4, exclude_box=None, oversample=2.2):
     """Distribui `count` pontos numa grade com leve variacao aleatoria --
     mais uniforme pelo espaco todo do que sorteio puramente aleatorio, que
     tende a formar aglomerados e deixar cantos vazios (era o que
-    acontecia antes, com rnd.uniform puro)."""
+    acontecia antes, com rnd.uniform puro). Com exclude_box=(x0,y0,x1,y1)
+    pula qualquer ponto que caia dentro dessa area (usado pra desviar do
+    texto do nome no banner); pra compensar as celulas puladas e ainda
+    preencher bem o espaco livre, gera a grade um pouco mais densa
+    (oversample) e so corta pra `count` no final."""
     rnd = random.Random(seed)
-    cols = max(1, round(math.sqrt(count * width / height)))
-    rows = max(1, math.ceil(count / cols))
+    target = round(count * oversample) if exclude_box else count
+    cols = max(1, round(math.sqrt(target * width / height)))
+    rows = max(1, math.ceil(target / cols))
+    if exclude_box:
+        # banner bem largo (854x180) da poucas linhas nesse calculo por
+        # aspecto (tipo 4-5) -- ai a faixa de cima/baixo do texto excluido
+        # (~50px de altura) sobra com so 1 linha, enquanto as colunas dos
+        # lados (que atravessam a altura toda) mantem todas as linhas, e
+        # os pontos acabam concentrados nas pontas. Forcar mais linhas da
+        # grade espalha melhor pelo espaco livre acima/abaixo tambem.
+        rows = max(rows, 13)
+        cols = max(1, math.ceil(target / rows))
     cell_w = (width - 2 * pad) / cols
     cell_h = (height - 2 * pad) / rows
     pts = []
     for r in range(rows):
         for c in range(cols):
-            if len(pts) >= count:
-                break
             cx = pad + cell_w * (c + 0.5) + rnd.uniform(-cell_w * jitter, cell_w * jitter)
             cy = pad + cell_h * (r + 0.5) + rnd.uniform(-cell_h * jitter, cell_h * jitter)
+            if exclude_box and exclude_box[0] <= cx <= exclude_box[2] and exclude_box[1] <= cy <= exclude_box[3]:
+                continue
             pts.append((cx, cy))
+    if len(pts) > count:
+        # amostragem em passo fixo (nao embaralha e corta) -- os pontos ja
+        # estao em ordem de varredura da grade, entao pular de `step` em
+        # `step` mantem a cobertura espalhada por toda a area; embaralhar
+        # e cortar podia por azar esvaziar uma faixa inteira (ex: o topo
+        # ou a base do banner, perto do texto excluido)
+        step = len(pts) / count
+        pts = [pts[min(round(i * step), len(pts) - 1)] for i in range(count)]
     return pts, rnd
 
 
 def _particle_network_content(width, height, count, seed, link_dist, color,
                                move_range, dur_range, radius_range=(1.8, 4),
-                               opacity_scale=1.0, pulse=True):
+                               opacity_scale=1.0, pulse=True, exclude_box=None):
     """Rede de pontos conectados por linhas, todos flutuando devagar --
     cada linha segue os MESMOS quadros de movimento dos dois pontos que
     ela liga (senao ela fica parada enquanto os pontos se afastam,
     parecendo elastico furado). Generico o bastante pra usar tanto no
     banner (mais pontos, mais visivel) quanto dentro dos cartoes de
-    estatistica (poucos pontos, bem discreto, opacity_scale baixo)."""
-    grid, rnd = _grid_points(width, height, count, seed)
+    estatistica (poucos pontos, bem discreto, opacity_scale baixo).
+    exclude_box=(x0,y0,x1,y1) desvia os pontos dessa area (o texto do
+    nome, no caso do banner) -- lig linhas so conectam pontos que ja
+    estao fora da area, entao tambem nao cruzam por cima do texto."""
+    grid, rnd = _grid_points(width, height, count, seed, exclude_box=exclude_box)
     pts = []
     for x, y in grid:
         pts.append({
@@ -537,16 +562,26 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
     """Banner com o nome escrito normal (texto de verdade, legivel) sobre
     uma rede de particulas abstrata (nao tenta desenhar o nome, so
     decoracao de fundo), distribuida em grade com jitter pra cobrir a
-    faixa toda de forma uniforme, sem aglomerar num canto. Tema escuro
-    pra bater com os cartoes de estatistica. O fade-in do texto usa CSS
-    @keyframes (roda normalmente dentro de <img> no GitHub); os pontos da
-    rede animam via SMIL (tambem confirmado rodando ao vivo). Ajuste
-    BANNER_PARTICLE_* no topo do arquivo pra mudar quantidade de pontos,
-    alcance de movimento, cor etc."""
+    faixa toda de forma uniforme, sem aglomerar num canto. Os pontos
+    desviam de uma caixa estimada em volta do texto (text_box), entao a
+    rede preenche o espaco livre ao redor do nome em vez de passar por
+    baixo dele. Tema escuro pra bater com os cartoes de estatistica. O
+    fade-in do texto usa CSS @keyframes (roda normalmente dentro de <img>
+    no GitHub); os pontos da rede animam via SMIL (tambem confirmado
+    rodando ao vivo). Ajuste BANNER_PARTICLE_* no topo do arquivo pra
+    mudar quantidade de pontos, alcance de movimento, cor etc."""
     width, height = BANNER_WIDTH, BANNER_HEIGHT
+    text_w = len(name) * BANNER_FONT_SIZE * 0.56
+    text_h = BANNER_FONT_SIZE * 1.3
+    pad = 14
+    text_box = (
+        width / 2 - text_w / 2 - pad, height * BANNER_FONT_ALIGN_Y / 100 - text_h / 2 - pad,
+        width / 2 + text_w / 2 + pad, height * BANNER_FONT_ALIGN_Y / 100 + text_h / 2 + pad,
+    )
     particles = _particle_network_content(
         width, height, BANNER_PARTICLE_COUNT, BANNER_PARTICLE_SEED,
         BANNER_PARTICLE_LINK_DIST, BANNER_PARTICLE_COLOR, BANNER_PARTICLE_MOVE_RANGE, BANNER_PARTICLE_DUR_RANGE,
+        exclude_box=text_box,
     )
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '

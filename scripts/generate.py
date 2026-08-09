@@ -4,7 +4,9 @@
 # explicado no README, nao repetido aqui.
 import datetime
 import json
+import math
 import os
+import random
 import re
 import urllib.error
 import urllib.request
@@ -25,6 +27,100 @@ CARD_TITLE_COLOR = "#f0f6fc"
 CARD_LABEL_COLOR = "#e6edf3"
 CARD_VALUE_COLOR = "#8b949e"
 CARD_TRACK_COLOR = "#21262d"
+
+# Particulas discretas atras das barras -- mesmos parametros usados nos
+# cartoes do perfil (generate_profile_stats.py), pra manter o padrao
+# visual identico entre os cartoes do mundo e os do perfil.
+CARD_PARTICLE_COUNT = 20
+CARD_PARTICLE_SEED = 4
+CARD_PARTICLE_LINK_DIST = 80
+CARD_PARTICLE_COLOR = "#8b949e"
+CARD_PARTICLE_MOVE_RANGE = (10, 8)
+CARD_PARTICLE_DUR_RANGE = (6, 12)
+CARD_PARTICLE_OPACITY = 0.4
+
+
+def _js_num(value):
+    """Formata numero do jeito que o JS faria ao interpolar em template
+    string (nunca sobra '.0' num inteiro)."""
+    if isinstance(value, float):
+        value = round(value, 2)
+        if value.is_integer():
+            return str(int(value))
+    return str(value)
+
+
+def _grid_points(width, height, count, seed, pad=15, jitter=0.4):
+    """Distribui `count` pontos numa grade com leve variacao aleatoria --
+    mais uniforme pelo espaco todo do que sorteio puramente aleatorio."""
+    rnd = random.Random(seed)
+    cols = max(1, round(math.sqrt(count * width / height)))
+    rows = max(1, math.ceil(count / cols))
+    cell_w = (width - 2 * pad) / cols
+    cell_h = (height - 2 * pad) / rows
+    pts = []
+    for r in range(rows):
+        for c in range(cols):
+            if len(pts) >= count:
+                break
+            cx = pad + cell_w * (c + 0.5) + rnd.uniform(-cell_w * jitter, cell_w * jitter)
+            cy = pad + cell_h * (r + 0.5) + rnd.uniform(-cell_h * jitter, cell_h * jitter)
+            pts.append((cx, cy))
+    return pts, rnd
+
+
+def _particle_network_content(width, height, count, seed, link_dist, color,
+                               move_range, dur_range, radius_range=(1, 2),
+                               opacity_scale=1.0, pulse=False):
+    """Rede de pontos conectados por linhas, todos flutuando devagar --
+    cada linha segue os MESMOS quadros de movimento dos dois pontos que
+    ela liga. Copia de generate_profile_stats.py (os dois scripts nao se
+    importam um ao outro, mesmo padrao ja usado pras constantes CARD_*)."""
+    grid, rnd = _grid_points(width, height, count, seed)
+    pts = []
+    for x, y in grid:
+        pts.append({
+            "x": x, "y": y,
+            "dx": rnd.uniform(-move_range[0], move_range[0]),
+            "dy": rnd.uniform(-move_range[1], move_range[1]),
+            "dur": rnd.uniform(*dur_range),
+            "r": rnd.uniform(*radius_range),
+        })
+
+    lines = []
+    for i in range(len(pts)):
+        for j in range(i + 1, len(pts)):
+            a, b = pts[i], pts[j]
+            dist = math.hypot(a["x"] - b["x"], a["y"] - b["y"])
+            if dist < link_dist:
+                lines.append((a, b, dist))
+
+    parts = []
+    for a, b, dist in lines:
+        opacity = max(0.06, 0.35 - dist / 400) * opacity_scale
+        parts.append(
+            f'<line x1="{_js_num(a["x"])}" y1="{_js_num(a["y"])}" x2="{_js_num(b["x"])}" y2="{_js_num(b["y"])}" '
+            f'stroke="{color}" stroke-width="1" opacity="{opacity:.2f}">'
+            f'<animate attributeName="x1" values="{_js_num(a["x"])};{_js_num(a["x"]+a["dx"])};{_js_num(a["x"])}" dur="{a["dur"]:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="y1" values="{_js_num(a["y"])};{_js_num(a["y"]+a["dy"])};{_js_num(a["y"])}" dur="{a["dur"]*1.2:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="x2" values="{_js_num(b["x"])};{_js_num(b["x"]+b["dx"])};{_js_num(b["x"])}" dur="{b["dur"]:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="y2" values="{_js_num(b["y"])};{_js_num(b["y"]+b["dy"])};{_js_num(b["y"])}" dur="{b["dur"]*1.2:.1f}s" repeatCount="indefinite"/>'
+            f'</line>'
+        )
+    for p in pts:
+        opacity_attr = f' opacity="{opacity_scale:.2f}"' if opacity_scale != 1.0 else ""
+        pulse_anim = (
+            f'<animate attributeName="r" values="{p["r"]:.1f};{p["r"]*1.8:.1f};{p["r"]:.1f}" dur="{rnd.uniform(2,4):.1f}s" repeatCount="indefinite"/>'
+            if pulse else ""
+        )
+        parts.append(
+            f'<circle cx="{_js_num(p["x"])}" cy="{_js_num(p["y"])}" r="{p["r"]:.1f}" fill="{color}"{opacity_attr}>'
+            f'<animate attributeName="cx" values="{_js_num(p["x"])};{_js_num(p["x"]+p["dx"])};{_js_num(p["x"])}" dur="{p["dur"]:.1f}s" repeatCount="indefinite"/>'
+            f'<animate attributeName="cy" values="{_js_num(p["y"])};{_js_num(p["y"]+p["dy"])};{_js_num(p["y"])}" dur="{p["dur"]*1.2:.1f}s" repeatCount="indefinite"/>'
+            f'{pulse_anim}'
+            f'</circle>'
+        )
+    return "".join(parts)
 
 LANG_COLORS = {
     "Python": "#3572A5", "JavaScript": "#f1e05a", "TypeScript": "#3178c6",
@@ -170,12 +266,21 @@ def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
     <rect x="{card_pad}" y="{row_top + 23}" width="{bar_w}" height="11" rx="5.5" fill="{color}" class="bar"/>
     <text x="{card_pad + bar_w_full + 8}" y="{row_top + 32}" class="val">{label}</text>''')
 
+    card_particles = _particle_network_content(
+        width, height, CARD_PARTICLE_COUNT, CARD_PARTICLE_SEED,
+        CARD_PARTICLE_LINK_DIST, CARD_PARTICLE_COLOR, CARD_PARTICLE_MOVE_RANGE, CARD_PARTICLE_DUR_RANGE,
+        opacity_scale=CARD_PARTICLE_OPACITY,
+    )
+
     svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}">
   <defs>
     <linearGradient id="{grad_id}" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="{gradient[0]}"/>
       <stop offset="100%" stop-color="{gradient[1]}"/>
     </linearGradient>
+    <clipPath id="cardClip{grad_id}">
+      <rect x="0" y="0" width="{width}" height="{height}" rx="14"/>
+    </clipPath>
   </defs>
   <style>
     text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13.5px; }}
@@ -187,6 +292,7 @@ def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
     .bar {{ stroke: rgba(255,255,255,0.2); stroke-width: 0.75; }}
   </style>
   <rect x="0" y="0" width="{width}" height="{height}" rx="14" class="card"/>
+  <g clip-path="url(#cardClip{grad_id})">{card_particles}</g>
   <text x="{card_pad}" y="{card_pad + 17}" class="title">{title}</text>
   {"".join(rows)}
 </svg>'''
