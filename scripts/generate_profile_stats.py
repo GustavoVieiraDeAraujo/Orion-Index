@@ -646,8 +646,12 @@ BADGE_ICON_GAP = 6
 def _badge_text_width(text):
     """Estimativa de largura de texto maiusculo em negrito -- nao tem
     biblioteca de metrica de fonte disponivel, entao aproxima por
-    caractere. Suficiente pra um badge, que so precisa caber o texto."""
-    return len(text) * BADGE_FONT_SIZE * 0.62
+    caractere. 0.72 foi medido de verdade (Playwright + getBBox) com a
+    fonte que realmente renderiza aqui -- Verdana nao costuma estar
+    instalada (nem aqui nem na maioria dos sistemas), cai pra um
+    substituto mais largo, e um fator menor tipo 0.62 deixava nome comprido
+    tipo 'POSTGRESQL' vazando pra fora do badge."""
+    return len(text) * BADGE_FONT_SIZE * 0.72
 
 
 def render_badge_svg(label, hex_color, icon_d, icon_color):
