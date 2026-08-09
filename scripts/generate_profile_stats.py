@@ -409,6 +409,14 @@ BANNER_GRAD_TO = "374151"
 BANNER_FONT_SIZE = 32
 BANNER_FONT_COLOR = "ffffff"
 BANNER_FONT_ALIGN_Y = 30  # % da altura, de cima pra baixo
+BANNER_WAVE_REPEATS = 3   # quantas vezes repetir o mesmo desenho de onda lado a lado (1 = identico ao capsule-render original, que so tem uma onda cobrindo a largura toda)
+
+# Deltas relativos a height de cada um dos 4 quadros de animacao de cada
+# camada -- copiados literalmente dos values= do waving.ts original
+# (height-80, height-40, height-70, height-45 etc). O ultimo quadro repete
+# o primeiro pra fechar o loop sem salto quando anima.
+_WAVING_LAYER1_FRAMES = [(80, 40, 70, 45), (55, 40, 60, 70), (35, 65, 35, 70), (80, 40, 70, 45)]
+_WAVING_LAYER2_FRAMES = [(65, 20, 50, 40), (50, 80, 80, 60), (55, 75, 50, 35), (65, 20, 50, 40)]
 
 
 def _js_num(value):
@@ -422,22 +430,32 @@ def _js_num(value):
     return str(value)
 
 
-def _capsule_waving_content(width, height):
-    """Copia exata do metodo content() de Waving (model/animationModel/
-    waving.ts): duas camadas com opacity 0.4, cada uma com 4 quadros de
-    animate no atributo d (curvas Q + T, nao senoide), a segunda comecando
-    em begin=-10s (metade dos 20s de duracao) -- mesmos numeros literais
-    do arquivo original deles (213.5 e 427 sao width/4 e width/2 pro
-    width=854 padrao). O 'calcmod' (em vez de calcMode) e erro de digitacao
-    do codigo-fonte real: mantido igual, o deles tambem nao aplica a
-    suavizacao por spline por causa disso."""
-    half = _js_num(width / 2)
-    cy = _js_num(height / 2)
-    quarter = _js_num(width / 4)
-    quarter2 = _js_num(width / 4 * 2)
-    return f'''
-      <g transform="translate({half}, {cy}) scale(1, 1) translate(-{half}, -{cy})">
-        <path d="" fill="url(#bannerGrad)" opacity="0.4">
+def _waving_frame_path(width, height, repeats, off_y0, off_yctrl, off_ymid, off_yend):
+    """Um quadro da onda: mesma curva Q+T do capsule-render original,
+    repetida `repeats` vezes lado a lado (cada repeticao usa os mesmos
+    deltas relativos a height, so muda a posicao x). Com repeats=1 fica
+    byte a byte igual ao 'M0 0L 0 {h-off_y0}Q ... T {width} {h-off_yend}L
+    {width} 0 Z' original."""
+    y0 = _js_num(height - off_y0)
+    yctrl = _js_num(height - off_yctrl)
+    ymid = _js_num(height - off_ymid)
+    yend = _js_num(height - off_yend)
+    seg = width / repeats
+    d = f"M0 0L 0 {y0}"
+    x = 0.0
+    for _ in range(repeats):
+        q1 = _js_num(x + seg / 4)
+        q2 = _js_num(x + seg / 2)
+        t = _js_num(x + seg)
+        d += f"Q {q1} {yctrl} {q2} {ymid}T {t} {yend}"
+        x += seg
+    d += f"L {_js_num(width)} 0 Z"
+    return d
+
+
+def _waving_layer_animate(width, height, repeats, frames, begin):
+    values = ";".join(_waving_frame_path(width, height, repeats, *frame) for frame in frames)
+    return f'''<path d="" fill="url(#bannerGrad)" opacity="0.4">
           <animate
               attributeName="d"
               dur="20s"
@@ -445,22 +463,28 @@ def _capsule_waving_content(width, height):
               keyTimes="0;0.333;0.667;1"
               calcmod="spline"
               keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
-              begin="0s"
-              values="M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter2} {height - 70}T {width} {height - 45}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 40} {quarter2} {height - 60}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 35}Q {quarter} {height - 65} {quarter2} {height - 35}T {width} {height - 70}L {width} 0 Z;M0 0L 0 {height - 80}Q {quarter} {height - 40} {quarter2} {height - 70}T {width} {height - 45}L {width} 0 Z">
+              begin="{begin}"
+              values="{values}">
           </animate>
-        </path>
-        <path d="" fill="url(#bannerGrad)" opacity="0.4">
-          <animate
-            attributeName="d"
-            dur="20s"
-            repeatCount="indefinite"
-            keyTimes="0;0.333;0.667;1"
-            calcmod="spline"
-            keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
-            begin="-10s"
-            values="M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter2} {height - 50}T {width} {height - 40}L {width} 0 Z;M0 0L 0 {height - 50}Q {quarter} {height - 80} {quarter2} {height - 80}T {width} {height - 60}L {width} 0 Z;M0 0L 0 {height - 55}Q {quarter} {height - 75} {quarter2} {height - 50}T {width} {height - 35}L {width} 0 Z;M0 0L 0 {height - 65}Q {quarter} {height - 20} {quarter2} {height - 50}T {width} {height - 40}L {width} 0 Z">
-          </animate>
-        </path>
+        </path>'''
+
+
+def _capsule_waving_content(width, height, repeats=1):
+    """Copia do metodo content() de Waving (model/animationModel/
+    waving.ts): duas camadas com opacity 0.4, cada uma com 4 quadros de
+    animate no atributo d (curvas Q + T, nao senoide), a segunda comecando
+    em begin=-10s (metade dos 20s de duracao). Com repeats=1 fica byte a
+    byte igual ao original (213.5 e 427 = width/4 e width/2 pro width=854
+    padrao); repeats>1 repete o mesmo desenho de onda lado a lado pra
+    caber mais cristas/vales na mesma largura. O 'calcmod' (em vez de
+    calcMode) e erro de digitacao do codigo-fonte real: mantido igual, o
+    deles tambem nao aplica a suavizacao por spline por causa disso."""
+    half = _js_num(width / 2)
+    cy = _js_num(height / 2)
+    return f'''
+      <g transform="translate({half}, {cy}) scale(1, 1) translate(-{half}, -{cy})">
+        {_waving_layer_animate(width, height, repeats, _WAVING_LAYER1_FRAMES, "0s")}
+        {_waving_layer_animate(width, height, repeats, _WAVING_LAYER2_FRAMES, "-10s")}
       </g>'''
 
 
@@ -490,7 +514,7 @@ def build_banner_svg(name="Gustavo Vieira de Araújo"):
         '<defs><linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
         f'<stop offset="0%" stop-color="#{BANNER_GRAD_FROM}"/><stop offset="100%" stop-color="#{BANNER_GRAD_TO}"/>'
         '</linearGradient></defs>'
-        f'{_capsule_waving_content(width, height)}'
+        f'{_capsule_waving_content(width, height, BANNER_WAVE_REPEATS)}'
         f'<text text-anchor="middle" dominant-baseline="middle" x="50%" y="{BANNER_FONT_ALIGN_Y}%" '
         f'class="text" style="fill:#{BANNER_FONT_COLOR};" stroke="#none" stroke-width="1">{name}</text>'
         '</svg>'
