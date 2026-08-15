@@ -40,5 +40,5 @@
     <text x="20" y="265" class="lbl">Go</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="139" height="11" rx="5.5" fill="#00ADD8" class="bar"/>
-    <text x="314" y="282" class="val">2.2%</text>
+    <text x="314" y="282" class="val">2.1%</text>
 </svg>
