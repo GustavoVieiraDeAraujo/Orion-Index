@@ -27,7 +27,7 @@
     <text x="314" y="82" class="val">4.4%</text>
     <text x="20" y="115" class="lbl">Rust</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="231" height="11" rx="5.5" fill="#dea584" class="bar"/>
+    <rect x="20" y="123" width="230" height="11" rx="5.5" fill="#dea584" class="bar"/>
     <text x="314" y="132" class="val">3.5%</text>
     <text x="20" y="165" class="lbl">Python</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
