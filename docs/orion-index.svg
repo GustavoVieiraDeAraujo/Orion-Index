@@ -29,19 +29,19 @@
     <text x="20" y="115" class="lbl">JavaScript</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="223" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
-    <text x="314" y="132" class="val">865.6k</text>
+    <text x="314" y="132" class="val">865.1k</text>
     <text x="20" y="165" class="lbl">TypeScript</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="202" height="11" rx="5.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="182" class="val">783.1k</text>
+    <rect x="20" y="173" width="201" height="11" rx="5.5" fill="#3178c6" class="bar"/>
+    <text x="314" y="182" class="val">782.1k</text>
     <text x="20" y="215" class="lbl">Java</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="56" height="11" rx="5.5" fill="#b07219" class="bar"/>
-    <text x="314" y="232" class="val">216.7k</text>
+    <rect x="20" y="223" width="55" height="11" rx="5.5" fill="#b07219" class="bar"/>
+    <text x="314" y="232" class="val">214.6k</text>
     <text x="20" y="265" class="lbl">C++</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="26" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
-    <text x="314" y="282" class="val">99.1k</text>
+    <rect x="20" y="273" width="25" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
+    <text x="314" y="282" class="val">98.8k</text>
 </g>
 <g transform="translate(396.0,0.0)">
   <defs>
@@ -69,11 +69,11 @@
     <text x="20" y="65" class="lbl">JavaScript</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
-    <text x="314" y="82" class="val">46.65M</text>
+    <text x="314" y="82" class="val">46.67M</text>
     <text x="20" y="115" class="lbl">Python</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="200" height="11" rx="5.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="132" class="val">32.65M</text>
+    <text x="314" y="132" class="val">32.69M</text>
     <text x="20" y="165" class="lbl">Java</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="173" width="132" height="11" rx="5.5" fill="#b07219" class="bar"/>
@@ -81,11 +81,11 @@
     <text x="20" y="215" class="lbl">TypeScript</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="223" width="110" height="11" rx="5.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="232" class="val">17.88M</text>
+    <text x="314" y="232" class="val">17.91M</text>
     <text x="20" y="265" class="lbl">C#</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="46" height="11" rx="5.5" fill="#178600" class="bar"/>
-    <text x="314" y="282" class="val">7.58M</text>
+    <text x="314" y="282" class="val">7.59M</text>
 </g>
 <g transform="translate(0.0,336.0)">
   <defs>
@@ -113,23 +113,23 @@
     <text x="20" y="65" class="lbl">IA / Machine Learning</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="82" class="val">234.0k</text>
+    <text x="314" y="82" class="val">234.4k</text>
     <text x="20" y="115" class="lbl">APIs</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="181" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="132" class="val">147.9k</text>
+    <text x="314" y="132" class="val">148.0k</text>
     <text x="20" y="165" class="lbl">Automação</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="173" width="112" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="182" class="val">91.5k</text>
+    <text x="314" y="182" class="val">91.7k</text>
     <text x="20" y="215" class="lbl">Ciência de Dados</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="97" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="232" class="val">79.0k</text>
+    <rect x="20" y="223" width="96" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="232" class="val">79.1k</text>
     <text x="20" y="265" class="lbl">DevOps</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="50" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="282" class="val">40.9k</text>
+    <text x="314" y="282" class="val">41.0k</text>
 </g>
 <g transform="translate(396.0,336.0)">
   <defs>
@@ -160,19 +160,19 @@
     <text x="314" y="82" class="val">4.4%</text>
     <text x="20" y="115" class="lbl">Rust</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="230" height="11" rx="5.5" fill="#dea584" class="bar"/>
+    <rect x="20" y="123" width="232" height="11" rx="5.5" fill="#dea584" class="bar"/>
     <text x="314" y="132" class="val">3.5%</text>
     <text x="20" y="165" class="lbl">Python</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="222" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <rect x="20" y="173" width="223" height="11" rx="5.5" fill="#3572A5" class="bar"/>
     <text x="314" y="182" class="val">3.4%</text>
     <text x="20" y="215" class="lbl">Go</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="157" height="11" rx="5.5" fill="#00ADD8" class="bar"/>
+    <rect x="20" y="223" width="158" height="11" rx="5.5" fill="#00ADD8" class="bar"/>
     <text x="314" y="232" class="val">2.4%</text>
     <text x="20" y="265" class="lbl">Kotlin</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="144" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
+    <rect x="20" y="273" width="145" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
     <text x="314" y="282" class="val">2.2%</text>
 </g>
 </svg>
