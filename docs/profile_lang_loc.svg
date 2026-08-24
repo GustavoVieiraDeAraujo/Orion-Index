@@ -24,7 +24,7 @@
     <text x="20" y="65" class="lbl">C++</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
-    <text x="314" y="82" class="val">21.6%</text>
+    <text x="314" y="82" class="val">21.5%</text>
     <text x="20" y="115" class="lbl">C</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="276" height="11" rx="5.5" fill="#555555" class="bar"/>
