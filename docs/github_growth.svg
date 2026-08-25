@@ -27,18 +27,18 @@
     <text x="314" y="82" class="val">4.4%</text>
     <text x="20" y="115" class="lbl">Rust</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="234" height="11" rx="5.5" fill="#dea584" class="bar"/>
+    <rect x="20" y="123" width="235" height="11" rx="5.5" fill="#dea584" class="bar"/>
     <text x="314" y="132" class="val">3.6%</text>
     <text x="20" y="165" class="lbl">Python</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="223" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <rect x="20" y="173" width="224" height="11" rx="5.5" fill="#3572A5" class="bar"/>
     <text x="314" y="182" class="val">3.4%</text>
     <text x="20" y="215" class="lbl">Go</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="160" height="11" rx="5.5" fill="#00ADD8" class="bar"/>
+    <rect x="20" y="223" width="162" height="11" rx="5.5" fill="#00ADD8" class="bar"/>
     <text x="314" y="232" class="val">2.5%</text>
     <text x="20" y="265" class="lbl">Kotlin</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="146" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
-    <text x="314" y="282" class="val">2.2%</text>
+    <rect x="20" y="273" width="147" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
+    <text x="314" y="282" class="val">2.3%</text>
 </svg>
