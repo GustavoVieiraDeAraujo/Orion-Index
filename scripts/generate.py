@@ -302,6 +302,31 @@ def build_source_svg(data, title, svg_path, unit="%", estimated=frozenset(),
         f.write(svg)
 
 
+def top_n_filtered(data, n=5):
+    """Mesmo filtro/corte usado em build_source_svg (sem HTML/CSS, top N),
+    pra que o JSON reflita exatamente o que aparece nos cartoes."""
+    filtered = {k: v for k, v in data.items() if k not in NOT_PROGRAMMING_LANGUAGES}
+    return sorted(filtered.items(), key=lambda kv: kv[1], reverse=True)[:n]
+
+
+def write_data_json(gh_new_data, gh_data, purpose_data, growth_data,
+                     gh_new_date, gh_date, purpose_date, out_path):
+    """Numeros crus (so o top 5 de cada perspectiva, igual aparece nos
+    cartoes) pra quem quiser gerar texto/analise em cima do dado, sem
+    precisar rebuscar na API do GitHub. Consumido pelo
+    generate_profile_stats.py deste mesmo repositorio."""
+    payload = {
+        "gerado_em": datetime.date.today().isoformat(),
+        "repositorios_novos": {"fonte": gh_new_date, "top5": top_n_filtered(gh_new_data)},
+        "repositorios_totais": {"fonte": gh_date, "top5": top_n_filtered(gh_data)},
+        "repositorios_por_finalidade": {"fonte": purpose_date, "top5": top_n_filtered(purpose_data)},
+        "crescimento_relativo": {"fonte": "derivado de totais e novos", "top5": top_n_filtered(growth_data)},
+    }
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
+
 def build_combined_svg(panel_paths, out_path, cols=2):
     """Junta os cartoes numa grade e escreve o SVG combinado. Concatena texto
     em vez de usar xml.etree pra nao esbarrar em conflito de id/namespace
@@ -382,6 +407,12 @@ def main():
         [paths["github_new"], paths["github_total"], paths["github_purpose"], paths["github_growth"]],
         os.path.join(DOCS_DIR, "orion-index.svg"),
         cols=2,
+    )
+
+    write_data_json(
+        gh_new_data, gh_data, purpose_data, growth_data,
+        gh_new_date, gh_date, purpose_date,
+        os.path.join(DOCS_DIR, "orion-index-data.json"),
     )
 
     print("SVGs gerados em docs/.")

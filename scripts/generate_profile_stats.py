@@ -15,6 +15,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.request
 
 PROFILE_OWNER = "GustavoVieiraDeAraujo"
 PROFILE_REPO_NAME = "GustavoVieiraDeAraujo"
@@ -24,11 +26,19 @@ DOCS_DIR = os.path.join(os.path.dirname(__file__), "..", "docs")
 
 ORION_INDEX_SVG = "https://raw.githubusercontent.com/GustavoVieiraDeAraujo/Orion-Index/main/docs/orion-index.svg"
 ORION_INDEX_REPO = "https://github.com/GustavoVieiraDeAraujo/Orion-Index"
+ORION_INDEX_DATA_JSON = os.path.join(DOCS_DIR, "orion-index-data.json")
+
+# Mesmo endpoint/formato de requisicao usado em kalymos-cartwheel
+# (src/assistente/gemini.ts): REST puro, sem SDK.
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
 MARKERS = {
     "STATS_MEU_REPO_CARTAO": ("<!-- STATS_MEU_REPO_CARTAO:START -->", "<!-- STATS_MEU_REPO_CARTAO:END -->"),
     "STATS_MUNDO_CARTAO": ("<!-- STATS_MUNDO_CARTAO:START -->", "<!-- STATS_MUNDO_CARTAO:END -->"),
     "SKILLS": ("<!-- SKILLS:START -->", "<!-- SKILLS:END -->"),
+    "ANALISE_MEU_REPO": ("<!-- ANALISE_MEU_REPO:START -->", "<!-- ANALISE_MEU_REPO:END -->"),
+    "ANALISE_MUNDO": ("<!-- ANALISE_MUNDO:START -->", "<!-- ANALISE_MUNDO:END -->"),
 }
 
 # Mesma medida nativa dos cartoes do proprio Orion Index (ver generate.py) --
@@ -724,6 +734,97 @@ def build_skills_block(topics_count, total_lines):
     return " ".join(badges)
 
 
+def perguntar_gemini(prompt, api_key):
+    """Mesmo endpoint/formato usado em kalymos-cartwheel
+    (src/assistente/gemini.ts): POST direto na API do Gemini, sem SDK."""
+    body = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode("utf-8")
+    req = urllib.request.Request(
+        f"{GEMINI_URL}?key={api_key}",
+        data=body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"Gemini respondeu {e.code}: {e.read().decode()[:300]}")
+    texto = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text")
+    if not texto:
+        raise RuntimeError("Gemini nao retornou texto na resposta")
+    return texto.strip()
+
+
+ANALISE_INSTRUCAO_COMUM = (
+    'Escreva um paragrafo curto (4 a 6 frases) em portugues do Brasil, tom natural e tecnico '
+    '(nem robotico nem vendedor). Baseie-se SOMENTE nos numeros fornecidos acima, nao invente '
+    'nenhum numero, fonte externa ou fato que nao esteja nos dados. Nao use markdown nenhum '
+    '(sem #, sem **negrito**, sem o caractere travessao "—", sem listas), so texto corrido em '
+    'paragrafo unico. Nao comece com saudacao nem introducao tipo "Analisando os dados...", '
+    'va direto ao ponto.'
+)
+
+
+def build_world_analysis_text(api_key):
+    """Le o JSON de dados crus gerado por generate.py (scripts/generate.py,
+    mesmo repositorio) e pede pro Gemini justificar os numeros com o
+    contexto atual do mercado de tecnologia -- nao inventa numero novo, so
+    comenta em cima do que ja foi buscado ao vivo na API do GitHub."""
+    if not api_key:
+        return "_analise indisponivel: GEMINI_API_KEY nao configurada_"
+    if not os.path.exists(ORION_INDEX_DATA_JSON):
+        return "_dados do Orion Index ainda nao disponiveis para analise_"
+    with open(ORION_INDEX_DATA_JSON, "r", encoding="utf-8") as f:
+        dados = json.load(f)
+
+    prompt = f'''Estes sao dados reais e ao vivo da API do GitHub sobre linguagens de programacao, coletados hoje ({dados["gerado_em"]}):
+
+Repositorios criados nos ultimos 30 dias, por linguagem (top 5): {dados["repositorios_novos"]["top5"]}
+Repositorios publicos totais existentes, por linguagem (top 5): {dados["repositorios_totais"]["top5"]}
+Repositorios por topico de finalidade, ex: IA, APIs, automacao (top 5): {dados["repositorios_por_finalidade"]["top5"]}
+Crescimento relativo (novos / totais, em %), por linguagem (top 5): {dados["crescimento_relativo"]["top5"]}
+
+{ANALISE_INSTRUCAO_COMUM} Tente explicar/justificar esses numeros especificos usando o contexto atual do mercado de tecnologia e da industria de software (ex: adocao de IA, tendencias de linguagem, tipo de projeto que cada uma favorece).'''
+
+    try:
+        return perguntar_gemini(prompt, api_key)
+    except (RuntimeError, urllib.error.URLError) as e:
+        print(f"[aviso] falha ao gerar analise de mercado: {e}", file=sys.stderr)
+        return "_falha ao gerar analise nesta execucao_"
+
+
+def build_profile_analysis_text(repo_total_lines, total_lines, repo_commits,
+                                 topics_count, year_count, grand_total, api_key):
+    """Usa so os dados computados dos proprios repositorios (linguagem por
+    LOC, commits, topicos, anos) -- sem contexto pessoal manual, por decisao
+    explicita: fica sempre atualizado sozinho, sem precisar editar o script
+    quando algo pessoal mudar (curso, estagio etc)."""
+    if not api_key:
+        return "_analise indisponivel: GEMINI_API_KEY nao configurada_"
+
+    top_langs = sorted(total_lines.items(), key=lambda kv: kv[1], reverse=True)[:6]
+    top_repos = sorted(repo_total_lines.items(), key=lambda kv: kv[1], reverse=True)[:5]
+    top_commits = sorted(repo_commits.items(), key=lambda kv: kv[1], reverse=True)[:5]
+    top_topics = sorted(topics_count.items(), key=lambda kv: kv[1], reverse=True)[:8]
+
+    prompt = f'''Estes sao dados reais extraidos hoje dos repositorios publicos no GitHub de uma pessoa desenvolvedora:
+
+Linhas de codigo por linguagem, todos os repositorios somados (top 6): {top_langs}
+Total de linhas de codigo analisadas: {grand_total}
+Repositorios com mais linhas de codigo (top 5): {top_repos}
+Repositorios com mais commits (top 5): {top_commits}
+Topicos/areas mais recorrentes nos repositorios (top 8): {top_topics}
+Repositorios criados por ano: {dict(sorted(year_count.items()))}
+
+{ANALISE_INSTRUCAO_COMUM} Escreva em segunda pessoa (falando diretamente com essa pessoa, "voce"), analisando o que esses dados revelam sobre o perfil dela como desenvolvedora: pontos fortes aparentes, area de foco, e trajetoria olhando a evolucao por ano. Nao invente nada sobre formacao, emprego ou biografia que nao esteja nos dados acima.'''
+
+    try:
+        return perguntar_gemini(prompt, api_key)
+    except (RuntimeError, urllib.error.URLError) as e:
+        print(f"[aviso] falha ao gerar analise de perfil: {e}", file=sys.stderr)
+        return "_falha ao gerar analise nesta execucao_"
+
+
 def push_profile_readme(blocks, pat):
     """Clona o repo de perfil com o PAT embutido na URL, substitui os blocos
     marcados no README.md e da commit+push."""
@@ -768,6 +869,10 @@ def main():
     if not pat:
         print("PROFILE_PAT nao configurado (precisa de permissao de escrita no repositorio de perfil)", file=sys.stderr)
         sys.exit(1)
+
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if not gemini_key:
+        print("[aviso] GEMINI_API_KEY nao configurada: blocos de analise ficam com texto de aviso", file=sys.stderr)
 
     repos = list_profile_repos()
     print(f"Repositorios do perfil encontrados: {len(repos)}")
@@ -843,6 +948,10 @@ def main():
         "STATS_MEU_REPO_CARTAO": build_mine_img_block(),
         "STATS_MUNDO_CARTAO": build_world_img_block(),
         "SKILLS": build_skills_block(topics_count, total_lines),
+        "ANALISE_MEU_REPO": build_profile_analysis_text(
+            repo_total_lines, total_lines, repo_commits, topics_count, year_count, grand_total, gemini_key,
+        ),
+        "ANALISE_MUNDO": build_world_analysis_text(gemini_key),
     }
 
     push_profile_readme(blocks, pat)
