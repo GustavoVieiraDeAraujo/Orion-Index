@@ -1,0 +1,103 @@
+{
+  "gerado_em": "2026-08-30",
+  "repositorios_novos": {
+    "fonte": "últimos 30 dias (31/07 a 30/08/2026)",
+    "top5": [
+      [
+        "Python",
+        1142585
+      ],
+      [
+        "JavaScript",
+        885179
+      ],
+      [
+        "TypeScript",
+        805916
+      ],
+      [
+        "Java",
+        222566
+      ],
+      [
+        "C++",
+        103601
+      ]
+    ]
+  },
+  "repositorios_totais": {
+    "fonte": "busca ao vivo, 30/08/2026",
+    "top5": [
+      [
+        "JavaScript",
+        46857955
+      ],
+      [
+        "Python",
+        32961305
+      ],
+      [
+        "Java",
+        21514029
+      ],
+      [
+        "TypeScript",
+        18094506
+      ],
+      [
+        "C#",
+        7604451
+      ]
+    ]
+  },
+  "repositorios_por_finalidade": {
+    "fonte": "busca ao vivo, 30/08/2026",
+    "top5": [
+      [
+        "IA / Machine Learning",
+        237244
+      ],
+      [
+        "APIs",
+        148589
+      ],
+      [
+        "Automação",
+        93597
+      ],
+      [
+        "Ciência de Dados",
+        79765
+      ],
+      [
+        "DevOps",
+        42121
+      ]
+    ]
+  },
+  "crescimento_relativo": {
+    "fonte": "derivado de totais e novos",
+    "top5": [
+      [
+        "TypeScript",
+        4.453926512279473
+      ],
+      [
+        "Rust",
+        3.663079579776061
+      ],
+      [
+        "Python",
+        3.4664434554396437
+      ],
+      [
+        "Go",
+        2.496756701543352
+      ],
+      [
+        "Kotlin",
+        2.360486848504278
+      ]
+    ]
+  }
+}
