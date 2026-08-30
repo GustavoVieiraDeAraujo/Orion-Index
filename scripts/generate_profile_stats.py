@@ -765,15 +765,28 @@ ANALISE_INSTRUCAO_COMUM = (
 )
 
 
+def format_analysis_block(title, body, generated):
+    """Titulo + corpo, e um rodape pequeno dizendo qual ferramenta gerou o
+    texto (so quando `generated=True`, ja que um texto de aviso/erro nao foi
+    gerado por nada)."""
+    footer = (
+        "\n\n<sub>Gerado automaticamente pela [API do Gemini](https://ai.google.dev/) (Google), "
+        "com base nos dados acima.</sub>"
+        if generated else ""
+    )
+    return f"**{title}**\n\n{body}{footer}"
+
+
 def build_world_analysis_text(api_key):
     """Le o JSON de dados crus gerado por generate.py (scripts/generate.py,
     mesmo repositorio) e pede pro Gemini justificar os numeros com o
     contexto atual do mercado de tecnologia -- nao inventa numero novo, so
     comenta em cima do que ja foi buscado ao vivo na API do GitHub."""
+    titulo = "🧠 Leitura da IA"
     if not api_key:
-        return "_analise indisponivel: GEMINI_API_KEY nao configurada_"
+        return format_analysis_block(titulo, "_analise indisponivel: GEMINI_API_KEY nao configurada_", False)
     if not os.path.exists(ORION_INDEX_DATA_JSON):
-        return "_dados do Orion Index ainda nao disponiveis para analise_"
+        return format_analysis_block(titulo, "_dados do Orion Index ainda nao disponiveis para analise_", False)
     with open(ORION_INDEX_DATA_JSON, "r", encoding="utf-8") as f:
         dados = json.load(f)
 
@@ -787,10 +800,10 @@ Crescimento relativo (novos / totais, em %), por linguagem (top 5): {dados["cres
 {ANALISE_INSTRUCAO_COMUM} Tente explicar/justificar esses numeros especificos usando o contexto atual do mercado de tecnologia e da industria de software (ex: adocao de IA, tendencias de linguagem, tipo de projeto que cada uma favorece).'''
 
     try:
-        return perguntar_gemini(prompt, api_key)
+        return format_analysis_block(titulo, perguntar_gemini(prompt, api_key), True)
     except (RuntimeError, urllib.error.URLError) as e:
         print(f"[aviso] falha ao gerar analise de mercado: {e}", file=sys.stderr)
-        return "_falha ao gerar analise nesta execucao_"
+        return format_analysis_block(titulo, "_falha ao gerar analise nesta execucao_", False)
 
 
 def build_profile_analysis_text(repo_total_lines, total_lines, repo_commits,
@@ -799,8 +812,9 @@ def build_profile_analysis_text(repo_total_lines, total_lines, repo_commits,
     LOC, commits, topicos, anos) -- sem contexto pessoal manual, por decisao
     explicita: fica sempre atualizado sozinho, sem precisar editar o script
     quando algo pessoal mudar (curso, estagio etc)."""
+    titulo = "🧠 Leitura da IA"
     if not api_key:
-        return "_analise indisponivel: GEMINI_API_KEY nao configurada_"
+        return format_analysis_block(titulo, "_analise indisponivel: GEMINI_API_KEY nao configurada_", False)
 
     top_langs = sorted(total_lines.items(), key=lambda kv: kv[1], reverse=True)[:6]
     top_repos = sorted(repo_total_lines.items(), key=lambda kv: kv[1], reverse=True)[:5]
@@ -819,10 +833,10 @@ Repositorios criados por ano: {dict(sorted(year_count.items()))}
 {ANALISE_INSTRUCAO_COMUM} Escreva em segunda pessoa (falando diretamente com essa pessoa, "voce"), analisando o que esses dados revelam sobre o perfil dela como desenvolvedora: pontos fortes aparentes, area de foco, e trajetoria olhando a evolucao por ano. Nao invente nada sobre formacao, emprego ou biografia que nao esteja nos dados acima.'''
 
     try:
-        return perguntar_gemini(prompt, api_key)
+        return format_analysis_block(titulo, perguntar_gemini(prompt, api_key), True)
     except (RuntimeError, urllib.error.URLError) as e:
         print(f"[aviso] falha ao gerar analise de perfil: {e}", file=sys.stderr)
-        return "_falha ao gerar analise nesta execucao_"
+        return format_analysis_block(titulo, "_falha ao gerar analise nesta execucao_", False)
 
 
 def push_profile_readme(blocks, pat):
