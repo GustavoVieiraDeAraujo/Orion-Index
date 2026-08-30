@@ -782,7 +782,7 @@ def build_world_analysis_text(api_key):
     mesmo repositorio) e pede pro Gemini justificar os numeros com o
     contexto atual do mercado de tecnologia -- nao inventa numero novo, so
     comenta em cima do que ja foi buscado ao vivo na API do GitHub."""
-    titulo = "🧠 Leitura da IA"
+    titulo = "🧠 Análise por IA"
     if not api_key:
         return format_analysis_block(titulo, "_analise indisponivel: GEMINI_API_KEY nao configurada_", False)
     if not os.path.exists(ORION_INDEX_DATA_JSON):
@@ -812,7 +812,7 @@ def build_profile_analysis_text(repo_total_lines, total_lines, repo_commits,
     LOC, commits, topicos, anos) -- sem contexto pessoal manual, por decisao
     explicita: fica sempre atualizado sozinho, sem precisar editar o script
     quando algo pessoal mudar (curso, estagio etc)."""
-    titulo = "🧠 Leitura da IA"
+    titulo = "🧠 Análise por IA"
     if not api_key:
         return format_analysis_block(titulo, "_analise indisponivel: GEMINI_API_KEY nao configurada_", False)
 
