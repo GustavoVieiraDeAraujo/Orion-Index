@@ -31,12 +31,12 @@
     <text x="314" y="132" class="val">3.7%</text>
     <text x="20" y="165" class="lbl">Python</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="225" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <rect x="20" y="173" width="224" height="11" rx="5.5" fill="#3572A5" class="bar"/>
     <text x="314" y="182" class="val">3.5%</text>
     <text x="20" y="215" class="lbl">Kotlin</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="162" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
-    <text x="314" y="232" class="val">2.5%</text>
+    <rect x="20" y="223" width="164" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
+    <text x="314" y="232" class="val">2.6%</text>
     <text x="20" y="265" class="lbl">Go</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="161" height="11" rx="5.5" fill="#00ADD8" class="bar"/>
