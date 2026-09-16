@@ -24,21 +24,21 @@
     <text x="20" y="65" class="lbl">Orion-Index</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
-    <text x="314" y="82" class="val">232</text>
+    <text x="314" y="82" class="val">234</text>
     <text x="20" y="115" class="lbl">Processo-Seletivo-Crescer-CWI</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="282" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <rect x="20" y="123" width="280" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
     <text x="314" y="132" class="val">229</text>
     <text x="20" y="165" class="lbl">Ciplus-Front-End</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="120" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <rect x="20" y="173" width="119" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
     <text x="314" y="182" class="val">97</text>
     <text x="20" y="215" class="lbl">Trabalho-2-Metodos-de-Programacao-Back-…</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="90" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <rect x="20" y="223" width="89" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
     <text x="314" y="232" class="val">73</text>
     <text x="20" y="265" class="lbl">Processo-Seletivo-TreinaDev</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="85" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
+    <rect x="20" y="273" width="84" height="11" rx="5.5" fill="#f59e0b" class="bar"/>
     <text x="314" y="282" class="val">69</text>
 </svg>
