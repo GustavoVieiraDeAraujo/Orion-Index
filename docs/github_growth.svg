@@ -35,7 +35,7 @@
     <text x="314" y="182" class="val">3.6%</text>
     <text x="20" y="215" class="lbl">Kotlin</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="186" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
+    <rect x="20" y="223" width="188" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
     <text x="314" y="232" class="val">2.9%</text>
     <text x="20" y="265" class="lbl">Dart</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
