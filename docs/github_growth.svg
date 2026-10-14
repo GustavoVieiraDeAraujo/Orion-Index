@@ -24,21 +24,21 @@
     <text x="20" y="65" class="lbl">TypeScript</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="82" class="val">4.4%</text>
+    <text x="314" y="82" class="val">4.3%</text>
     <text x="20" y="115" class="lbl">Rust</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="270" height="11" rx="5.5" fill="#dea584" class="bar"/>
-    <text x="314" y="132" class="val">4.1%</text>
+    <rect x="20" y="123" width="274" height="11" rx="5.5" fill="#dea584" class="bar"/>
+    <text x="314" y="132" class="val">4.2%</text>
     <text x="20" y="165" class="lbl">Python</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="253" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <rect x="20" y="173" width="254" height="11" rx="5.5" fill="#3572A5" class="bar"/>
     <text x="314" y="182" class="val">3.9%</text>
     <text x="20" y="215" class="lbl">Kotlin</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="212" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
+    <rect x="20" y="223" width="214" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
     <text x="314" y="232" class="val">3.2%</text>
     <text x="20" y="265" class="lbl">Dart</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="163" height="11" rx="5.5" fill="#8a8a8a" class="bar"/>
+    <rect x="20" y="273" width="164" height="11" rx="5.5" fill="#8a8a8a" class="bar"/>
     <text x="314" y="282" class="val">2.5%</text>
 </svg>
