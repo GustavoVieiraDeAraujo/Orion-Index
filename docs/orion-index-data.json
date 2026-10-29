@@ -1,77 +1,77 @@
 {
-  "gerado_em": "2026-10-28",
+  "gerado_em": "2026-10-29",
   "repositorios_novos": {
-    "fonte": "últimos 30 dias (28/09 a 28/10/2026)",
+    "fonte": "últimos 30 dias (29/09 a 29/10/2026)",
     "top5": [
       [
         "Python",
-        1387527
+        1388185
       ],
       [
         "JavaScript",
-        1012729
+        1014705
       ],
       [
         "TypeScript",
-        817973
+        814968
       ],
       [
         "Java",
-        282861
+        281936
       ],
       [
         "C++",
-        139806
+        139863
       ]
     ]
   },
   "repositorios_totais": {
-    "fonte": "busca ao vivo, 28/10/2026",
+    "fonte": "busca ao vivo, 29/10/2026",
     "top5": [
       [
         "JavaScript",
-        48463308
+        48497756
       ],
       [
         "Python",
-        35370958
+        35420584
       ],
       [
         "Java",
-        21948255
+        21955833
       ],
       [
         "TypeScript",
-        19517666
+        19540059
       ],
       [
         "C#",
-        7807706
+        7812122
       ]
     ]
   },
   "repositorios_por_finalidade": {
-    "fonte": "busca ao vivo, 28/10/2026",
+    "fonte": "busca ao vivo, 29/10/2026",
     "top5": [
       [
         "IA / Machine Learning",
-        261298
+        261714
       ],
       [
         "APIs",
-        152597
+        152604
       ],
       [
         "Automação",
-        111366
+        112239
       ],
       [
         "Ciência de Dados",
-        85726
+        85825
       ],
       [
         "DevOps",
-        48795
+        48949
       ]
     ]
   },
@@ -79,24 +79,24 @@
     "fonte": "derivado de totais e novos",
     "top5": [
       [
-        "Rust",
-        5.155039378773032
+        "TypeScript",
+        4.17075506271501
       ],
       [
-        "TypeScript",
-        4.190936559730042
+        "Rust",
+        3.9538288124449656
       ],
       [
         "Python",
-        3.92278603254116
+        3.919147691071384
       ],
       [
         "Kotlin",
-        3.6819322302098607
+        3.7128251054143813
       ],
       [
         "Dart",
-        2.587040297245351
+        2.58332508150968
       ]
     ]
   }
