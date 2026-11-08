@@ -25,23 +25,23 @@
     <text x="20" y="65" class="lbl">Python</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="82" class="val">1395.1k</text>
+    <text x="314" y="82" class="val">1389.7k</text>
     <text x="20" y="115" class="lbl">JavaScript</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="208" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
-    <text x="314" y="132" class="val">1017.0k</text>
+    <text x="314" y="132" class="val">1011.2k</text>
     <text x="20" y="165" class="lbl">TypeScript</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="164" height="11" rx="5.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="182" class="val">798.0k</text>
+    <rect x="20" y="173" width="163" height="11" rx="5.5" fill="#3178c6" class="bar"/>
+    <text x="314" y="182" class="val">791.5k</text>
     <text x="20" y="215" class="lbl">Java</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="223" width="56" height="11" rx="5.5" fill="#b07219" class="bar"/>
-    <text x="314" y="232" class="val">275.3k</text>
+    <text x="314" y="232" class="val">272.8k</text>
     <text x="20" y="265" class="lbl">C++</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="29" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
-    <text x="314" y="282" class="val">139.2k</text>
+    <rect x="20" y="273" width="28" height="11" rx="5.5" fill="#f34b7d" class="bar"/>
+    <text x="314" y="282" class="val">138.1k</text>
 </g>
 <g transform="translate(396.0,0.0)">
   <defs>
@@ -69,11 +69,11 @@
     <text x="20" y="65" class="lbl">JavaScript</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#f1e05a" class="bar"/>
-    <text x="314" y="82" class="val">48.74M</text>
+    <text x="314" y="82" class="val">48.77M</text>
     <text x="20" y="115" class="lbl">Python</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="210" height="11" rx="5.5" fill="#3572A5" class="bar"/>
-    <text x="314" y="132" class="val">35.78M</text>
+    <text x="314" y="132" class="val">35.81M</text>
     <text x="20" y="165" class="lbl">Java</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="173" width="129" height="11" rx="5.5" fill="#b07219" class="bar"/>
@@ -81,11 +81,11 @@
     <text x="20" y="215" class="lbl">TypeScript</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="223" width="116" height="11" rx="5.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="232" class="val">19.69M</text>
+    <text x="314" y="232" class="val">19.71M</text>
     <text x="20" y="265" class="lbl">C#</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="273" width="46" height="11" rx="5.5" fill="#178600" class="bar"/>
-    <text x="314" y="282" class="val">7.84M</text>
+    <text x="314" y="282" class="val">7.85M</text>
 </g>
 <g transform="translate(0.0,336.0)">
   <defs>
@@ -113,23 +113,23 @@
     <text x="20" y="65" class="lbl">IA / Machine Learning</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="82" class="val">264.8k</text>
+    <text x="314" y="82" class="val">265.2k</text>
     <text x="20" y="115" class="lbl">APIs</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="123" width="165" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
     <text x="314" y="132" class="val">153.2k</text>
     <text x="20" y="165" class="lbl">Automação</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="125" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="182" class="val">116.1k</text>
+    <rect x="20" y="173" width="126" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="182" class="val">116.8k</text>
     <text x="20" y="215" class="lbl">Ciência de Dados</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="223" width="94" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="232" class="val">86.8k</text>
+    <text x="314" y="232" class="val">86.9k</text>
     <text x="20" y="265" class="lbl">DevOps</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="54" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
-    <text x="314" y="282" class="val">50.4k</text>
+    <rect x="20" y="273" width="55" height="11" rx="5.5" fill="#a78bfa" class="bar"/>
+    <text x="314" y="282" class="val">50.6k</text>
 </g>
 <g transform="translate(396.0,336.0)">
   <defs>
@@ -157,22 +157,22 @@
     <text x="20" y="65" class="lbl">Rust</text>
     <rect x="20" y="73" width="286" height="11" rx="5.5" class="track"/>
     <rect x="20" y="73" width="286" height="11" rx="5.5" fill="#dea584" class="bar"/>
-    <text x="314" y="82" class="val">5.8%</text>
+    <text x="314" y="82" class="val">5.9%</text>
     <text x="20" y="115" class="lbl">TypeScript</text>
     <rect x="20" y="123" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="123" width="199" height="11" rx="5.5" fill="#3178c6" class="bar"/>
-    <text x="314" y="132" class="val">4.1%</text>
+    <rect x="20" y="123" width="196" height="11" rx="5.5" fill="#3178c6" class="bar"/>
+    <text x="314" y="132" class="val">4.0%</text>
     <text x="20" y="165" class="lbl">Python</text>
     <rect x="20" y="173" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="173" width="192" height="11" rx="5.5" fill="#3572A5" class="bar"/>
+    <rect x="20" y="173" width="189" height="11" rx="5.5" fill="#3572A5" class="bar"/>
     <text x="314" y="182" class="val">3.9%</text>
     <text x="20" y="215" class="lbl">Kotlin</text>
     <rect x="20" y="223" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="223" width="191" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
+    <rect x="20" y="223" width="189" height="11" rx="5.5" fill="#A97BFF" class="bar"/>
     <text x="314" y="232" class="val">3.9%</text>
     <text x="20" y="265" class="lbl">Swift</text>
     <rect x="20" y="273" width="286" height="11" rx="5.5" class="track"/>
-    <rect x="20" y="273" width="131" height="11" rx="5.5" fill="#F05138" class="bar"/>
+    <rect x="20" y="273" width="130" height="11" rx="5.5" fill="#F05138" class="bar"/>
     <text x="314" y="282" class="val">2.7%</text>
 </g>
 </svg>
