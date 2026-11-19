@@ -5,7 +5,7 @@
     .title { fill: #9ca3af; }
   </style>
   <rect x="0" y="0" width="783" height="165" rx="14" class="card"/>
-  <text x="22" y="26" class="title">465 commits no último ano</text>
+  <text x="22" y="26" class="title">463 commits no último ano</text>
   
     <rect x="22.0" y="48.0" width="11" height="11" rx="2.5" fill="#2d3748">
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
@@ -439,30 +439,10 @@
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
         keyTimes="0;0.1541;0.1601;1" values="1;1;0;0" />
     </rect>
-    <rect x="680.0" y="62.0" width="11" height="11" rx="2.5" fill="#3b82f6">
-      <animate attributeName="fill" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.1688;1" values="#3b82f6;#3b82f6;#f8fafc;#3b82f6" />
+    <rect x="680.0" y="62.0" width="11" height="11" rx="2.5" fill="#2d3748">
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.1688;0.2068;1" values="1;1;1;0;0" />
+        keyTimes="0;0.1568;0.1628;1" values="1;1;0;0" />
     </rect>
-    <circle cx="685.5" cy="67.5" r="1.4" fill="#fde68a" opacity="0">
-      <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.1688;0.3168;1" values="0;0;1;0;0" />
-      <animateTransform attributeName="transform" type="translate" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.3168;1" values="0,0;0,0;8.5,3.1;8.5,3.1"/>
-    </circle>
-    <circle cx="685.5" cy="67.5" r="1.4" fill="#fde68a" opacity="0">
-      <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.1688;0.3168;1" values="0;0;1;0;0" />
-      <animateTransform attributeName="transform" type="translate" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.3168;1" values="0,0;0,0;-8.5,3.1;-8.5,3.1"/>
-    </circle>
-    <circle cx="685.5" cy="67.5" r="1.4" fill="#fde68a" opacity="0">
-      <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.1688;0.3168;1" values="0;0;1;0;0" />
-      <animateTransform attributeName="transform" type="translate" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.1568;0.3168;1" values="0,0;0,0;-1.6,-8.9;-1.6,-8.9"/>
-    </circle>
     <rect x="666.0" y="62.0" width="11" height="11" rx="2.5" fill="#2d3748">
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
         keyTimes="0;0.1595;0.1655;1" values="1;1;0;0" />
@@ -895,30 +875,10 @@
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
         keyTimes="0;0.4081;0.4141;1" values="1;1;0;0" />
     </rect>
-    <rect x="666.0" y="76.0" width="11" height="11" rx="2.5" fill="#3b82f6">
-      <animate attributeName="fill" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.4228;1" values="#3b82f6;#3b82f6;#f8fafc;#3b82f6" />
+    <rect x="666.0" y="76.0" width="11" height="11" rx="2.5" fill="#2d3748">
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.4228;0.4608;1" values="1;1;1;0;0" />
+        keyTimes="0;0.4108;0.4168;1" values="1;1;0;0" />
     </rect>
-    <circle cx="671.5" cy="81.5" r="1.4" fill="#fde68a" opacity="0">
-      <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.4228;0.5708;1" values="0;0;1;0;0" />
-      <animateTransform attributeName="transform" type="translate" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.5708;1" values="0,0;0,0;8.5,3.1;8.5,3.1"/>
-    </circle>
-    <circle cx="671.5" cy="81.5" r="1.4" fill="#fde68a" opacity="0">
-      <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.4228;0.5708;1" values="0;0;1;0;0" />
-      <animateTransform attributeName="transform" type="translate" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.5708;1" values="0,0;0,0;-8.5,3.1;-8.5,3.1"/>
-    </circle>
-    <circle cx="671.5" cy="81.5" r="1.4" fill="#fde68a" opacity="0">
-      <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.4228;0.5708;1" values="0;0;1;0;0" />
-      <animateTransform attributeName="transform" type="translate" dur="26s" repeatCount="indefinite"
-        keyTimes="0;0.4108;0.5708;1" values="0,0;0,0;-1.6,-8.9;-1.6,-8.9"/>
-    </circle>
     <rect x="680.0" y="76.0" width="11" height="11" rx="2.5" fill="#2d3748">
       <animate attributeName="opacity" dur="26s" repeatCount="indefinite"
         keyTimes="0;0.4135;0.4195;1" values="1;1;0;0" />
